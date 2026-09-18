@@ -125,6 +125,18 @@ def create_scaffold(
         control / "tools" / "reconstruct_context.py",
     )
     copy_file(
+        ROOT / "tools" / "state_tx.py",
+        control / "tools" / "state_tx.py",
+    )
+    copy_file(
+        ROOT / "tools" / "discover_project.py",
+        control / "tools" / "discover_project.py",
+    )
+    copy_file(
+        ROOT / "tools" / "apply_adoption.py",
+        control / "tools" / "apply_adoption.py",
+    )
+    copy_file(
         ROOT / "migrations" / "registry.json",
         control / "migrations" / "registry.json",
     )

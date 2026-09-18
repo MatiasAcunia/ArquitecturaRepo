@@ -87,6 +87,15 @@ def main() -> int:
                 raise AssertionError(f"{profile}: copied migration tool missing")
             if not (control / "tools" / "reconstruct_context.py").exists():
                 raise AssertionError(f"{profile}: copied reconstruction tool missing")
+            for portable_tool in (
+                "state_tx.py",
+                "discover_project.py",
+                "apply_adoption.py",
+            ):
+                if not (control / "tools" / portable_tool).exists():
+                    raise AssertionError(
+                        f"{profile}: copied adoption tool missing: {portable_tool}"
+                    )
             if not (control / "migrations" / "registry.json").exists():
                 raise AssertionError(f"{profile}: migration registry missing")
             migration_plan = run(
@@ -199,6 +208,7 @@ def main() -> int:
     print("- generated bootstrap uses latest v0.2 contract")
     print("- copied migration registry/tool are self-contained")
     print("- copied reconstruction tool is self-contained")
+    print("- discovery/adoption/recovery tools are self-contained")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0

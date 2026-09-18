@@ -155,14 +155,33 @@ Implemented:
 
 ## v0.8 — Transfer/adoption testing
 
+Implemented:
+
+- deterministic read-only project inventory;
+- explicit adoption-spec contract;
+- preflight validation on a copied candidate control layer;
+- journaled multi-file adoption promotion;
+- generic portable state-transaction recovery;
+- retry-idempotent adoption;
+- application-file preservation checks;
+- six unrelated synthetic project shapes across all public operating profiles;
+- profile-proportional mechanism checks;
+- post-adoption project validation;
+- post-adoption deterministic fresh-context reconstruction;
+- fault-injected adoption crash and recovery;
+- no technical CLIENT editing of Product State/bootstrap/owners/currentness.
+
+## v0.9 — Hardening and release-candidate reduction
+
 Next candidate work:
 
-- install/reconstruct across unrelated project shapes and profiles;
-- prove setup does not require technical CLIENT rescue;
-- verify small projects do not inherit unnecessary runtime/MASTER OWNER machinery;
-- verify heavier profiles receive only their required mechanism families;
-- run fresh-context probes after installation and after currentness promotion;
-- identify/remove adoption complexity that does not reduce real failure risk.
+- remove duplicated transaction/locking implementations where safe;
+- define machine-readable v1 release criteria;
+- make one command execute the complete release evidence suite;
+- measure required-vs-optional mechanism burden;
+- remove stale roadmap/documentation claims;
+- run clean-install/reconstruct/adopt probes from final artifacts;
+- freeze new features unless a release criterion is still unproven.
 
 ## v1.0 — Transfer-hardened public starter
 

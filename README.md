@@ -39,6 +39,7 @@ It provides:
 - canonical owner registry with verifiable supersession lineage;
 - deterministic fresh-context reconstruction;
 - a physical stateful reference system with transfer evidence;
+- six-shape fail-closed transfer/adoption workflow;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -202,6 +203,14 @@ See `docs/14_CANONICAL_OWNERSHIP.md`.
 
 See `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md`.
 
+## Transfer/adoption workflow
+
+Generated scaffolds include read-only discovery, explicit adoption-spec application and generic state-transaction recovery. Adoption preflights a complete candidate control layer before canonical mutation, then promotes requirements/Product State/bootstrap/owners/overlay as one journaled transaction.
+
+CI applies the workflow to six unrelated synthetic project shapes: SMALL, STATEFUL, ARTIFACT_HEAVY, MULTI_WORKSTREAM, MULTI_PRODUCT and HIGH_CONSEQUENCE. It requires deterministic discovery, application-file preservation, profile-proportional mechanism burden, retry-idempotence, validation, fresh-context reconstruction and crash recovery.
+
+See `docs/16_TRANSFER_ADOPTION.md`.
+
 ## Repository map
 
 - `AGENTS.md` — root instructions.
@@ -216,6 +225,9 @@ See `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md`.
 - `tools/campaignctl.py` — optional durable Campaign Lead runtime.
 - `tools/migrate_state.py` — explicit state-schema migration planner/executor.
 - `tools/reconstruct_context.py` — validate-first deterministic fresh-context reconstruction.
+- `tools/discover_project.py` — deterministic read-only project inventory.
+- `tools/apply_adoption.py` — preflighted, journaled adoption promotion.
+- `tools/state_tx.py` — generic local control-state transaction/recovery engine.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
@@ -223,11 +235,12 @@ See `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md`.
 - `tools/selftest_ownership.py` — owner/currentness/supersession falsification self-test.
 - `tools/selftest_reconstruction.py` — fresh-context determinism/fail-closed self-test.
 - `tools/selftest_stateful_reference.py` — physical SQLite + control-layer transfer self-test.
+- `tools/selftest_adoption.py` — six-shape adoption, proportionality and crash-recovery self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
 - `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership and transfer guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/16_TRANSFER_ADOPTION.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership and transfer/adoption guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -242,9 +255,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.7.0 — PUBLIC STARTER PREVIEW`
+`v0.8.0 — PUBLIC STARTER PREVIEW`
 
-v0.7 adds deterministic fresh-context reconstruction and a physical stateful reference system that binds application behavior, currentness and custom ownership in one CI gate. Every fork still has to establish its own product truth and gates.
+v0.8 adds a self-contained transfer/adoption workflow tested across six unrelated project shapes, including retry-idempotence and crash recovery without application-file mutation. Every fork still has to establish its own product truth and gates.
 
 ## License
 

@@ -43,5 +43,7 @@ jobs:
         run: python tools/selftest_reconstruction.py
       - name: Exercise stateful reference system
         run: python tools/selftest_stateful_reference.py
+      - name: Exercise transfer adoption
+        run: python tools/selftest_adoption.py
       - name: Exercise resumable campaign runtime
         run: python tools/selftest_runtime.py
