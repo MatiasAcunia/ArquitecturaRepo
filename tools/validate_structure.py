@@ -62,6 +62,8 @@ REQUIRED_PATHS = [
     "tools/migrate_state.py",
     "tools/selftest_migrations.py",
     "tools/selftest_ownership.py",
+    "tools/reconstruct_context.py",
+    "tools/selftest_reconstruction.py",
     "templates/PROJECT_OVERLAY.md",
     "templates/INSTALLATION_REPORT.md",
     "templates/MASTER_OWNER_HANDOFF_CURRENT.md",
@@ -74,9 +76,17 @@ REQUIRED_PATHS = [
     "docs/12_TRANSACTION_RECOVERY.md",
     "docs/13_SCHEMA_EVOLUTION.md",
     "docs/14_CANONICAL_OWNERSHIP.md",
+    "docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md",
     "examples/minimal/PRODUCT_STATE_CURRENT.json",
     "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
     "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
+    "tools/selftest_stateful_reference.py",
+    "examples/stateful_backend/app/note_store.py",
+    "examples/stateful_backend/tests/test_note_store.py",
+    "examples/stateful_backend/evidence/STATEFUL_REFERENCE_EVIDENCE.json",
+    "examples/stateful_backend/control/state/PRODUCT_STATE_CURRENT.json",
+    "examples/stateful_backend/control/state/CURRENT_BOOTSTRAP_STATE.json",
+    "examples/stateful_backend/control/state/OWNER_REGISTRY_CURRENT.json",
 ]
 
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)

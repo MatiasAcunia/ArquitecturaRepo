@@ -1,0 +1,49 @@
+{
+  "schema_version": "product-state-0.1",
+  "product_or_workstream": "SYNTHETIC_STATEFUL_BACKEND",
+  "state_version": "1",
+  "status": "CURRENT",
+  "updated_at": "2030-04-01T12:00:00Z",
+  "current_code_ref": "reference/stateful-v1",
+  "product_objective": "Provide a durable local note store reference with persistent state and request idempotency.",
+  "requirement_refs": [
+    "REQ-STATEFUL-IDEMPOTENCY",
+    "REQ-STATEFUL-CONFLICT",
+    "REQ-STATEFUL-RESTART",
+    "REQ-STATEFUL-ROLLBACK"
+  ],
+  "open_product_questions": [],
+  "currentness_set": [
+    "AGENTS.md",
+    "state/CLIENT_REQUIREMENTS_CURRENT.md",
+    "state/PRODUCT_STATE_CURRENT.json",
+    "state/CURRENT_BOOTSTRAP_STATE.json",
+    "state/OWNER_REGISTRY_CURRENT.json",
+    "governance/PROJECT_OVERLAY.md",
+    "../app/note_store.py",
+    "../evidence/STATEFUL_REFERENCE_EVIDENCE.json"
+  ],
+  "capabilities": [
+    {
+      "id": "CAPABILITY_DURABLE_NOTE_STORE",
+      "owner": "NOTE_STORE",
+      "physical_state": "REFERENCE_VALIDATED",
+      "gate": "RUNTIME_PHYSICAL",
+      "dependencies": [],
+      "evidence_refs": [
+        "../evidence/STATEFUL_REFERENCE_EVIDENCE.json"
+      ]
+    }
+  ],
+  "active_campaign": null,
+  "current_gate": "REFERENCE_VALIDATED",
+  "strongest_evidence_refs": [
+    "../evidence/STATEFUL_REFERENCE_EVIDENCE.json"
+  ],
+  "blockers": [],
+  "next_legal_boundary": "Use this validated synthetic system as a transfer/adoption fixture; no engineering campaign is active.",
+  "forbidden_actions": [
+    "Treat this synthetic reference as a production deployment.",
+    "Infer external-service authority from this local example."
+  ]
+}

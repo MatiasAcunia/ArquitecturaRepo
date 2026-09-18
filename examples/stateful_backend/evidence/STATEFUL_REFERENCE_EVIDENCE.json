@@ -1,0 +1,13 @@
+{
+  "schema_version": "stateful-reference-evidence-0.1",
+  "reference_id": "SYNTHETIC_STATEFUL_BACKEND",
+  "claims": [
+    "same idempotency key and payload returns the same durable note",
+    "same idempotency key with a different payload is rejected",
+    "committed note survives store reconstruction",
+    "fault after note insertion rolls back note and request identity together",
+    "concurrent replay of one request creates one note"
+  ],
+  "test_command": "python -m unittest discover -s tests -v",
+  "expected_test_count": 5
+}

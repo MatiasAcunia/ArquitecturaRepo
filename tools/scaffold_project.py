@@ -121,6 +121,10 @@ def create_scaffold(
         control / "tools" / "migrate_state.py",
     )
     copy_file(
+        ROOT / "tools" / "reconstruct_context.py",
+        control / "tools" / "reconstruct_context.py",
+    )
+    copy_file(
         ROOT / "migrations" / "registry.json",
         control / "migrations" / "registry.json",
     )

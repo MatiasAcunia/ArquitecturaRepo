@@ -1,0 +1,95 @@
+{
+  "schema_version": "owner-registry-0.1",
+  "product_or_workstream": "SYNTHETIC_STATEFUL_BACKEND",
+  "updated_at": "2030-04-01T12:00:00Z",
+  "owners": [
+    {
+      "owner_id": "OWNER_STATEFUL_ENTRYPOINT_001",
+      "concern_id": "AGENT_ENTRYPOINT",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "AGENTS.md",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_REQUIREMENTS_001",
+      "concern_id": "CLIENT_REQUIREMENTS",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "state/CLIENT_REQUIREMENTS_CURRENT.md",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_PRODUCT_STATE_001",
+      "concern_id": "PRODUCT_STATE",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "state/PRODUCT_STATE_CURRENT.json",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_BOOTSTRAP_001",
+      "concern_id": "CURRENT_BOOTSTRAP",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "state/CURRENT_BOOTSTRAP_STATE.json",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_OVERLAY_001",
+      "concern_id": "PROJECT_OVERLAY",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "governance/PROJECT_OVERLAY.md",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_REGISTRY_001",
+      "concern_id": "CANONICAL_OWNER_REGISTRY",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "state/OWNER_REGISTRY_CURRENT.json",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_APP_MECHANISM_001",
+      "concern_id": "APPLICATION_STATE_MECHANISM",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "../app/note_store.py",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    },
+    {
+      "owner_id": "OWNER_STATEFUL_EVIDENCE_001",
+      "concern_id": "REFERENCE_EVIDENCE",
+      "scope": "SYNTHETIC_STATEFUL_BACKEND",
+      "status": "CURRENT",
+      "surface_ref": "../evidence/STATEFUL_REFERENCE_EVIDENCE.json",
+      "surface_type": "FILE",
+      "required_in_currentness_set": true,
+      "supersedes_owner_ids": [],
+      "superseded_by_owner_id": null
+    }
+  ]
+}

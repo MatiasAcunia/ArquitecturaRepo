@@ -37,6 +37,8 @@ It provides:
 - fail-closed multi-file transition journaling and crash recovery;
 - backward-compatible schema evolution with explicit migrations;
 - canonical owner registry with verifiable supersession lineage;
+- deterministic fresh-context reconstruction;
+- a physical stateful reference system with transfer evidence;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -192,6 +194,14 @@ Existing forks without an owner registry remain supported; this is an extensible
 
 See `docs/14_CANONICAL_OWNERSHIP.md`.
 
+## Fresh-context reconstruction and reference system
+
+`tools/reconstruct_context.py` validates a control layer first and then emits one deterministic current posture from durable evidence only. It refuses to summarize through invalid currentness, duplicate owners or pending recovery state.
+
+`examples/stateful_backend/` is the first physical transfer fixture: a real SQLite note store with idempotency, rollback, restart persistence and concurrent replay tests, bound to a separate Agentic SDLC control layer. CI requires application behavior, control validation and reconstruction to pass together.
+
+See `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md`.
+
 ## Repository map
 
 - `AGENTS.md` — root instructions.
@@ -205,15 +215,19 @@ See `docs/14_CANONICAL_OWNERSHIP.md`.
 - `tools/scaffold_project.py` — fail-closed project scaffold generator.
 - `tools/campaignctl.py` — optional durable Campaign Lead runtime.
 - `tools/migrate_state.py` — explicit state-schema migration planner/executor.
+- `tools/reconstruct_context.py` — validate-first deterministic fresh-context reconstruction.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
 - `tools/selftest_migrations.py` — forward/reverse/idempotence/lossy-downgrade migration self-test.
 - `tools/selftest_ownership.py` — owner/currentness/supersession falsification self-test.
+- `tools/selftest_reconstruction.py` — fresh-context determinism/fail-closed self-test.
+- `tools/selftest_stateful_reference.py` — physical SQLite + control-layer transfer self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/14_CANONICAL_OWNERSHIP.md` — architecture, adaptation, validation, runtime, recovery, schema evolution and ownership guidance.
+- `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership and transfer guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -228,9 +242,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.6.0 — PUBLIC STARTER PREVIEW`
+`v0.7.0 — PUBLIC STARTER PREVIEW`
 
-v0.6 adds a generic canonical-owner registry with currentness binding and mechanically verified supersession lineage for extensible project state. Every fork still has to establish its own product truth and gates.
+v0.7 adds deterministic fresh-context reconstruction and a physical stateful reference system that binds application behavior, currentness and custom ownership in one CI gate. Every fork still has to establish its own product truth and gates.
 
 ## License
 

@@ -85,6 +85,8 @@ def main() -> int:
                 raise AssertionError(f"{profile}: validation requirements missing")
             if not (control / "tools" / "migrate_state.py").exists():
                 raise AssertionError(f"{profile}: copied migration tool missing")
+            if not (control / "tools" / "reconstruct_context.py").exists():
+                raise AssertionError(f"{profile}: copied reconstruction tool missing")
             if not (control / "migrations" / "registry.json").exists():
                 raise AssertionError(f"{profile}: migration registry missing")
             migration_plan = run(
@@ -102,6 +104,18 @@ def main() -> int:
                 )
             if json.loads(migration_plan.stdout)["steps"] != []:
                 raise AssertionError(f"{profile}: fresh bootstrap should already be latest")
+            reconstruction = run(
+                str(control / "tools" / "reconstruct_context.py"),
+                "--root",
+                str(control),
+            )
+            if reconstruction.returncode != 0:
+                raise AssertionError(
+                    f"{profile}: copied reconstruction tool failed\n"
+                    f"{reconstruction.stdout}\n{reconstruction.stderr}"
+                )
+            if json.loads(reconstruction.stdout)["posture"] != "UNTRUSTED_CONTEXT":
+                raise AssertionError(f"{profile}: fresh reconstruction posture is not UNTRUSTED_CONTEXT")
             if (control / "tools" / "campaignctl.py").exists():
                 raise AssertionError(f"{profile}: campaign runtime installed without --with-runtime")
 
@@ -184,6 +198,7 @@ def main() -> int:
     print("- copied validator is self-contained")
     print("- generated bootstrap uses latest v0.2 contract")
     print("- copied migration registry/tool are self-contained")
+    print("- copied reconstruction tool is self-contained")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0

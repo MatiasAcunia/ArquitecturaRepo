@@ -134,18 +134,35 @@ Implemented:
 - valid owner replacement fixture;
 - adversarial ownership/supersession CI self-test.
 
-## v0.7 — Synthetic reference systems
+## v0.7 — Fresh-context reconstruction and physical reference transfer
+
+Implemented:
+
+- validate-first deterministic fresh-context reconstruction;
+- deterministic posture output across repeated fresh invocations;
+- fail-closed reconstruction through invalid owners/currentness/recovery state;
+- reconstruction of fresh scaffold, active campaign and Planner-return states;
+- portable reconstruction tool in generated scaffolds;
+- physical SQLite stateful reference system;
+- idempotent replay semantics;
+- idempotency conflict detection;
+- transactional rollback under injected application failure;
+- restart persistence;
+- concurrent replay verification;
+- project-specific application/evidence owners bound to Product State currentness;
+- end-to-end CI requiring application tests + control validation + fresh reconstruction;
+- adversarial removal of the canonical application state mechanism.
+
+## v0.8 — Transfer/adoption testing
 
 Next candidate work:
 
-- synthetic stateful backend reference;
-- synthetic multi-workstream reference;
-- synthetic artifact-heavy reference;
-- synthetic high-consequence/external-action reference;
-- fresh-context transfer tests across those profiles;
-- measure which optional mechanisms actually reduce reconstruction/execution failure.
-
-Examples must remain synthetic and structure-only.
+- install/reconstruct across unrelated project shapes and profiles;
+- prove setup does not require technical CLIENT rescue;
+- verify small projects do not inherit unnecessary runtime/MASTER OWNER machinery;
+- verify heavier profiles receive only their required mechanism families;
+- run fresh-context probes after installation and after currentness promotion;
+- identify/remove adoption complexity that does not reduce real failure risk.
 
 ## v1.0 — Transfer-hardened public starter
 
