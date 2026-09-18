@@ -1,0 +1,96 @@
+# Managed by Agentic SDLC starter. Safe to delete to disable scheduled feedback entirely.
+name: Agentic SDLC architecture feedback
+
+on:
+  schedule:
+    - cron: "23 4 * * 0"
+    - cron: "41 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  architecture-feedback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve control root and trigger
+        id: resolve
+        shell: bash
+        run: |
+          if [ -d ".agentic-sdlc" ]; then
+            echo "control_root=.agentic-sdlc" >> "$GITHUB_OUTPUT"
+          elif [ -f "state/STARTER_MANIFEST.json" ]; then
+            echo "control_root=." >> "$GITHUB_OUTPUT"
+          else
+            echo "No Agentic SDLC control layer found."
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "trigger=MANUAL" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "23 4 * * 0" ]; then
+            echo "trigger=WEEKLY" >> "$GITHUB_OUTPUT"
+          else
+            echo "trigger=MONTHLY" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate strict metadata-only report
+        id: generate
+        if: steps.resolve.outputs.control_root != ''
+        shell: bash
+        run: |
+          CONTROL_ROOT="${{ steps.resolve.outputs.control_root }}"
+          mkdir -p "$RUNNER_TEMP/agentic-feedback"
+          python "$CONTROL_ROOT/tools/architecture_feedback.py"             --control-root "$CONTROL_ROOT"             --trigger "${{ steps.resolve.outputs.trigger }}"             --output "$RUNNER_TEMP/agentic-feedback/report.json"             --github-output "$GITHUB_OUTPUT"
+
+      - name: Upload feedback artifact
+        if: steps.generate.outputs.emitted == 'true' && steps.generate.outputs.artifact_enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentic-sdlc-architecture-feedback
+          path: ${{ runner.temp }}/agentic-feedback/report.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Optional external submission
+        if: >-
+          steps.generate.outputs.emitted == 'true' &&
+          steps.generate.outputs.external_submission_enabled == 'true' &&
+          vars.AGENTIC_SDLC_FEEDBACK_SUBMIT == 'true' &&
+          vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT != ''
+        env:
+          FEEDBACK_ENDPOINT: ${{ vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT }}
+        shell: bash
+        run: |
+          response_file="$RUNNER_TEMP/agentic-feedback/collector-response.txt"
+          curl --fail-with-body --silent --show-error             --request POST             --header "Content-Type: application/json"             --data-binary @"$RUNNER_TEMP/agentic-feedback/report.json"             "$FEEDBACK_ENDPOINT" > "$response_file"
+          {
+            echo "### Agentic SDLC feedback submission"
+            echo
+            echo "External submission was explicitly enabled by both the control config and repository variables."
+            echo
+            echo "Collector response:"
+            echo '~~~'
+            head -c 2000 "$response_file"
+            echo
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Privacy notice
+        if: steps.generate.outputs.emitted == 'true'
+        shell: bash
+        run: |
+          {
+            echo "### Privacy"
+            echo
+            echo "The uploaded report is strict metadata only: no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials."
+            echo
+            echo "Disable by setting feedback/ARCHITECTURE_FEEDBACK_CONFIG.json enabled=false, or delete this managed workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
