@@ -23,6 +23,7 @@ SCHEMA_BY_VERSION = {
     "starter-bootstrap-0.1": "current-bootstrap.schema.json",
     "starter-profiles-0.1": "profiles.schema.json",
     "starter-profile-selection-0.1": "profile-selection.schema.json",
+    "campaign-runtime-0.1": "campaign-runtime.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {
@@ -438,6 +439,240 @@ def validate_terminals(
                 )
 
 
+
+def runtime_write_conflict(a: str, b: str) -> bool:
+    aa = a.strip().rstrip("/")
+    bb = b.strip().rstrip("/")
+    if aa == bb:
+        return True
+    if "/" in aa or "/" in bb:
+        return aa.startswith(bb + "/") or bb.startswith(aa + "/")
+    return False
+
+
+def validate_campaign_runtime(
+    buckets: dict[str, list[tuple[Path, dict[str, Any]]]],
+    errors: list[str],
+) -> None:
+    runtimes = one_by_key(
+        buckets.get("campaign-runtime-0.1", []),
+        "campaign_id",
+        "campaign runtime",
+        errors,
+    )
+    charters = one_by_key(
+        buckets.get("campaign-charter-0.1", []),
+        "campaign_id",
+        "campaign charter",
+        errors,
+    )
+    checkpoints = one_by_key(
+        buckets.get("campaign-checkpoint-0.1", []),
+        "checkpoint_id",
+        "checkpoint",
+        errors,
+    )
+    products = one_by_key(
+        buckets.get("product-state-0.1", []),
+        "product_or_workstream",
+        "Product State owner",
+        errors,
+    )
+    authorities_by_campaign: dict[str, list[tuple[Path, dict[str, Any]]]] = defaultdict(list)
+    for authority_path, authority in buckets.get("execution-authority-0.1", []):
+        if authority.get("campaign_id"):
+            authorities_by_campaign[authority["campaign_id"]].append(
+                (authority_path, authority)
+            )
+
+    for campaign_id, (path, runtime) in runtimes.items():
+        charter_record = charters.get(campaign_id)
+        if charter_record is None:
+            errors.append(f"{rel(path)}: runtime campaign {campaign_id!r} has no charter")
+            continue
+        _, charter = charter_record
+        if runtime["product_or_workstream"] != charter["product_or_workstream"]:
+            errors.append(
+                f"{rel(path)}: runtime product {runtime['product_or_workstream']!r} "
+                f"!= charter product {charter['product_or_workstream']!r}"
+            )
+
+        units: dict[str, dict[str, Any]] = {}
+        for unit in runtime["work_units"]:
+            unit_id = unit["id"]
+            if unit_id in units:
+                errors.append(f"{rel(path)}: duplicate runtime work unit id {unit_id!r}")
+            units[unit_id] = unit
+
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def dfs(unit_id: str) -> None:
+            if unit_id in visiting:
+                errors.append(f"{rel(path)}: dependency cycle includes {unit_id!r}")
+                return
+            if unit_id in visited or unit_id not in units:
+                return
+            visiting.add(unit_id)
+            for dep in units[unit_id]["dependencies"]:
+                if dep not in units:
+                    errors.append(
+                        f"{rel(path)}: {unit_id!r} dependency does not exist: {dep!r}"
+                    )
+                else:
+                    dfs(dep)
+            visiting.remove(unit_id)
+            visited.add(unit_id)
+
+        for unit_id in units:
+            dfs(unit_id)
+
+        for unit in units.values():
+            if unit["status"] in {"READY", "ACTIVE", "VERIFY", "DONE"}:
+                incomplete = [
+                    dep
+                    for dep in unit["dependencies"]
+                    if dep in units and units[dep]["status"] != "DONE"
+                ]
+                if incomplete:
+                    errors.append(
+                        f"{rel(path)}: {unit['id']!r} status {unit['status']} "
+                        f"has incomplete dependencies {sorted(incomplete)}"
+                    )
+
+        active = [u for u in units.values() if u["status"] == "ACTIVE"]
+        for i, left in enumerate(active):
+            for right in active[i + 1 :]:
+                shared = set(left["shared_resources"]) & set(right["shared_resources"])
+                if shared:
+                    errors.append(
+                        f"{rel(path)}: ACTIVE units {left['id']!r}/{right['id']!r} "
+                        f"share resources {sorted(shared)}"
+                    )
+                for lsurf in left["allowed_write_surfaces"]:
+                    for rsurf in right["allowed_write_surfaces"]:
+                        if runtime_write_conflict(lsurf, rsurf):
+                            errors.append(
+                                f"{rel(path)}: ACTIVE units {left['id']!r}/{right['id']!r} "
+                                f"have conflicting write surfaces {lsurf!r}/{rsurf!r}"
+                            )
+
+        seqs = [item["seq"] for item in runtime["event_log"]]
+        if seqs != list(range(1, len(seqs) + 1)):
+            errors.append(f"{rel(path)}: event_log seq must be contiguous from 1")
+        if runtime["revision"] != len(runtime["event_log"]):
+            errors.append(
+                f"{rel(path)}: revision {runtime['revision']} "
+                f"!= event count {len(runtime['event_log'])}"
+            )
+
+        checkpoint_id = runtime.get("current_checkpoint_id")
+        if checkpoint_id:
+            cp_record = checkpoints.get(checkpoint_id)
+            if cp_record is None:
+                errors.append(
+                    f"{rel(path)}: current_checkpoint_id {checkpoint_id!r} not found"
+                )
+            else:
+                cp_path, cp = cp_record
+                if cp["campaign_id"] != campaign_id:
+                    errors.append(
+                        f"{rel(cp_path)}: runtime checkpoint belongs to "
+                        f"{cp['campaign_id']!r}, not {campaign_id!r}"
+                    )
+                if cp["exact_integrated_ref"] != runtime["integrated_ref"]:
+                    errors.append(
+                        f"{rel(path)}: runtime integrated_ref {runtime['integrated_ref']!r} "
+                        f"!= checkpoint ref {cp['exact_integrated_ref']!r}"
+                    )
+
+        authority_records = authorities_by_campaign.get(campaign_id, [])
+        active_authorities = [
+            (authority_path, authority)
+            for authority_path, authority in authority_records
+            if authority.get("authority_status") == "ACTIVE"
+        ]
+        if (
+            runtime["campaign_status"] in {"ACTIVE", "HOLD", "CAPACITY_CHECKPOINT"}
+            and authority_records
+            and not active_authorities
+        ):
+            errors.append(
+                f"{rel(path)}: campaign runtime is {runtime['campaign_status']} but "
+                "configured execution authority is not ACTIVE"
+            )
+        if active_authorities and checkpoint_id:
+            authority_path, authority = active_authorities[0]
+            if authority.get("checkpoint_ref") != checkpoint_id:
+                errors.append(
+                    f"{rel(authority_path)}: active authority checkpoint "
+                    f"{authority.get('checkpoint_ref')!r} != runtime checkpoint "
+                    f"{checkpoint_id!r}"
+                )
+
+        product_record = products.get(runtime["product_or_workstream"])
+        if product_record is not None:
+            product_path, product = product_record
+            active_campaign = product.get("active_campaign")
+            if active_campaign and active_campaign.get("campaign_id") == campaign_id:
+                if product["current_code_ref"] != runtime["integrated_ref"]:
+                    errors.append(
+                        f"{rel(product_path)}: Product State current_code_ref "
+                        f"{product['current_code_ref']!r} != runtime integrated_ref "
+                        f"{runtime['integrated_ref']!r}"
+                    )
+                if checkpoint_id and active_campaign.get("checkpoint_or_terminal_ref") != checkpoint_id:
+                    errors.append(
+                        f"{rel(product_path)}: Product State pointer "
+                        f"{active_campaign.get('checkpoint_or_terminal_ref')!r} "
+                        f"!= runtime checkpoint {checkpoint_id!r}"
+                    )
+
+        freeze = runtime.get("review_freeze")
+        if freeze and freeze["status"] == "REVIEWED":
+            if freeze["candidate_ref"] != runtime["integrated_ref"]:
+                errors.append(
+                    f"{rel(path)}: REVIEWED freeze candidate {freeze['candidate_ref']!r} "
+                    f"!= runtime integrated_ref {runtime['integrated_ref']!r}"
+                )
+            producer_actors = {
+                unit["actor_id"]
+                for unit in units.values()
+                if unit["actor_id"] and unit["status"] == "DONE"
+            }
+            if freeze.get("reviewer_actor_id") in producer_actors:
+                errors.append(
+                    f"{rel(path)}: reviewer actor {freeze.get('reviewer_actor_id')!r} "
+                    "also produced DONE work"
+                )
+
+        terminal = runtime.get("terminal_request")
+        if runtime["campaign_status"] == "STRATEGIC_TERMINAL" and terminal is None:
+            errors.append(f"{rel(path)}: STRATEGIC_TERMINAL requires terminal_request")
+        if runtime["campaign_status"] != "STRATEGIC_TERMINAL" and terminal is not None:
+            errors.append(
+                f"{rel(path)}: terminal_request exists while campaign_status is "
+                f"{runtime['campaign_status']!r}"
+            )
+        if terminal and terminal["terminal_type"] in {
+            "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+            "QUALITY_GATE_READY_FOR_PLANNER_OR_HUMAN_DECISION",
+        }:
+            if not freeze or freeze["status"] != "REVIEWED":
+                errors.append(
+                    f"{rel(path)}: readiness terminal request requires REVIEWED freeze"
+                )
+            unfinished = [
+                unit["id"]
+                for unit in units.values()
+                if unit["status"] not in {"DONE", "PARKED", "SUPERSEDED", "CANCELLED"}
+            ]
+            if unfinished:
+                errors.append(
+                    f"{rel(path)}: readiness terminal has nonterminal work "
+                    f"{sorted(unfinished)}"
+                )
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Validate Agentic SDLC JSON contracts and cross-file relationships."
@@ -460,6 +695,7 @@ def main() -> int:
     validate_identity_and_authority(buckets, errors)
     validate_bootstrap(target_root, buckets, errors)
     validate_terminals(buckets, errors)
+    validate_campaign_runtime(buckets, errors)
 
     if errors:
         print("PROJECT VALIDATION FAILED")

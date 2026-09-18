@@ -55,13 +55,20 @@ python tools/scaffold_project.py \
   --objective "Describe the client-visible product objective."
 ```
 
-Then validate it:
+The generated control layer starts in `HOLD / UNTRUSTED_CONTEXT`. It does not invent live code, campaign or acceptance state.
+
+To include the optional runtime:
 
 ```bash
-python tools/validate_project.py --root "../my-project/.agentic-sdlc"
+python tools/scaffold_project.py \
+  --target "../my-project" \
+  --profile STATEFUL \
+  --product-id PROJECT_ALPHA \
+  --objective "Describe the client-visible product objective." \
+  --with-runtime
 ```
 
-The generated control layer starts in `HOLD / UNTRUSTED_CONTEXT`. It does not invent live code, campaign or acceptance state.
+Generated control layers carry their own schemas, validator and validation dependency declaration.
 
 For a project with substantial existing history, use `prompts/REANCHOR_EXISTING_PROJECT.md`.
 
@@ -130,7 +137,7 @@ See `docs/06_SCALING_PROFILES.md` and `docs/09_ADAPTATION_DECISION_TREE.md`.
 
 ## Executable validation
 
-Version 0.2 validates more than JSON syntax.
+The validator checks more than JSON syntax.
 
 Current checks include:
 
@@ -165,7 +172,7 @@ See `docs/10_EXECUTABLE_VALIDATION.md`.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/10_EXECUTABLE_VALIDATION.md` — architecture, adaptation and validation guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/11_REFERENCE_RUNTIME.md` — architecture, adaptation, validation and runtime guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -180,9 +187,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.2.0 — PUBLIC STARTER PREVIEW`
+`v0.3.0 — PUBLIC STARTER PREVIEW`
 
-v0.2 adds executable validation and fail-closed scaffolding. Every fork still has to establish its own product truth and gates.
+v0.3 adds the optional durable campaign runtime and independent runtime validation. Every fork still has to establish its own product truth and gates.
 
 ## License
 

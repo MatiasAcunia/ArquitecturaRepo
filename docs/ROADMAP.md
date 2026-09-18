@@ -48,30 +48,44 @@ Not yet implemented:
 - schema migration/versioning framework;
 - generic relationship rules for arbitrary project-specific custom state.
 
-## v0.3 — Minimal reference runtime
+## v0.3 — Optional reference Campaign Lead runtime
+
+Implemented:
+
+- campaign-runtime schema;
+- persistent tactical work-unit state;
+- append/reprioritize/park/supersede/cancel;
+- dependency-aware READY state;
+- cross-platform exclusive mutation lock with timeout;
+- write-surface/shared-resource conflict prevention;
+- failure/retry;
+- HOLD and capacity checkpoint/resume;
+- durable checkpoint emission;
+- Product State/bootstrap/execution-authority currentness reconciliation;
+- execution-authority acquire/release;
+- exact review-freeze lifecycle;
+- independent reviewer binding;
+- automatic freeze invalidation after later tactical/producer mutation;
+- typed strategic terminal requests;
+- independent runtime relationship validation;
+- end-to-end runtime self-test;
+- optional portable runtime installation via `--with-runtime`.
+
+Known bounded limitation:
+
+- multi-file currentness transitions use atomic file replacement and exclusive process locking, but do not yet use a write-ahead transaction journal across all files.
+
+## v0.4 — Hardening and synthetic reference projects
 
 Next candidate work:
 
-- resumable campaign controller;
-- persisted tactical work-unit state;
-- append/reprioritize/retire tactical work;
-- resource/write-set isolation;
-- execution-authority transitions;
-- checkpoint/recovery;
-- typed strategic terminals;
-- independent-review lifecycle hooks.
-
-The runtime must remain optional. Projects must be able to use the architecture without adopting a specific orchestration engine.
-
-## v0.4 — Synthetic reference projects
-
-Candidate examples:
-
-- small single-repository application;
-- stateful backend;
-- multi-workstream product;
-- artifact-heavy pipeline;
-- high-consequence/external-action project.
+- fail-closed multi-file transition journal / recovery;
+- schema migration/versioning framework;
+- stronger generic supersession/current-owner checks;
+- synthetic stateful backend reference;
+- synthetic multi-workstream reference;
+- synthetic artifact-heavy reference;
+- synthetic high-consequence/external-action reference.
 
 Examples must remain synthetic and structure-only.
 

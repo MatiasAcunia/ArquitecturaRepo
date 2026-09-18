@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:campaign-runtime:0.1",
+  "title": "Agentic SDLC Campaign Runtime",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "product_or_workstream",
+    "charter_ref",
+    "campaign_status",
+    "revision",
+    "updated_at",
+    "integrated_ref",
+    "current_checkpoint_id",
+    "checkpoint_counter",
+    "review_freeze_counter",
+    "review_freeze",
+    "terminal_request",
+    "campaign_falsifiers",
+    "work_units",
+    "event_log"
+  ],
+  "properties": {
+    "schema_version": {"const": "campaign-runtime-0.1"},
+    "campaign_id": {"type": "string", "minLength": 1},
+    "product_or_workstream": {"type": "string", "minLength": 1},
+    "charter_ref": {"type": "string", "minLength": 1},
+    "campaign_status": {
+      "enum": ["ACTIVE", "HOLD", "CAPACITY_CHECKPOINT", "STRATEGIC_TERMINAL"]
+    },
+    "revision": {"type": "integer", "minimum": 0},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "integrated_ref": {"type": "string", "minLength": 1},
+    "current_checkpoint_id": {"type": ["string", "null"]},
+    "checkpoint_counter": {"type": "integer", "minimum": 0},
+    "review_freeze_counter": {"type": "integer", "minimum": 0},
+    "review_freeze": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "freeze_id",
+        "candidate_ref",
+        "status",
+        "created_at",
+        "invalidated_at",
+        "invalidation_reason",
+        "reviewer_actor_id",
+        "reviewer_run_id",
+        "verdict",
+        "evidence_refs"
+      ],
+      "properties": {
+        "freeze_id": {"type": "string", "minLength": 1},
+        "candidate_ref": {"type": "string", "minLength": 1},
+        "status": {"enum": ["FROZEN", "INVALIDATED", "REVIEWED"]},
+        "created_at": {"type": "string", "format": "date-time"},
+        "invalidated_at": {"type": ["string", "null"], "format": "date-time"},
+        "invalidation_reason": {"type": ["string", "null"]},
+        "reviewer_actor_id": {"type": ["string", "null"]},
+        "reviewer_run_id": {"type": ["string", "null"]},
+        "verdict": {"type": ["string", "null"]},
+        "evidence_refs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "terminal_request": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["terminal_type", "reason", "created_at"],
+      "properties": {
+        "terminal_type": {
+          "enum": [
+            "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+            "QUALITY_GATE_READY_FOR_PLANNER_OR_HUMAN_DECISION",
+            "REPLAN_REQUIRED__CHARTER_INVALIDATED",
+            "BLOCKED_EXTERNAL_OR_AUTHORITY",
+            "CAPACITY_CHECKPOINT__RESUMABLE",
+            "NO_FUNCTIONAL_UNLOCK__CAMPAIGN_EXHAUSTED"
+          ]
+        },
+        "reason": {"type": "string", "minLength": 1},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "campaign_falsifiers": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "work_units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "status",
+          "priority",
+          "dependencies",
+          "allowed_write_surfaces",
+          "shared_resources",
+          "actor_id",
+          "run_id",
+          "evidence_refs",
+          "result_ref",
+          "notes"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "title": {"type": "string", "minLength": 1},
+          "status": {
+            "enum": [
+              "BLOCKED_DEPENDENCY",
+              "READY",
+              "ACTIVE",
+              "VERIFY",
+              "DONE",
+              "FAILED",
+              "PARKED",
+              "SUPERSEDED",
+              "CANCELLED"
+            ]
+          },
+          "priority": {"type": "integer"},
+          "dependencies": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "allowed_write_surfaces": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "shared_resources": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "actor_id": {"type": ["string", "null"]},
+          "run_id": {"type": ["string", "null"]},
+          "evidence_refs": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          },
+          "result_ref": {"type": ["string", "null"]},
+          "notes": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "event_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "seq",
+          "at",
+          "action",
+          "work_unit_id",
+          "actor_id",
+          "details"
+        ],
+        "properties": {
+          "seq": {"type": "integer", "minimum": 1},
+          "at": {"type": "string", "format": "date-time"},
+          "action": {"type": "string", "minLength": 1},
+          "work_unit_id": {"type": ["string", "null"]},
+          "actor_id": {"type": ["string", "null"]},
+          "details": {"type": "object"}
+        }
+      }
+    }
+  }
+}

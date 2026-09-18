@@ -33,3 +33,5 @@ jobs:
         run: python tools/selftest_validation.py
       - name: Generate and validate all scaffold profiles
         run: python tools/selftest_scaffold.py
+      - name: Exercise resumable campaign runtime
+        run: python tools/selftest_runtime.py

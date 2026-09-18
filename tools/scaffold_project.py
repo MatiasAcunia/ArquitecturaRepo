@@ -57,6 +57,7 @@ def create_scaffold(
     product_id: str,
     objective: str,
     force: bool,
+    with_runtime: bool,
 ) -> Path:
     if not target.exists():
         target.mkdir(parents=True, exist_ok=True)
@@ -106,6 +107,19 @@ def create_scaffold(
         ROOT / "templates" / "CAMPAIGN_TERMINAL.md",
         control / "templates" / "CAMPAIGN_TERMINAL.md",
     )
+    copy_file(
+        ROOT / "tools" / "validate_project.py",
+        control / "tools" / "validate_project.py",
+    )
+    copy_file(
+        ROOT / "requirements-validation.txt",
+        control / "requirements-validation.txt",
+    )
+    if with_runtime:
+        copy_file(
+            ROOT / "tools" / "campaignctl.py",
+            control / "tools" / "campaignctl.py",
+        )
 
     include_identity = any(
         item in profile["recommended_current_contracts"]
@@ -301,6 +315,17 @@ Planner owns strategy. Campaign Lead owns tactics inside a valid charter. Worker
 """
     write_text(control / "AGENTS.md", agents)
 
+    runtime_report_line = (
+        "- optional campaign runtime/controller;"
+        if with_runtime
+        else "- reference campaign runtime not installed;"
+    )
+    identity_report_line = (
+        "- identity registry and execution-authority placeholders;"
+        if include_identity
+        else "- no identity/execution current state because this profile does not require it by default;"
+    )
+
     report = f"""# Agentic SDLC Installation Report
 
 ## Target
@@ -321,7 +346,7 @@ Planner owns strategy. Campaign Lead owns tactics inside a valid charter. Worker
 - project overlay;
 - campaign templates;
 - fresh-context probe;
-{"- identity registry and execution-authority placeholders;" if include_identity else "- no identity/execution current state because this profile does not require it by default;"}
+{runtime_report_line}\n{identity_report_line}
 
 ## Mechanization status
 
@@ -364,7 +389,14 @@ This installation is not ready if a fresh context cannot reconstruct one coheren
             "description": profile["description"],
             "selected_protocols": selected_protocols,
             "recommended_current_contracts": profile["recommended_current_contracts"],
+            "runtime_enabled": with_runtime,
         },
+    )
+
+    runtime_readme_line = (
+        f"Optional runtime installed at {control_dir_name}/tools/campaignctl.py."
+        if with_runtime
+        else "The optional reference runtime was not installed."
     )
 
     readme = f"""# Local Agentic SDLC Control Layer
@@ -377,11 +409,19 @@ Generated from Agentic SDLC starter {version}.
 
 Next action: perform read-only discovery and currentness reconstruction.
 
-Validation from the starter repository:
+Install the validation dependency:
 
 ```bash
-python tools/validate_project.py --root {control_dir_name}
+python -m pip install -r {control_dir_name}/requirements-validation.txt
 ```
+
+Validate this control layer with its copied validator:
+
+```bash
+python {control_dir_name}/tools/validate_project.py --root .
+```
+
+{runtime_readme_line}
 
 Do not claim installation success until the fresh-context probe has been exercised and the installation report is updated with physical evidence.
 """
@@ -417,6 +457,11 @@ def main() -> int:
         action="store_true",
         help="Replace only the generated control directory if it already exists.",
     )
+    parser.add_argument(
+        "--with-runtime",
+        action="store_true",
+        help="Copy the optional campaign runtime/controller into the generated control layer.",
+    )
     args = parser.parse_args()
 
     try:
@@ -427,6 +472,7 @@ def main() -> int:
             product_id=args.product_id,
             objective=args.objective,
             force=args.force,
+            with_runtime=args.with_runtime,
         )
     except Exception as exc:
         print(f"SCAFFOLD FAILED: {exc}", file=sys.stderr)

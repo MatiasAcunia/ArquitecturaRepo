@@ -64,14 +64,21 @@ def main() -> int:
             if bootstrap["status"] != "UNTRUSTED_CONTEXT":
                 raise AssertionError(f"{profile}: scaffold must start UNTRUSTED_CONTEXT")
 
-            selected = set(
-                json.loads((control / "PROFILE.json").read_text(encoding="utf-8"))[
-                    "selected_protocols"
-                ]
+            profile_state = json.loads(
+                (control / "PROFILE.json").read_text(encoding="utf-8")
             )
+            selected = set(profile_state["selected_protocols"])
             expected_optional = set(PROFILES[profile]["optional_protocols"])
             if not expected_optional.issubset(selected):
                 raise AssertionError(f"{profile}: missing selected optional protocol")
+            if profile_state.get("runtime_enabled") is not False:
+                raise AssertionError(f"{profile}: runtime must remain opt-in")
+            if not (control / "tools" / "validate_project.py").exists():
+                raise AssertionError(f"{profile}: copied validator missing")
+            if not (control / "requirements-validation.txt").exists():
+                raise AssertionError(f"{profile}: validation requirements missing")
+            if (control / "tools" / "campaignctl.py").exists():
+                raise AssertionError(f"{profile}: campaign runtime installed without --with-runtime")
 
         small = base / "small" / ".agentic-sdlc"
         if (small / "protocols" / "MASTER_OWNER_OS.md").exists():
@@ -91,6 +98,47 @@ def main() -> int:
         ).exists():
             raise AssertionError("HIGH_CONSEQUENCE profile must include security/privacy protocol")
 
+        runtime_target = base / "runtime_enabled"
+        runtime_result = run(
+            str(SCAFFOLD),
+            "--target",
+            str(runtime_target),
+            "--profile",
+            "STATEFUL",
+            "--product-id",
+            "EXAMPLE_RUNTIME",
+            "--objective",
+            "Synthetic runtime-enabled product.",
+            "--with-runtime",
+        )
+        if runtime_result.returncode != 0:
+            raise AssertionError(
+                "runtime-enabled scaffold failed\n"
+                + runtime_result.stdout
+                + "\n"
+                + runtime_result.stderr
+            )
+        runtime_control = runtime_target / ".agentic-sdlc"
+        runtime_profile = json.loads(
+            (runtime_control / "PROFILE.json").read_text(encoding="utf-8")
+        )
+        if runtime_profile.get("runtime_enabled") is not True:
+            raise AssertionError("runtime-enabled scaffold did not record runtime_enabled=true")
+        if not (runtime_control / "tools" / "campaignctl.py").exists():
+            raise AssertionError("runtime-enabled scaffold missing campaignctl.py")
+        copied_validation = run(
+            str(runtime_control / "tools" / "validate_project.py"),
+            "--root",
+            ".",
+        )
+        if copied_validation.returncode != 0:
+            raise AssertionError(
+                "copied validator failed inside runtime-enabled scaffold\n"
+                + copied_validation.stdout
+                + "\n"
+                + copied_validation.stderr
+            )
+
         rerun = run(
             str(SCAFFOLD),
             "--target",
@@ -108,6 +156,8 @@ def main() -> int:
     print("- SMALL remains minimal")
     print("- MULTI_PRODUCT includes MASTER OWNER + fail-closed authority")
     print("- HIGH_CONSEQUENCE includes security/privacy/rights protocol")
+    print("- copied validator is self-contained")
+    print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0
 
