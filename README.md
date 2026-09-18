@@ -23,6 +23,9 @@ It provides:
 - currentness, supersession and fail-closed rules;
 - identity/run/execution-authority separation;
 - strategic capability planning;
+- product-discovery interviews + CLIENT-confirmed requirements baseline;
+- persistent technical stack/security/network/deployment baseline;
+- dated delivery plans and derived project-status tracking;
 - persistent engineering campaigns;
 - dynamic tactical DAGs;
 - exact-candidate independent review;
@@ -132,8 +135,11 @@ A fresh agent must be able to reconstruct the same legal next action from durabl
 11. Material product decisions made in conversation must become durable state.
 12. Governance must pay rent.
 13. Git history records meaningful integration/recovery/authority boundaries, not every tactical action.
-14. Known-baseline repository refresh is delta-first; fresh context does not imply fresh clone.
-15. System-owned local workspaces have explicit lifecycle/cleanup authority.
+14. Product discovery precedes the first material campaign.
+15. CLIENT confirms requirements; Planner owns technical stack/security/network/deployment decisions.
+16. Delivery plans contain real target dates, confidence, risks and explicit schedule changes.
+17. Known-baseline repository refresh is delta-first; fresh context does not imply fresh clone.
+18. System-owned local workspaces have explicit lifecycle/cleanup authority.
 
 ## Profiles
 
@@ -223,15 +229,15 @@ See `docs/16_TRANSFER_ADOPTION.md`.
 
 Runtime, schema migration and adoption now share `tools/state_tx.py` for local locking/durable transaction semantics instead of maintaining parallel implementations.
 
-The 1.0 definition of done is machine-readable at `state/V1_RELEASE_CRITERIA.json` and executable with:
+The current v1 release definition is machine-readable at `state/V1_RELEASE_CRITERIA.json` and executable with:
 
 ```bash
 python tools/verify_v1_release.py
 ```
 
-The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, resumable campaign runtime and hardening/bounded governance.
+The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, product-baseline readiness, resumable campaign runtime, repository hygiene and hardening/bounded governance.
 
-See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `docs/19_V1_RELEASE.md` and `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md`.
+See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `docs/19_V1_RELEASE.md`, `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md` and `docs/21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md`.
 
 ## Repository map
 
@@ -254,6 +260,8 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - `tools/repo_delta.py` — exact-branch fetch + changed-path currentness without pull/merge.
 - `tools/commit_guard.py` — canonical commit role/boundary preflight.
 - `tools/workspace_gc.py` — marker-owned fail-closed local workspace GC.
+- `tools/baseline_guard.py` — pre-campaign requirements/technical/delivery baseline gate.
+- `tools/project_status.py` — derived human-facing project/date/status tracker.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
@@ -265,11 +273,12 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - `tools/selftest_contracts.py` — canonical contract-instance validation suite.
 - `tools/selftest_hardening.py` — primitive-centralization and bounded-governance self-test.
 - `tools/selftest_repository_hygiene.py` — commit/delta-sync/local-GC adversarial self-test.
+- `tools/selftest_project_baseline.py` — product-discovery/stack/date baseline gate self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
 - `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer, repository efficiency and stable-release guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer, repository efficiency, product baselining and stable-release guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -284,9 +293,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v1.0.1 — PUBLIC STARTER STABLE`
+`v1.1.0 — PUBLIC STARTER STABLE`
 
-v1.0.1 is a defect-driven stable patch: it hardens commit granularity, delta-first repository currentness and marker-owned local workspace cleanup without changing the role topology or product-authority model.
+v1.1 adds a pre-campaign product-discovery baseline: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking and project-local operating-review evidence.
 
 ## License
 

@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:delivery-plan:0.1",
+  "title": "Agentic SDLC Delivery Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_or_workstream",
+    "plan_version",
+    "status",
+    "updated_at",
+    "planning_start_date",
+    "target_release_date",
+    "schedule_basis",
+    "milestones",
+    "risks",
+    "schedule_changes",
+    "next_review_date",
+    "unresolved"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "delivery-plan-0.1"
+    },
+    "product_or_workstream": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "CURRENT",
+        "SUPERSEDED"
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "planning_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "target_release_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "schedule_basis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "target_date",
+          "status",
+          "capability_ids",
+          "depends_on",
+          "done_when",
+          "forecast_confidence",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "ACTIVE",
+              "BLOCKED",
+              "DONE",
+              "SUPERSEDED"
+            ]
+          },
+          "capability_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "done_when": {
+            "type": "string",
+            "minLength": 1
+          },
+          "forecast_confidence": {
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "description",
+          "impact",
+          "mitigation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "impact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mitigation": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "schedule_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "changed_at",
+          "milestone_id",
+          "from_date",
+          "to_date",
+          "reason"
+        ],
+        "properties": {
+          "changed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "milestone_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "next_review_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -8,7 +8,10 @@ It is repository-anchored. Chat is a temporary interface.
 
 ## Planner owns
 
+- product discovery/interview synthesis;
 - current CLIENT requirement interpretation;
+- technical baseline / stack-frame ownership;
+- delivery-plan milestones, dates and schedule reconciliation;
 - whole-product/capability model;
 - owner/public-interface/state semantics;
 - strategic currentness/invalidation;
@@ -41,9 +44,31 @@ Before material strategy:
 4. inspect live code/state/evidence materially affected;
 5. load material domain theory;
 6. identify current gate/critical path;
-7. identify unresolved authority/currentness contradictions.
+7. identify unresolved authority/currentness contradictions;
+8. when establishing a new baseline, run the product-discovery protocol before campaign authorization;
+9. establish or load the current technical baseline and delivery plan.
 
 Contradiction -> HOLD, not guess.
+
+## Product discovery and baseline gate
+
+For a new product, materially re-anchored product, or installation whose requirements are not yet confirmed:
+
+1. conduct a product-facing discovery conversation;
+2. synthesize functional/non-functional/security/network/UI/data/cost/date requirements;
+3. present one compact requirements baseline to the CLIENT;
+4. obtain an explicit current-baseline confirmation;
+5. choose and persist the technical stack/security/network/deployment baseline;
+6. assess machine/environment constraints when material;
+7. build a dated milestone plan with confidence and risks;
+8. run the baseline guard;
+9. only then authorize the first material campaign.
+
+Ask active product questions, but batch them coherently and stop asking when the system can decide/verify the technical matter itself.
+
+CLIENT confirmation does not approve the stack. The Planner owns routine technical architecture.
+
+Dates are forecasts/targets unless explicitly hard external deadlines. A date slip must be persisted and reconciled; never silently move it.
 
 ## Product-backward reasoning
 
@@ -69,6 +94,8 @@ Load all known material theory needed for the active decision, not all project h
 When changing domains, load that domain before deciding.
 
 ## Campaign boundary
+
+Before a new-scaffold campaign, baseline readiness is a precondition.
 
 The Planner defines WHAT/WHY/boundaries/interfaces/gates/falsifiers.
 

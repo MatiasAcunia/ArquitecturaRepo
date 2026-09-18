@@ -1,6 +1,6 @@
-# v1.0 Release Gates
+# v1 Release Gates
 
-Version 1.0 is not triggered by a version-number sequence.
+A v1 release is not triggered by a version-number sequence.
 
 It is triggered when every required release gate passes on the exact release candidate.
 
@@ -153,6 +153,24 @@ Requires:
 - proportional mechanism burden;
 - crash recovery.
 
+### PROJECT_BASELINE_READINESS
+
+Requires new project scaffolds to prove before material campaign initialization:
+
+- CLIENT-confirmed current product requirements;
+- explicit functional/non-functional/security/network/UI/data/cost/date baseline;
+- CURRENT Planner-owned technical stack frame;
+- assessed machine/environment constraints when material;
+- explicit deployment/network exposure posture;
+- security/backup/recovery choices proportional to exposure;
+- CURRENT delivery plan with target release date;
+- dated milestones with done conditions and confidence;
+- explicit schedule-review date;
+- derived project-status view;
+- fail-closed campaign initialization while the baseline is incomplete.
+
+Legacy installations that do not yet materialize these baseline surfaces retain backward-compatible runtime behavior until they deliberately adopt the mechanism.
+
 ### RESUMABLE_CAMPAIGN_RUNTIME
 
 Requires:
@@ -216,7 +234,7 @@ The CLIENT can still be required for genuine product authority such as:
 
 ## Claim boundary
 
-A v1 PASS demonstrates that the starter's declared generic mechanisms and synthetic transfer gates work together.
+A v1 PASS demonstrates that the starter's declared generic mechanisms, product-baseline controls and synthetic transfer gates work together.
 
 It does not prove autonomous correctness on arbitrary real software, nor does it grant external authority.
 

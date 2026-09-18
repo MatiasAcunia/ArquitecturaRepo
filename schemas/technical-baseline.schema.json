@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:technical-baseline:0.1",
+  "title": "Agentic SDLC Technical Baseline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_or_workstream",
+    "baseline_version",
+    "status",
+    "updated_at",
+    "source_requirements_ref",
+    "decision_owner",
+    "environment",
+    "stack",
+    "security",
+    "networking",
+    "ui_quality",
+    "operations",
+    "costs",
+    "change_policy",
+    "unresolved"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "technical-baseline-0.1"
+    },
+    "product_or_workstream": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "CURRENT",
+        "SUPERSEDED"
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_requirements_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_owner": {
+      "const": "I2_PROJECT_WORKSTREAM_PLANNER"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "development_os",
+        "deployment_target",
+        "machine_profile",
+        "network_mode"
+      ],
+      "properties": {
+        "development_os": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deployment_target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "network_mode": {
+          "enum": [
+            "UNDECIDED",
+            "LOCALHOST_ONLY",
+            "LAN",
+            "INTERNET",
+            "PRIVATE_NETWORK",
+            "OTHER"
+          ]
+        },
+        "machine_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "assessment_status",
+            "os_summary",
+            "cpu_summary",
+            "ram_gb",
+            "storage_free_gb",
+            "gpu_summary",
+            "notes"
+          ],
+          "properties": {
+            "assessment_status": {
+              "enum": [
+                "UNASSESSED",
+                "OBSERVED",
+                "CLIENT_DECLARED",
+                "NOT_MATERIAL"
+              ]
+            },
+            "os_summary": {
+              "type": "string"
+            },
+            "cpu_summary": {
+              "type": "string"
+            },
+            "ram_gb": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "storage_free_gb": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "gpu_summary": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "runtime",
+        "backend",
+        "frontend",
+        "database",
+        "persistence_migrations",
+        "package_manager",
+        "test_stack",
+        "deployment",
+        "rationale"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backend": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frontend": {
+          "type": "string",
+          "minLength": 1
+        },
+        "database": {
+          "type": "string",
+          "minLength": 1
+        },
+        "persistence_migrations": {
+          "type": "string",
+          "minLength": 1
+        },
+        "package_manager": {
+          "type": "string",
+          "minLength": 1
+        },
+        "test_stack": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deployment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authentication_model",
+        "authorization_model",
+        "secrets_management",
+        "data_classification",
+        "backup_recovery",
+        "exposure_controls"
+      ],
+      "properties": {
+        "authentication_model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorization_model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "secrets_management": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backup_recovery": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exposure_controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "listen_scope",
+        "ports_services",
+        "tls",
+        "dns",
+        "firewall_notes"
+      ],
+      "properties": {
+        "listen_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ports_services": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "tls": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dns": {
+          "type": "string",
+          "minLength": 1
+        },
+        "firewall_notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ui_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "required_checks"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logging_observability",
+        "backup_restore",
+        "rollback"
+      ],
+      "properties": {
+        "logging_observability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backup_restore": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rollback": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "costs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "developer_ai_tooling",
+        "product_external_services",
+        "recurring_cost_assumptions"
+      ],
+      "properties": {
+        "developer_ai_tooling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product_external_services": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "recurring_cost_assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "change_policy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "v1-release-criteria-0.1",
-  "release": "1.0",
+  "release": "1.1",
   "policy": "Every required gate must pass on the exact release candidate. A green lower-level gate cannot substitute for another gate.",
   "gates": [
     {
@@ -47,6 +47,11 @@
       "id": "CROSS_PROFILE_ADOPTION",
       "purpose": "Six unrelated project shapes install/adopt without application mutation, technical CLIENT file editing or profile over-installation.",
       "command": "python tools/selftest_adoption.py"
+    },
+    {
+      "id": "PROJECT_BASELINE_READINESS",
+      "purpose": "New project scaffolds require CLIENT-confirmed product requirements, a current technical/security/network stack frame, and a dated delivery plan before material campaign initialization.",
+      "command": "python tools/selftest_project_baseline.py"
     },
     {
       "id": "RESUMABLE_CAMPAIGN_RUNTIME",

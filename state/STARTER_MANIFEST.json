@@ -1,6 +1,6 @@
 {
   "starter": "agentic-sdlc-starter",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "status": "PUBLIC_STARTER_STABLE",
   "content_policy": {
     "structure_only": true,
@@ -44,7 +44,9 @@
     "OWNER_REGISTRY",
     "ADOPTION_SPEC",
     "V1_RELEASE_CRITERIA",
-    "WORKSPACE_LIFECYCLE"
+    "WORKSPACE_LIFECYCLE",
+    "TECHNICAL_BASELINE",
+    "DELIVERY_PLAN"
   ],
   "claim_boundary": "Generic engineering starter; each fork must validate its own mechanisms and product gates.",
   "fresh_context_required": true,
@@ -56,6 +58,7 @@
     "IDENTITY_AND_EXECUTION_AUTHORITY",
     "CURRENTNESS_RECONSTRUCTION",
     "REPOSITORY_EFFICIENCY_AND_WORKSPACE_HYGIENE",
+    "PRODUCT_DISCOVERY_REQUIREMENTS_AND_TECHNICAL_BASELINE",
     "PLANNER_KERNEL",
     "PRODUCT_MODEL_AND_THEORY_LOADING",
     "CAMPAIGN_CHARTER_STANDARD",

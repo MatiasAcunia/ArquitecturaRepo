@@ -33,14 +33,15 @@ Before material adaptation or planning:
 3. `protocols/IDENTITY_AND_EXECUTION_AUTHORITY.md`
 4. `protocols/CURRENTNESS_RECONSTRUCTION.md`
 5. `protocols/REPOSITORY_EFFICIENCY_AND_WORKSPACE_HYGIENE.md`
-6. `protocols/PLANNER_KERNEL.md`
-7. `protocols/CAMPAIGN_CHARTER_STANDARD.md`
-8. `protocols/EXECUTION_TEAM_OS.md`
-9. `protocols/PRODUCT_MODEL_AND_THEORY_LOADING.md`
-10. `protocols/CAPABILITY_DAG_AND_ISOLATION.md`
-11. `protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md`
-12. `protocols/REVIEW_FREEZE_AND_TERMINAL_INTEGRITY.md`
-13. load optional modules only when the selected profile requires them:
+6. `protocols/PRODUCT_DISCOVERY_REQUIREMENTS_AND_TECHNICAL_BASELINE.md`
+7. `protocols/PLANNER_KERNEL.md`
+8. `protocols/CAMPAIGN_CHARTER_STANDARD.md`
+9. `protocols/EXECUTION_TEAM_OS.md`
+10. `protocols/PRODUCT_MODEL_AND_THEORY_LOADING.md`
+11. `protocols/CAPABILITY_DAG_AND_ISOLATION.md`
+12. `protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md`
+13. `protocols/REVIEW_FREEZE_AND_TERMINAL_INTEGRITY.md`
+14. load optional modules only when the selected profile requires them:
    - `protocols/MASTER_OWNER_OS.md`
    - `protocols/STATE_DB_LINEAGE_AND_IDEMPOTENCY.md`
    - `protocols/STORAGE_AND_ARTIFACT_LIFECYCLE.md`
@@ -49,7 +50,7 @@ Before material adaptation or planning:
    - `protocols/SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS.md`
    - `protocols/SYSTEMIC_ESCALATION_AND_ANTI_CHURN.md`
    - `protocols/INTERACTION_LEDGER.md`
-14. target-project current requirements/state/code/evidence.
+15. target-project current requirements/state/technical baseline/delivery plan/code/evidence.
 
 For installation, follow `prompts/INSTALL_THIS_SDLC.md`.
 
@@ -90,6 +91,8 @@ Do not ask the CLIENT to debug implementation, select ordinary architecture, rec
 
 Persist material client decisions that change product intent.
 
+Before the first material campaign in a newly baselined project, the Planner must complete product discovery, obtain an explicit non-legal CLIENT baseline confirmation, persist the technical stack/security/network/deployment baseline, and create a dated delivery plan. The CLIENT confirms product requirements; the Planner owns technical choices.
+
 ## Campaign rule
 
 The Planner emits strategic capability charters.
@@ -119,6 +122,9 @@ Before claiming the adapted SDLC is installed, a fresh agent should be able to r
 - current client intent/requirements;
 - product objective;
 - current Product State;
+- requirements-baseline confirmation state;
+- current technical stack/security/network/deployment baseline when present;
+- target release/milestones/next schedule review when present;
 - current code/state authority;
 - active campaign/checkpoint if any;
 - current hard gate;

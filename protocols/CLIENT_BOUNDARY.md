@@ -41,7 +41,10 @@ Examples:
 - subjective visual/audio/UX feedback;
 - business constraints;
 - approval for a paid/external action;
-- materially different product trade-offs.
+- materially different product trade-offs;
+- scope/exclusion clarification;
+- target dates or hard external deadlines;
+- where/how the product is expected to be used when that changes product behavior.
 
 ## Technical client escape
 
@@ -70,6 +73,14 @@ Do not persist casual brainstorming as a hard requirement by literalism.
 
 ## Ask fewer, better questions
 
-Ask one high-leverage CLIENT question when the answer can materially change product architecture, quality, recurring economics or business behavior.
+During initial product discovery, an intentional conversation is expected.
+
+Ask coherent groups of high-leverage questions and synthesize between rounds. A useful default is 3-7 related questions per round rather than one-question-at-a-time interrogation.
+
+After the baseline is coherent, return to sparse high-leverage questions only when the answer can materially change product behavior, quality, recurring economics, schedule or external authority.
 
 Do not request generic feedback every iteration.
+
+Before the first material campaign, ask one explicit baseline-confirmation question after presenting the complete current functional/non-functional/security/network/UI/data/cost/date/exclusion summary.
+
+That confirmation is not a legal signature and must not be used to transfer technical architecture responsibility to the CLIENT.

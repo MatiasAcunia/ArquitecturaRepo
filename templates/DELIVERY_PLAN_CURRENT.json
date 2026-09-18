@@ -1,0 +1,17 @@
+{
+  "schema_version": "delivery-plan-0.1",
+  "product_or_workstream": "PROJECT_ALPHA",
+  "plan_version": "0",
+  "status": "DRAFT",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "planning_start_date": "2030-01-01",
+  "target_release_date": null,
+  "schedule_basis": "TO_BE_PLANNED_FROM_CONFIRMED_REQUIREMENTS_AND_CURRENT_PHYSICAL_STATE",
+  "milestones": [],
+  "risks": [],
+  "schedule_changes": [],
+  "next_review_date": null,
+  "unresolved": [
+    "Create dated milestones after requirements and technical baseline are coherent."
+  ]
+}

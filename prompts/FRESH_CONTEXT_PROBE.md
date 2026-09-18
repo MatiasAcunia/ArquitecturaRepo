@@ -16,6 +16,9 @@ Return a compact reconstruction containing:
 - your role and non-role;
 - current CLIENT requirements and open product questions;
 - Product State;
+- current requirements-baseline confirmation status when present;
+- current technical stack/security/network/deployment baseline when present;
+- target release, milestone status, overdue targets and next schedule review when present;
 - exact current code/ref/runtime authority you can physically establish;
 - active campaign, charter and checkpoint/terminal if any;
 - current gate;

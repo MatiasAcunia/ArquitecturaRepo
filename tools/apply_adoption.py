@@ -78,12 +78,16 @@ def render_requirements(spec: dict[str, Any]) -> str:
         "# CLIENT Requirements — CURRENT",
         "",
         "Status: CURRENT",
+        "Baseline status: DISCOVERY_REQUIRED",
+        "Baseline version: 1",
+        "CLIENT confirmation: PENDING",
+        "Confirmed at: PENDING",
         "",
         "## Product objective",
         "",
         spec["product_objective"],
         "",
-        "## Active decisions",
+        "## Reconstructed active decisions",
         "",
         "| ID | Strength | Decision |",
         "|---|---|---|",
@@ -92,19 +96,28 @@ def render_requirements(spec: dict[str, Any]) -> str:
         decision = item["decision"].replace("|", "\\|").replace("\n", " ")
         rows.append(f"| {item['id']} | {item['strength']} | {decision} |")
 
+    for heading in [
+        "Functional requirements",
+        "Non-functional requirements",
+        "Data / state requirements",
+        "UI / UX expectations",
+        "Security / privacy expectations",
+        "Deployment / networking expectations",
+        "Performance / reliability expectations",
+        "Backup / recovery expectations",
+        "Budget / paid services",
+        "Dates / deadlines",
+        "Explicit exclusions",
+    ]:
+        rows.extend(["", f"## {heading}", "", "- Normalize during product-baseline review."])
+
     rows.extend(["", "## Open product questions", ""])
     if spec["open_product_questions"]:
         rows.extend(f"- {item}" for item in spec["open_product_questions"])
     else:
-        rows.append("- None.")
+        rows.append("- Complete explicit baseline review with the CLIENT.")
 
-    rows.extend(
-        [
-            "",
-            "## External authority",
-            "",
-        ]
-    )
+    rows.extend(["", "## External authority", ""])
     if spec["external_authority"]:
         rows.extend(f"- {item}" for item in spec["external_authority"])
     else:
@@ -113,10 +126,11 @@ def render_requirements(spec: dict[str, Any]) -> str:
     rows.extend(
         [
             "",
-            "## Interpretation rule",
+            "## Confirmation rule",
             "",
-            "This file was normalized from an explicit adoption spec. "
-            "Implementation details do not silently redefine these product decisions.",
+            "Adoption reconstructs current evidence but does not fabricate CLIENT confirmation. "
+            "Run product discovery and obtain one explicit current-baseline confirmation before "
+            "the first material engineering campaign.",
             "",
         ]
     )
@@ -278,8 +292,24 @@ def planned_state(
     product["current_gate"] = spec["current_gate"]
     product["strongest_evidence_refs"] = list(spec["evidence_refs"])
     product["blockers"] = []
-    product["next_legal_boundary"] = spec["next_legal_boundary"]
-    product["forbidden_actions"] = list(spec["forbidden_actions"])
+    baseline_surfaces_present = (
+        (control / "state" / "TECHNICAL_BASELINE_CURRENT.json").exists()
+        or (control / "state" / "DELIVERY_PLAN_CURRENT.json").exists()
+    )
+    if baseline_surfaces_present:
+        product["next_legal_boundary"] = (
+            "Complete CLIENT requirements confirmation, CURRENT technical baseline and "
+            "CURRENT dated delivery plan before opening a material engineering campaign."
+        )
+        product["forbidden_actions"] = list(spec["forbidden_actions"])
+        baseline_forbidden = (
+            "Starting a material engineering campaign before project baseline readiness."
+        )
+        if baseline_forbidden not in product["forbidden_actions"]:
+            product["forbidden_actions"].append(baseline_forbidden)
+    else:
+        product["next_legal_boundary"] = spec["next_legal_boundary"]
+        product["forbidden_actions"] = list(spec["forbidden_actions"])
 
     bootstrap["schema_version"] = "starter-bootstrap-0.2"
     bootstrap["status"] = "READY"
@@ -290,8 +320,8 @@ def planned_state(
     bootstrap["active_checkpoint_or_terminal_ref"] = None
     bootstrap["current_gate"] = spec["current_gate"]
     bootstrap["strongest_evidence_refs"] = list(spec["evidence_refs"])
-    bootstrap["next_legal_boundary"] = spec["next_legal_boundary"]
-    bootstrap["forbidden_actions"] = list(spec["forbidden_actions"])
+    bootstrap["next_legal_boundary"] = product["next_legal_boundary"]
+    bootstrap["forbidden_actions"] = list(product["forbidden_actions"])
     bootstrap.pop("unresolved_currentness", None)
     bootstrap["currentness"] = {
         "verified": True,
@@ -347,6 +377,24 @@ def already_adopted(control: Path, spec: dict[str, Any]) -> bool:
     if product.get("active_campaign") is not None or bootstrap.get("active_campaign_ref") is not None:
         return False
 
+    baseline_surfaces_present = (
+        (control / "state" / "TECHNICAL_BASELINE_CURRENT.json").exists()
+        or (control / "state" / "DELIVERY_PLAN_CURRENT.json").exists()
+    )
+    effective_next_boundary = (
+        "Complete CLIENT requirements confirmation, CURRENT technical baseline and "
+        "CURRENT dated delivery plan before opening a material engineering campaign."
+        if baseline_surfaces_present
+        else spec["next_legal_boundary"]
+    )
+    effective_forbidden = list(spec["forbidden_actions"])
+    if baseline_surfaces_present:
+        baseline_forbidden = (
+            "Starting a material engineering campaign before project baseline readiness."
+        )
+        if baseline_forbidden not in effective_forbidden:
+            effective_forbidden.append(baseline_forbidden)
+
     expected_product = {
         "current_code_ref": spec["current_code_ref"],
         "product_objective": spec["product_objective"],
@@ -355,8 +403,8 @@ def already_adopted(control: Path, spec: dict[str, Any]) -> bool:
         "capabilities": list(spec["capabilities"]),
         "current_gate": spec["current_gate"],
         "strongest_evidence_refs": list(spec["evidence_refs"]),
-        "next_legal_boundary": spec["next_legal_boundary"],
-        "forbidden_actions": list(spec["forbidden_actions"]),
+        "next_legal_boundary": effective_next_boundary,
+        "forbidden_actions": effective_forbidden,
     }
     for key, expected in expected_product.items():
         if product.get(key) != expected:
@@ -367,8 +415,8 @@ def already_adopted(control: Path, spec: dict[str, Any]) -> bool:
         "role": spec["role"],
         "current_gate": spec["current_gate"],
         "strongest_evidence_refs": list(spec["evidence_refs"]),
-        "next_legal_boundary": spec["next_legal_boundary"],
-        "forbidden_actions": list(spec["forbidden_actions"]),
+        "next_legal_boundary": effective_next_boundary,
+        "forbidden_actions": effective_forbidden,
     }
     for key, expected in expected_bootstrap.items():
         if bootstrap.get(key) != expected:

@@ -1,0 +1,74 @@
+{
+  "schema_version": "technical-baseline-0.1",
+  "product_or_workstream": "PROJECT_ALPHA",
+  "baseline_version": "0",
+  "status": "DRAFT",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "source_requirements_ref": "state/CLIENT_REQUIREMENTS_CURRENT.md",
+  "decision_owner": "I2_PROJECT_WORKSTREAM_PLANNER",
+  "environment": {
+    "development_os": "UNDECIDED",
+    "deployment_target": "UNDECIDED",
+    "machine_profile": {
+      "assessment_status": "UNASSESSED",
+      "os_summary": "",
+      "cpu_summary": "",
+      "ram_gb": null,
+      "storage_free_gb": null,
+      "gpu_summary": "",
+      "notes": ""
+    },
+    "network_mode": "UNDECIDED"
+  },
+  "stack": {
+    "language": "UNDECIDED",
+    "runtime": "UNDECIDED",
+    "backend": "UNDECIDED",
+    "frontend": "UNDECIDED",
+    "database": "UNDECIDED",
+    "persistence_migrations": "UNDECIDED",
+    "package_manager": "UNDECIDED",
+    "test_stack": "UNDECIDED",
+    "deployment": "UNDECIDED",
+    "rationale": "TO_BE_DECIDED"
+  },
+  "security": {
+    "authentication_model": "UNDECIDED",
+    "authorization_model": "UNDECIDED",
+    "secrets_management": "UNDECIDED",
+    "data_classification": "UNDECIDED",
+    "backup_recovery": "UNDECIDED",
+    "exposure_controls": [
+      "TO_BE_DECIDED"
+    ]
+  },
+  "networking": {
+    "listen_scope": "UNDECIDED",
+    "ports_services": [],
+    "tls": "UNDECIDED",
+    "dns": "UNDECIDED",
+    "firewall_notes": "UNDECIDED"
+  },
+  "ui_quality": {
+    "strategy": "SIMPLE_FUNCTIONAL_UNLESS_PRODUCT_REQUIRES_MORE",
+    "required_checks": [
+      "No broken controls or navigation",
+      "Forms validate and communicate errors",
+      "No obvious supported-screen layout breakage"
+    ]
+  },
+  "operations": {
+    "logging_observability": "UNDECIDED",
+    "backup_restore": "UNDECIDED",
+    "rollback": "UNDECIDED"
+  },
+  "costs": {
+    "developer_ai_tooling": "TO_BE_RECORDED",
+    "product_external_services": [],
+    "recurring_cost_assumptions": []
+  },
+  "change_policy": "CURRENT stack choices remain stable until evidence justifies explicit supersession with impact analysis.",
+  "unresolved": [
+    "Complete technical baseline after CLIENT requirements confirmation."
+  ]
+}

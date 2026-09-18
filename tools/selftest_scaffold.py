@@ -94,11 +94,32 @@ def main() -> int:
                 "repo_delta.py",
                 "commit_guard.py",
                 "workspace_gc.py",
+                "baseline_guard.py",
+                "project_status.py",
             ):
                 if not (control / "tools" / portable_tool).exists():
                     raise AssertionError(
                         f"{profile}: copied adoption tool missing: {portable_tool}"
                     )
+            for baseline_surface in (
+                "state/TECHNICAL_BASELINE_CURRENT.json",
+                "state/DELIVERY_PLAN_CURRENT.json",
+                "governance/AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md",
+            ):
+                if not (control / baseline_surface).exists():
+                    raise AssertionError(
+                        f"{profile}: baseline surface missing: {baseline_surface}"
+                    )
+            baseline_guard = run(
+                str(control / "tools" / "baseline_guard.py"),
+                "--control-root",
+                str(control),
+                "--json",
+            )
+            if baseline_guard.returncode == 0:
+                raise AssertionError(
+                    f"{profile}: fresh scaffold baseline must start blocked"
+                )
             if not (control / "templates" / "WORKSPACE_LIFECYCLE.json").exists():
                 raise AssertionError(f"{profile}: workspace lifecycle template missing")
             if not (control / "migrations" / "registry.json").exists():
@@ -215,6 +236,7 @@ def main() -> int:
     print("- copied reconstruction tool is self-contained")
     print("- discovery/adoption/recovery tools are self-contained")
     print("- delta-sync/commit-boundary/local-GC tools are self-contained")
+    print("- product-baseline/status tools are self-contained and fresh baseline starts blocked")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0

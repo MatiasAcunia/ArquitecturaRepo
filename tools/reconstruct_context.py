@@ -197,6 +197,8 @@ def reconstruct(root: Path) -> dict[str, Any]:
     bootstrap_path, bootstrap = bootstrap_record
 
     owner_record = one(records, {"owner-registry-0.1"}, "owner registry", product)
+    technical_record = one(records, {"technical-baseline-0.1"}, "technical baseline", product)
+    delivery_record = one(records, {"delivery-plan-0.1"}, "delivery plan", product)
     owner_registry = owner_record[1] if owner_record else None
 
     authority_records = [
@@ -259,6 +261,44 @@ def reconstruct(root: Path) -> dict[str, Any]:
         },
         "currentness": currentness,
         "current_owners": current_owners(owner_registry),
+        "technical_baseline": (
+            {
+                "status": technical_record[1].get("status"),
+                "baseline_version": technical_record[1].get("baseline_version"),
+                "deployment_target": technical_record[1].get("environment", {}).get("deployment_target"),
+                "network_mode": technical_record[1].get("environment", {}).get("network_mode"),
+                "stack": {
+                    "language": technical_record[1].get("stack", {}).get("language"),
+                    "backend": technical_record[1].get("stack", {}).get("backend"),
+                    "frontend": technical_record[1].get("stack", {}).get("frontend"),
+                    "database": technical_record[1].get("stack", {}).get("database"),
+                },
+                "unresolved": list(technical_record[1].get("unresolved", [])),
+            }
+            if technical_record
+            else None
+        ),
+        "delivery_plan": (
+            {
+                "status": delivery_record[1].get("status"),
+                "plan_version": delivery_record[1].get("plan_version"),
+                "target_release_date": delivery_record[1].get("target_release_date"),
+                "next_review_date": delivery_record[1].get("next_review_date"),
+                "milestones": [
+                    {
+                        "id": item.get("id"),
+                        "title": item.get("title"),
+                        "target_date": item.get("target_date"),
+                        "status": item.get("status"),
+                        "forecast_confidence": item.get("forecast_confidence"),
+                    }
+                    for item in delivery_record[1].get("milestones", [])
+                ],
+                "unresolved": list(delivery_record[1].get("unresolved", [])),
+            }
+            if delivery_record
+            else None
+        ),
         "execution_authority": authority_summary(authority),
         "campaign_runtime": runtime_summary(runtime),
         "forbidden_actions": forbidden,

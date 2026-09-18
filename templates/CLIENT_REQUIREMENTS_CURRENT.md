@@ -1,30 +1,67 @@
 # CLIENT Requirements — CURRENT
 
 Status: CURRENT
+Baseline status: DRAFT
+Baseline version: 0
+CLIENT confirmation: PENDING
+Confirmed at: PENDING
 
 ## Product objective
 
-Describe the product in client-visible terms.
+Describe the client-visible product outcome.
 
-## Active decisions
+## Functional requirements
 
-| ID | Strength | Decision | Applies to | Evidence |
-|---|---|---|---|---|
-| REQ-001 | HARD_REQUIREMENT / EXPLICIT_DECISION / QUALITY_BAR / STRONG_PREFERENCE / DIRECTION | ... | ... | interaction/ref |
+- TO_BE_DISCOVERED.
+
+## Non-functional requirements
+
+- TO_BE_DISCOVERED.
+
+## Data / state requirements
+
+- TO_BE_DISCOVERED.
+
+## UI / UX expectations
+
+- TO_BE_DISCOVERED.
+
+## Security / privacy expectations
+
+- TO_BE_DISCOVERED.
+
+## Deployment / networking expectations
+
+- TO_BE_DISCOVERED.
+
+## Performance / reliability expectations
+
+- TO_BE_DISCOVERED.
+
+## Backup / recovery expectations
+
+- TO_BE_DISCOVERED.
+
+## Budget / paid services
+
+- TO_BE_DISCOVERED.
+
+## Dates / deadlines
+
+- TO_BE_DISCOVERED.
+
+## Explicit exclusions
+
+- TO_BE_DISCOVERED.
 
 ## Open product questions
 
-Only questions whose answers can materially change product/business behavior.
+- Product discovery not complete.
 
 ## Superseded decisions
 
-| ID | Superseded by | Prior decision | Reason |
-|---|---|---|---|
+- None.
 
-## External authority
+## Confirmation rule
 
-Record credentials/access, paid actions, publication, irreversible/destructive boundaries and other client-reserved authority.
-
-## Interpretation rule
-
-Do not promote brainstorming or implementation suggestions into hard requirements without evidence.
+CLIENT confirmation means this document accurately represents the current product baseline. It is not a legal signature and does not approve technical implementation choices.

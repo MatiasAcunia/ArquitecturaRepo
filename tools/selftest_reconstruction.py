@@ -105,9 +105,16 @@ def main() -> int:
             "PRODUCT_STATE",
             "CURRENT_BOOTSTRAP",
             "CANONICAL_OWNER_REGISTRY",
+            "TECHNICAL_BASELINE",
+            "DELIVERY_PLAN",
         }:
             if concern not in owner_concerns:
                 raise AssertionError(f"fresh reconstruction missing owner concern {concern}")
+
+        if fresh_state["technical_baseline"]["status"] != "DRAFT":
+            raise AssertionError("fresh scaffold technical baseline must start DRAFT")
+        if fresh_state["delivery_plan"]["status"] != "DRAFT":
+            raise AssertionError("fresh scaffold delivery plan must start DRAFT")
 
         active = must_reconstruct(
             ROOT / "examples" / "active_campaign",

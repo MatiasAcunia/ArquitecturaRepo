@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from baseline_guard import evaluate_baseline
+
 from state_tx import (
     StateTransactionError,
     atomic_json,
@@ -300,8 +302,23 @@ def update_product_and_bootstrap_checkpoint(
         atomic_json(bs_path, bs)
 
 
+def require_project_baseline_if_present(control: Path) -> None:
+    refs = [
+        control / "state" / "CLIENT_REQUIREMENTS_CURRENT.md",
+        control / "state" / "TECHNICAL_BASELINE_CURRENT.json",
+        control / "state" / "DELIVERY_PLAN_CURRENT.json",
+    ]
+    if not any(path.exists() for path in refs[1:]):
+        return
+    report = evaluate_baseline(control)
+    if not report.get("ready"):
+        detail = "; ".join(report.get("errors", []))
+        raise CampaignError(f"PROJECT_BASELINE_NOT_READY: {detail}")
+
+
 def cmd_init(args: argparse.Namespace) -> None:
     control = control_root(args)
+    require_project_baseline_if_present(control)
     rt_path = runtime_path(control)
     if rt_path.exists() and not args.force:
         raise CampaignError(f"runtime already exists: {rt_path}")

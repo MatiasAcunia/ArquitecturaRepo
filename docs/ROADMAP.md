@@ -241,3 +241,21 @@ Implemented from observed operational failure classes:
 - v1 release gate extended to cover these failure classes.
 
 This is a defect-driven patch under the post-1.0 stopping rule; role topology and product authority are unchanged.
+
+
+## v1.1 — Product discovery and engineering baseline
+
+Implemented:
+
+- structured product-discovery conversation before first material campaign;
+- CLIENT-confirmed current requirements baseline without treating confirmation as a legal signature;
+- Planner-owned persistent technical stack/security/network/deployment baseline;
+- machine/environment capability assessment when material;
+- simple-functional UI default with explicit system-verifiable checks;
+- dated delivery plan with milestone confidence, risks and schedule-change history;
+- derived project status/tracker instead of a second manual source of truth;
+- project-local Agentic SDLC operating review for real-use/pilot evidence;
+- campaign runtime fail-closed baseline guard for new scaffolds;
+- fresh-context reconstruction includes technical/delivery baseline state.
+
+This is an evidence-driven capability addition, not a restart of open-ended architecture iteration.

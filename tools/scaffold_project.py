@@ -39,6 +39,8 @@ def build_currentness_set(include_identity: bool) -> list[str]:
         "state/PRODUCT_STATE_CURRENT.json",
         "state/CURRENT_BOOTSTRAP_STATE.json",
         "state/OWNER_REGISTRY_CURRENT.json",
+        "state/TECHNICAL_BASELINE_CURRENT.json",
+        "state/DELIVERY_PLAN_CURRENT.json",
         "governance/PROJECT_OVERLAY.md",
     ]
     if include_identity:
@@ -76,6 +78,7 @@ def create_scaffold(
     profile = PROFILES[profile_name]
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     version = MANIFEST["version"]
+    today = now[:10]
 
     core_protocols = list(MANIFEST["core_protocols"])
     optional_protocols = list(profile["optional_protocols"])
@@ -136,6 +139,14 @@ def create_scaffold(
         ROOT / "tools" / "apply_adoption.py",
         control / "tools" / "apply_adoption.py",
     )
+    copy_file(
+        ROOT / "tools" / "baseline_guard.py",
+        control / "tools" / "baseline_guard.py",
+    )
+    copy_file(
+        ROOT / "tools" / "project_status.py",
+        control / "tools" / "project_status.py",
+    )
     for portable_tool in ("repo_delta.py", "commit_guard.py", "workspace_gc.py"):
         copy_file(
             ROOT / "tools" / portable_tool,
@@ -164,18 +175,62 @@ def create_scaffold(
     requirements = f"""# CLIENT Requirements — CURRENT
 
 Status: CURRENT
+Baseline status: DRAFT
+Baseline version: 0
+CLIENT confirmation: PENDING
+Confirmed at: PENDING
 
 ## Product objective
 
 {objective}
 
-## Active decisions
+## Functional requirements
 
-No normalized material decisions have been captured yet beyond the initial objective.
+- TO_BE_DISCOVERED.
+
+## Non-functional requirements
+
+- TO_BE_DISCOVERED.
+
+## Data / state requirements
+
+- TO_BE_DISCOVERED.
+
+## UI / UX expectations
+
+- Prefer the simplest interface that correctly supports the product unless the CLIENT requests a stronger visual bar.
+
+## Security / privacy expectations
+
+- TO_BE_DISCOVERED from actual exposure and data.
+
+## Deployment / networking expectations
+
+- TO_BE_DISCOVERED: local machine, LAN, Internet/cloud or another target.
+
+## Performance / reliability expectations
+
+- TO_BE_DISCOVERED.
+
+## Backup / recovery expectations
+
+- TO_BE_DISCOVERED.
+
+## Budget / paid services
+
+- TO_BE_DISCOVERED.
+
+## Dates / deadlines
+
+- TO_BE_DISCOVERED.
+
+## Explicit exclusions
+
+- TO_BE_DISCOVERED.
 
 ## Open product questions
 
-- Confirm or refine product requirements during product discovery when they materially affect product/business behavior.
+- Complete product discovery with the CLIENT before first material campaign.
 
 ## Superseded decisions
 
@@ -185,11 +240,111 @@ No normalized material decisions have been captured yet beyond the initial objec
 
 - No external, paid, publication or destructive authority is implied by this scaffold.
 
-## Interpretation rule
+## Confirmation rule
 
-This file is a fail-closed starting point. Do not convert placeholders or implementation suggestions into hard requirements.
+CLIENT confirmation means this document accurately represents the current product baseline. It is not a legal signature and does not approve technical implementation choices.
 """
     write_text(control / "state" / "CLIENT_REQUIREMENTS_CURRENT.md", requirements)
+
+    write_json(
+        control / "state" / "TECHNICAL_BASELINE_CURRENT.json",
+        {
+            "schema_version": "technical-baseline-0.1",
+            "product_or_workstream": product_id,
+            "baseline_version": "0",
+            "status": "DRAFT",
+            "updated_at": now,
+            "source_requirements_ref": "state/CLIENT_REQUIREMENTS_CURRENT.md",
+            "decision_owner": "I2_PROJECT_WORKSTREAM_PLANNER",
+            "environment": {
+                "development_os": "UNDECIDED",
+                "deployment_target": "UNDECIDED",
+                "network_mode": "UNDECIDED",
+                "machine_profile": {
+                    "assessment_status": "UNASSESSED",
+                    "os_summary": "",
+                    "cpu_summary": "",
+                    "ram_gb": None,
+                    "storage_free_gb": None,
+                    "gpu_summary": "",
+                    "notes": "",
+                },
+            },
+            "stack": {
+                "language": "UNDECIDED",
+                "runtime": "UNDECIDED",
+                "backend": "UNDECIDED",
+                "frontend": "UNDECIDED",
+                "database": "UNDECIDED",
+                "persistence_migrations": "UNDECIDED",
+                "package_manager": "UNDECIDED",
+                "test_stack": "UNDECIDED",
+                "deployment": "UNDECIDED",
+                "rationale": "TO_BE_DECIDED",
+            },
+            "security": {
+                "authentication_model": "UNDECIDED",
+                "authorization_model": "UNDECIDED",
+                "secrets_management": "UNDECIDED",
+                "data_classification": "UNDECIDED",
+                "backup_recovery": "UNDECIDED",
+                "exposure_controls": ["TO_BE_DECIDED"],
+            },
+            "networking": {
+                "listen_scope": "UNDECIDED",
+                "ports_services": [],
+                "tls": "UNDECIDED",
+                "dns": "UNDECIDED",
+                "firewall_notes": "UNDECIDED",
+            },
+            "ui_quality": {
+                "strategy": "SIMPLE_FUNCTIONAL_UNLESS_PRODUCT_REQUIRES_MORE",
+                "required_checks": [
+                    "No broken controls or navigation",
+                    "Forms validate and communicate errors",
+                    "No obvious supported-screen layout breakage",
+                ],
+            },
+            "operations": {
+                "logging_observability": "UNDECIDED",
+                "backup_restore": "UNDECIDED",
+                "rollback": "UNDECIDED",
+            },
+            "costs": {
+                "developer_ai_tooling": "TO_BE_RECORDED",
+                "product_external_services": [],
+                "recurring_cost_assumptions": [],
+            },
+            "change_policy": (
+                "CURRENT stack choices remain stable until evidence justifies an explicit "
+                "supersession with impact analysis."
+            ),
+            "unresolved": [
+                "Complete technical baseline after CLIENT requirements confirmation."
+            ],
+        },
+    )
+
+    write_json(
+        control / "state" / "DELIVERY_PLAN_CURRENT.json",
+        {
+            "schema_version": "delivery-plan-0.1",
+            "product_or_workstream": product_id,
+            "plan_version": "0",
+            "status": "DRAFT",
+            "updated_at": now,
+            "planning_start_date": today,
+            "target_release_date": None,
+            "schedule_basis": "TO_BE_PLANNED_FROM_CONFIRMED_REQUIREMENTS_AND_CURRENT_PHYSICAL_STATE",
+            "milestones": [],
+            "risks": [],
+            "schedule_changes": [],
+            "next_review_date": None,
+            "unresolved": [
+                "Create dated milestones after requirements and technical baseline are coherent."
+            ],
+        },
+    )
 
     product_state = {
         "schema_version": "product-state-0.1",
@@ -349,6 +504,43 @@ This file is a fail-closed starting point. Do not convert placeholders or implem
             "superseded_by_owner_id": None,
         },
     ]
+    owner_entries.extend(
+        [
+            {
+                "owner_id": "OWNER_TECHNICAL_BASELINE_001",
+                "concern_id": "TECHNICAL_BASELINE",
+                "scope": product_id,
+                "status": "CURRENT",
+                "surface_ref": "state/TECHNICAL_BASELINE_CURRENT.json",
+                "surface_type": "FILE",
+                "required_in_currentness_set": True,
+                "supersedes_owner_ids": [],
+                "superseded_by_owner_id": None,
+            },
+            {
+                "owner_id": "OWNER_DELIVERY_PLAN_001",
+                "concern_id": "DELIVERY_PLAN",
+                "scope": product_id,
+                "status": "CURRENT",
+                "surface_ref": "state/DELIVERY_PLAN_CURRENT.json",
+                "surface_type": "FILE",
+                "required_in_currentness_set": True,
+                "supersedes_owner_ids": [],
+                "superseded_by_owner_id": None,
+            },
+            {
+                "owner_id": "OWNER_SDLC_OPERATING_REVIEW_001",
+                "concern_id": "AGENTIC_SDLC_OPERATING_REVIEW",
+                "scope": product_id,
+                "status": "CURRENT",
+                "surface_ref": "governance/AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md",
+                "surface_type": "FILE",
+                "required_in_currentness_set": False,
+                "supersedes_owner_ids": [],
+                "superseded_by_owner_id": None,
+            },
+        ]
+    )
     if include_identity:
         owner_entries.extend(
             [
@@ -450,12 +642,14 @@ Start every fresh authority-bearing context as UNTRUSTED_CONTEXT.
 Before material mutation read:
 
 1. state/CLIENT_REQUIREMENTS_CURRENT.md
-2. state/PRODUCT_STATE_CURRENT.json
-3. state/CURRENT_BOOTSTRAP_STATE.json
-4. state/OWNER_REGISTRY_CURRENT.json
-5. governance/PROJECT_OVERLAY.md
-6. applicable files under protocols/
-7. live project code/state/runtime evidence
+2. state/TECHNICAL_BASELINE_CURRENT.json
+3. state/DELIVERY_PLAN_CURRENT.json
+4. state/PRODUCT_STATE_CURRENT.json
+5. state/CURRENT_BOOTSTRAP_STATE.json
+6. state/OWNER_REGISTRY_CURRENT.json
+7. governance/PROJECT_OVERLAY.md
+8. applicable files under protocols/
+9. live project code/state/runtime evidence
 
 Do not treat this scaffold as evidence that the product is implemented.
 
@@ -470,6 +664,67 @@ With a trusted local baseline, refresh remote state delta-first; do not default 
 System-created local workspaces should be lifecycle-marked and cleaned only through explicit safe-delete authority.
 """
     write_text(control / "AGENTS.md", agents)
+
+    write_text(
+        control / "governance" / "AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md",
+        f"""# Agentic SDLC Operating Review — CURRENT
+
+Status: CURRENT
+
+This is process-improvement evidence, not product authority.
+
+## Review period
+
+- from: {today}
+- to: OPEN
+- next review: TO_BE_SCHEDULED
+
+## Overall architecture usefulness
+
+- rating: UNKNOWN
+- summary: Initial installation; insufficient evidence.
+
+## Planner / CLIENT interaction
+
+- useful product questions: TO_BE_OBSERVED
+- repetitive/low-value questions: TO_BE_OBSERVED
+- technical questions that escaped to CLIENT: TO_BE_OBSERVED
+- product decisions correctly persisted: TO_BE_OBSERVED
+
+## Delivery / dates
+
+- forecast quality: UNKNOWN
+- missed targets: None yet.
+- causes: None yet.
+- schedule corrections: None yet.
+
+## Execution / recovery
+
+- major execution failures: None yet.
+- recovery incidents: None yet.
+- repeated failure signatures: None yet.
+
+## Repository / local hygiene
+
+- commit-boundary incidents: None yet.
+- unnecessary pull/reclone/full-read incidents: None yet.
+- workspace/garbage incidents: None yet.
+
+## What worked
+
+- TO_BE_OBSERVED.
+
+## What created friction
+
+- TO_BE_OBSERVED.
+
+## Corrective actions
+
+| Finding | Causal owner | Action | Status |
+|---|---|---|---|
+| Initial observation period | I2 Planner | Review after material usage evidence exists | OPEN |
+""",
+    )
 
     runtime_report_line = (
         "- optional campaign runtime/controller;"
@@ -498,6 +753,9 @@ System-created local workspaces should be lifecycle-marked and cleaned only thro
 - machine-readable schemas;
 - CLIENT requirements owner;
 - Product State owner;
+- product-discovery requirements baseline;
+- technical stack/security/network/deployment baseline;
+- dated delivery-plan surface;
 - bootstrap/currentness state;
 - canonical owner registry;
 - project overlay;
@@ -516,11 +774,13 @@ System-created local workspaces should be lifecycle-marked and cleaned only thro
 ## Open HOLDs
 
 - exact code/runtime authority has not been reconstructed;
-- product-specific capability map and gates are not yet established.
+- product-specific capability map and gates are not yet established;
+- requirements are not CLIENT-confirmed;
+- technical baseline and dated delivery plan are still DRAFT.
 
 ## First legal boundary
 
-Perform read-only discovery and currentness reconstruction. Do not start a material engineering campaign yet.
+Perform read-only discovery/currentness reconstruction, then product discovery, requirements confirmation, technical baseline and dated delivery planning. Do not start a material engineering campaign until the baseline guard passes.
 
 ## Falsifiers
 
@@ -564,7 +824,7 @@ Generated from Agentic SDLC starter {version}.
 - product/workstream: {product_id}
 - initial state: HOLD / UNTRUSTED_CONTEXT
 
-Next action: perform read-only discovery and currentness reconstruction.
+Next action: read-only discovery -> currentness reconstruction -> product discovery -> CLIENT requirements confirmation -> technical baseline -> dated delivery plan -> baseline guard.
 
 Install the validation dependency:
 
