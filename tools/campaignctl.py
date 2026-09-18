@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import shutil
 import sys
 import tempfile
 import time
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -117,9 +120,259 @@ def atomic_json(path: Path, data: dict[str, Any]) -> None:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(tmp_name, path)
+        fsync_dir(path.parent)
     finally:
         if os.path.exists(tmp_name):
             os.unlink(tmp_name)
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def sha256_file(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def fsync_dir(path: Path) -> None:
+    if os.name == "nt":
+        return
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def durable_bytes(path: Path, payload: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "wb") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    fsync_dir(path.parent)
+
+
+def journal_path(control: Path) -> Path:
+    return control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json"
+
+
+def transaction_stage_dir(control: Path, transaction_id: str) -> Path:
+    return control / "runtime" / "transactions" / transaction_id
+
+
+def internal_relative_path(control: Path, path: Path) -> str:
+    resolved_control = control.resolve()
+    resolved_path = path.resolve()
+    try:
+        return str(resolved_path.relative_to(resolved_control))
+    except ValueError:
+        raise CampaignError(f"transaction target escapes control root: {path}")
+
+
+def cleanup_transaction_files(control: Path, journal: dict[str, Any]) -> None:
+    tx_dir = transaction_stage_dir(control, journal["transaction_id"])
+    if tx_dir.exists():
+        shutil.rmtree(tx_dir)
+        fsync_dir(tx_dir.parent)
+    current = journal_path(control)
+    if current.exists():
+        current.unlink()
+        fsync_dir(current.parent)
+
+
+def mark_transaction_conflict(
+    control: Path,
+    journal: dict[str, Any],
+    reason: str,
+) -> None:
+    journal["status"] = "CONFLICT"
+    journal["conflict_reason"] = reason
+    journal["updated_at"] = now()
+    atomic_json(journal_path(control), journal)
+
+
+def recover_pending_transaction(control: Path) -> str | None:
+    path = journal_path(control)
+    if not path.exists():
+        return None
+
+    journal = load_json(path)
+    if journal.get("schema_version") != "transition-journal-0.1":
+        raise CampaignError(f"unsupported transition journal: {path}")
+    if journal.get("status") == "CONFLICT":
+        raise CampaignError(
+            f"transaction conflict requires manual reconciliation: "
+            f"{journal.get('conflict_reason')}"
+        )
+
+    for op in journal["operations"]:
+        target = control / op["path"]
+        stage = control / op["stage_ref"]
+        current_hash = sha256_file(target)
+
+        if current_hash == op["after_sha256"]:
+            op["applied"] = True
+            continue
+
+        if op["before_exists"]:
+            if current_hash != op["before_sha256"]:
+                reason = (
+                    f"{op['path']}: target hash is neither transaction before nor after state"
+                )
+                mark_transaction_conflict(control, journal, reason)
+                raise CampaignError(reason)
+        elif target.exists():
+            reason = f"{op['path']}: target unexpectedly exists during recovery"
+            mark_transaction_conflict(control, journal, reason)
+            raise CampaignError(reason)
+
+        stage_hash = sha256_file(stage)
+        if stage_hash != op["after_sha256"]:
+            reason = (
+                f"{op['path']}: staged payload missing or hash-mismatched during recovery"
+            )
+            mark_transaction_conflict(control, journal, reason)
+            raise CampaignError(reason)
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(stage, target)
+        fsync_dir(target.parent)
+        op["applied"] = True
+        journal["status"] = "COMMITTING"
+        journal["updated_at"] = now()
+        atomic_json(path, journal)
+
+    for op in journal["operations"]:
+        target = control / op["path"]
+        if sha256_file(target) != op["after_sha256"]:
+            reason = f"{op['path']}: after-state verification failed"
+            mark_transaction_conflict(control, journal, reason)
+            raise CampaignError(reason)
+
+    journal["status"] = "COMMITTED"
+    journal["updated_at"] = now()
+    atomic_json(path, journal)
+    txid = journal["transaction_id"]
+    cleanup_transaction_files(control, journal)
+    return txid
+
+
+def transaction_write_json(
+    control: Path,
+    label: str,
+    writes: list[tuple[Path, dict[str, Any]]],
+) -> str:
+    if not writes:
+        raise CampaignError("transaction requires at least one write")
+
+    if journal_path(control).exists():
+        raise CampaignError(
+            "pending transition exists; run campaignctl recover before starting another mutation"
+        )
+
+    txid = uuid.uuid4().hex
+    tx_dir = transaction_stage_dir(control, txid)
+    tx_dir.mkdir(parents=True, exist_ok=False)
+    fsync_dir(tx_dir.parent)
+
+    operations: list[dict[str, Any]] = []
+    seen_paths: set[str] = set()
+    try:
+        for index, (target, data) in enumerate(writes, start=1):
+            rel_target = internal_relative_path(control, target)
+            if rel_target in seen_paths:
+                raise CampaignError(f"duplicate transaction target: {rel_target}")
+            seen_paths.add(rel_target)
+
+            payload = (json.dumps(data, indent=2) + "\n").encode("utf-8")
+            stage = tx_dir / f"op_{index:04d}.json"
+            durable_bytes(stage, payload)
+            before_exists = target.exists()
+            operations.append(
+                {
+                    "path": rel_target,
+                    "before_exists": before_exists,
+                    "before_sha256": sha256_file(target) if before_exists else None,
+                    "after_sha256": sha256_bytes(payload),
+                    "stage_ref": internal_relative_path(control, stage),
+                    "applied": False,
+                }
+            )
+    except Exception:
+        if tx_dir.exists():
+            shutil.rmtree(tx_dir)
+            fsync_dir(tx_dir.parent)
+        raise
+
+    created = now()
+    journal = {
+        "schema_version": "transition-journal-0.1",
+        "transaction_id": txid,
+        "label": label,
+        "status": "PREPARED",
+        "created_at": created,
+        "updated_at": created,
+        "operations": operations,
+        "conflict_reason": None,
+    }
+    atomic_json(journal_path(control), journal)
+
+    journal["status"] = "COMMITTING"
+    journal["updated_at"] = now()
+    atomic_json(journal_path(control), journal)
+
+    crash_after_raw = os.getenv("AGENTIC_SDLC_TEST_CRASH_AFTER_APPLY")
+    crash_after = int(crash_after_raw) if crash_after_raw else None
+    applied_count = 0
+
+    for op in journal["operations"]:
+        target = control / op["path"]
+        stage = control / op["stage_ref"]
+        current_hash = sha256_file(target)
+
+        if op["before_exists"]:
+            if current_hash != op["before_sha256"]:
+                reason = f"{op['path']}: target changed after transaction preparation"
+                mark_transaction_conflict(control, journal, reason)
+                raise CampaignError(reason)
+        elif target.exists():
+            reason = f"{op['path']}: target appeared after transaction preparation"
+            mark_transaction_conflict(control, journal, reason)
+            raise CampaignError(reason)
+
+        if sha256_file(stage) != op["after_sha256"]:
+            reason = f"{op['path']}: staged payload failed integrity check"
+            mark_transaction_conflict(control, journal, reason)
+            raise CampaignError(reason)
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(stage, target)
+        fsync_dir(target.parent)
+        op["applied"] = True
+        applied_count += 1
+        journal["updated_at"] = now()
+        atomic_json(journal_path(control), journal)
+
+        if crash_after is not None and applied_count == crash_after:
+            os._exit(91)
+
+    journal["status"] = "COMMITTED"
+    journal["updated_at"] = now()
+    atomic_json(journal_path(control), journal)
+    cleanup_transaction_files(control, journal)
+    return txid
+
+
+def require_no_pending_transaction(control: Path) -> None:
+    if journal_path(control).exists():
+        journal = load_json(journal_path(control))
+        raise CampaignError(
+            f"pending transition journal {journal.get('transaction_id')}; "
+            "run campaignctl recover before read-only inspection"
+        )
 
 
 def control_root(args: argparse.Namespace) -> Path:
@@ -395,8 +648,6 @@ def cmd_init(args: argparse.Namespace) -> None:
         for capability in ps["capabilities"]:
             if capability["id"] == charter["capability"]:
                 capability["physical_state"] = "ACTIVE_CAMPAIGN"
-        ps["updated_at"] = now()
-        atomic_json(ps_path, ps)
     elif active.get("campaign_id") != charter["campaign_id"]:
         raise CampaignError(
             f"Product State already has different active campaign: {active.get('campaign_id')}"
@@ -426,9 +677,7 @@ def cmd_init(args: argparse.Namespace) -> None:
         "CAMPAIGN_RUNTIME_INITIALIZED",
         details={"integrated_ref": integrated_ref},
     )
-    save_runtime(control, state)
 
-    ps = load_json(ps_path)
     runtime_ref = "runtime/CAMPAIGN_RUNTIME_CURRENT.json"
     if runtime_ref not in ps.get("currentness_set", []):
         ps.setdefault("currentness_set", []).append(runtime_ref)
@@ -441,7 +690,11 @@ def cmd_init(args: argparse.Namespace) -> None:
         if identity_ref not in ps["currentness_set"]:
             ps["currentness_set"].append(identity_ref)
     ps["updated_at"] = now()
-    atomic_json(ps_path, ps)
+
+    writes: list[tuple[Path, dict[str, Any]]] = [
+        (rt_path, state),
+        (ps_path, ps),
+    ]
 
     bs_path = bootstrap_path(control)
     if bs_path.exists():
@@ -453,10 +706,10 @@ def cmd_init(args: argparse.Namespace) -> None:
         bs["next_legal_boundary"] = (
             "Continue the same campaign through the durable campaign runtime."
         )
-        atomic_json(bs_path, bs)
+        writes.append((bs_path, bs))
 
+    transaction_write_json(control, "CAMPAIGN_INIT", writes)
     print(f"INITIALIZED {state['campaign_id']} at {rt_path}")
-
 
 def cmd_add(args: argparse.Namespace) -> None:
     control = control_root(args)
@@ -691,11 +944,10 @@ def cmd_checkpoint(args: argparse.Namespace) -> None:
             "Reconstruct Product State, charter, execution authority and this checkpoint; "
             "then continue READY work in the same campaign if the charter remains valid."
         ),
-        "strategic_return_required": state["campaign_status"] == "STRATEGIC_TERMINAL",
+        "strategic_return_required": False,
     }
 
     cp_path = control / "campaigns" / state["campaign_id"] / "CHECKPOINT_CURRENT.json"
-    atomic_json(cp_path, checkpoint)
     event(
         state,
         "CHECKPOINT_WRITTEN",
@@ -705,8 +957,37 @@ def cmd_checkpoint(args: argparse.Namespace) -> None:
             "path": relative_to_control(control, cp_path),
         },
     )
-    save_runtime(control, state)
-    update_product_and_bootstrap_checkpoint(control, state, checkpoint_id)
+
+    ps_path = product_state_path(control)
+    ps = load_json(ps_path)
+    active = ps.get("active_campaign")
+    if not active or active.get("campaign_id") != state["campaign_id"]:
+        raise CampaignError("Product State active campaign does not match runtime campaign")
+    ps["current_code_ref"] = state["integrated_ref"]
+    active["checkpoint_or_terminal_ref"] = checkpoint_id
+    canonical_checkpoint_ref = f"campaigns/{state['campaign_id']}/CHECKPOINT_CURRENT.json"
+    if canonical_checkpoint_ref not in ps.get("currentness_set", []):
+        ps.setdefault("currentness_set", []).append(canonical_checkpoint_ref)
+    ps["updated_at"] = now()
+
+    writes: list[tuple[Path, dict[str, Any]]] = [
+        (cp_path, checkpoint),
+        (runtime_path(control), state),
+        (ps_path, ps),
+    ]
+
+    bs_path = bootstrap_path(control)
+    if bs_path.exists():
+        bs = load_json(bs_path)
+        bs["observed_code_ref"] = state["integrated_ref"]
+        bs["observed_at"] = now()
+        bs["active_campaign_ref"] = state["campaign_id"]
+        bs["active_checkpoint_or_terminal_ref"] = checkpoint_id
+        bs["current_gate"] = ps.get("current_gate", bs.get("current_gate", ""))
+        bs["next_legal_boundary"] = ps.get(
+            "next_legal_boundary", bs.get("next_legal_boundary", "")
+        )
+        writes.append((bs_path, bs))
 
     auth_path = authority_path(control)
     if auth_path.exists():
@@ -717,10 +998,10 @@ def cmd_checkpoint(args: argparse.Namespace) -> None:
         ):
             authority["checkpoint_ref"] = checkpoint_id
             authority["updated_at"] = now()
-            atomic_json(auth_path, authority)
+            writes.append((auth_path, authority))
 
+    transaction_write_json(control, "CAMPAIGN_CHECKPOINT", writes)
     print(f"CHECKPOINT {checkpoint_id} ref={state['integrated_ref']}")
-
 
 def set_campaign_status(
     args: argparse.Namespace,
@@ -861,8 +1142,10 @@ def cmd_terminal(args: argparse.Namespace) -> None:
         "STRATEGIC_TERMINAL_REQUESTED",
         details={"terminal_type": args.type, "reason": args.reason},
     )
-    save_runtime(control, state)
 
+    writes: list[tuple[Path, dict[str, Any]]] = [
+        (runtime_path(control), state),
+    ]
     bs_path = bootstrap_path(control)
     if bs_path.exists():
         bs = load_json(bs_path)
@@ -870,10 +1153,10 @@ def cmd_terminal(args: argparse.Namespace) -> None:
             f"Strategic terminal requested: {args.type}. Return to Planner/authority owner."
         )
         bs["observed_at"] = now()
-        atomic_json(bs_path, bs)
+        writes.append((bs_path, bs))
 
+    transaction_write_json(control, "STRATEGIC_TERMINAL", writes)
     print(f"STRATEGIC_TERMINAL {args.type}")
-
 
 def cmd_authority_acquire(args: argparse.Namespace) -> None:
     control = control_root(args)
@@ -920,16 +1203,18 @@ def cmd_authority_acquire(args: argparse.Namespace) -> None:
         "protected_surfaces": list(envelope.get("protected_surfaces", [])),
         "expires_at": None,
     }
-    atomic_json(path, authority)
     event(
         state,
         "EXECUTION_AUTHORITY_ACQUIRED",
         actor_id=args.actor,
         details={"run_id": args.run},
     )
-    save_runtime(control, state)
+    transaction_write_json(
+        control,
+        "EXECUTION_AUTHORITY_ACQUIRE",
+        [(path, authority), (runtime_path(control), state)],
+    )
     print(f"AUTHORITY ACTIVE actor={args.actor} run={args.run}")
-
 
 def cmd_authority_release(args: argparse.Namespace) -> None:
     control = control_root(args)
@@ -948,19 +1233,32 @@ def cmd_authority_release(args: argparse.Namespace) -> None:
     authority["authority_status"] = "SUPERSEDED"
     authority["updated_at"] = now()
     authority["expires_at"] = authority["updated_at"]
-    atomic_json(path, authority)
     event(
         state,
         "EXECUTION_AUTHORITY_RELEASED",
         actor_id=args.actor,
         details={"run_id": args.run},
     )
-    save_runtime(control, state)
+    transaction_write_json(
+        control,
+        "EXECUTION_AUTHORITY_RELEASE",
+        [(path, authority), (runtime_path(control), state)],
+    )
     print("AUTHORITY SUPERSEDED")
 
 
+def cmd_recover(args: argparse.Namespace) -> None:
+    control = control_root(args)
+    txid = recover_pending_transaction(control)
+    if txid is None:
+        print("NO PENDING TRANSACTION")
+    else:
+        print(f"RECOVERED {txid}")
+
 def cmd_next(args: argparse.Namespace) -> None:
-    state = load_runtime(control_root(args))
+    control = control_root(args)
+    require_no_pending_transaction(control)
+    state = load_runtime(control)
     recompute_ready(state)
     ready = sorted(
         (u for u in state["work_units"] if u["status"] == "READY"),
@@ -984,7 +1282,9 @@ def cmd_next(args: argparse.Namespace) -> None:
 
 
 def cmd_show(args: argparse.Namespace) -> None:
-    print(json.dumps(load_runtime(control_root(args)), indent=2))
+    control = control_root(args)
+    require_no_pending_transaction(control)
+    print(json.dumps(load_runtime(control), indent=2))
 
 
 def add_common_parser_options(parser: argparse.ArgumentParser) -> None:
@@ -1117,6 +1417,9 @@ def main() -> int:
     p.add_argument("--run", required=True)
     p.set_defaults(func=cmd_authority_release)
 
+    p = sub.add_parser("recover")
+    p.set_defaults(func=cmd_recover)
+
     p = sub.add_parser("next")
     p.set_defaults(func=cmd_next)
 
@@ -1128,7 +1431,12 @@ def main() -> int:
         if args.command in {"next", "show"}:
             args.func(args)
         else:
-            with campaign_lock(control_root(args), args.lock_timeout):
+            control = control_root(args)
+            with campaign_lock(control, args.lock_timeout):
+                if args.command != "recover" and journal_path(control).exists():
+                    raise CampaignError(
+                        "pending transition exists; run campaignctl recover before another mutation"
+                    )
                 args.func(args)
     except CampaignError as exc:
         print(f"CAMPAIGNCTL FAILED: {exc}", file=sys.stderr)

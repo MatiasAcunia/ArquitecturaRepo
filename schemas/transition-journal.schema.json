@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:transition-journal:0.1",
+  "title": "Agentic SDLC Multi-file Transition Journal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "transaction_id",
+    "label",
+    "status",
+    "created_at",
+    "updated_at",
+    "operations",
+    "conflict_reason"
+  ],
+  "properties": {
+    "schema_version": {"const": "transition-journal-0.1"},
+    "transaction_id": {"type": "string", "minLength": 1},
+    "label": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PREPARED", "COMMITTING", "COMMITTED", "CONFLICT"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "before_exists",
+          "before_sha256",
+          "after_sha256",
+          "stage_ref",
+          "applied"
+        ],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "before_exists": {"type": "boolean"},
+          "before_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "after_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "stage_ref": {"type": "string", "minLength": 1},
+          "applied": {"type": "boolean"}
+        }
+      }
+    },
+    "conflict_reason": {"type": ["string", "null"]}
+  }
+}

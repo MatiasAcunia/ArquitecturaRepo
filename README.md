@@ -33,6 +33,8 @@ It provides:
 - machine-readable schemas;
 - cross-file relationship validation;
 - fail-closed scaffolding by project profile;
+- optional durable Campaign Lead runtime/controller;
+- fail-closed multi-file transition journaling and crash recovery;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -150,11 +152,23 @@ Current checks include:
 - bootstrap/Product State consistency;
 - terminal/review exact-candidate consistency;
 - evidence coverage for required charter gates;
+- campaign-runtime DAG/dependency/currentness integrity;
+- runtime checkpoint/authority/Product State coherence;
+- producer/reviewer separation;
+- pending transition-journal rejection;
 - duplicate current owner detection for mechanically identifiable owners.
 
 CI also runs negative fixtures that must fail.
 
 See `docs/10_EXECUTABLE_VALIDATION.md`.
+
+## Optional reference runtime
+
+`tools/campaignctl.py` is a durable local Campaign Lead control-plane reference. It supports tactical DAG mutation, dependency-aware work, execution authority, checkpoints, exact review freeze, strategic terminals, exclusive mutation locking and fail-closed multi-file recovery.
+
+Critical currentness transitions are staged and journaled before canonical files are replaced. A crash leaves `runtime/transactions/CURRENT_TRANSACTION.json`; normal inspection/mutation fails closed until explicit `campaignctl recover` succeeds. External hash conflicts are preserved as `CONFLICT` rather than overwritten.
+
+See `docs/11_REFERENCE_RUNTIME.md` and `docs/12_TRANSACTION_RECOVERY.md`.
 
 ## Repository map
 
@@ -167,12 +181,14 @@ See `docs/10_EXECUTABLE_VALIDATION.md`.
 - `tools/validate_structure.py` — starter structure/leak validator.
 - `tools/validate_project.py` — schema + relationship validator.
 - `tools/scaffold_project.py` — fail-closed project scaffold generator.
+- `tools/campaignctl.py` — optional durable Campaign Lead runtime.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
+- `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/11_REFERENCE_RUNTIME.md` — architecture, adaptation, validation and runtime guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/12_TRANSACTION_RECOVERY.md` — architecture, adaptation, validation, runtime and recovery guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -187,9 +203,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.3.0 — PUBLIC STARTER PREVIEW`
+`v0.4.0 — PUBLIC STARTER PREVIEW`
 
-v0.3 adds the optional durable campaign runtime and independent runtime validation. Every fork still has to establish its own product truth and gates.
+v0.4 adds fail-closed multi-file transaction journaling, explicit crash recovery and adversarial external-conflict handling. Every fork still has to establish its own product truth and gates.
 
 ## License
 

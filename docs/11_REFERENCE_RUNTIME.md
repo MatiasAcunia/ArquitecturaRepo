@@ -178,6 +178,20 @@ and reconciles, where present:
 
 A fresh context should therefore be able to discover the current runtime and checkpoint without chat memory.
 
+## Crash recovery
+
+Multi-file currentness transitions are journaled. If the process dies after only part of a transition is applied, normal `show`, `next` and mutation commands fail closed while the live journal exists.
+
+Recover explicitly:
+
+```bash
+python tools/campaignctl.py --control-root "../my-project/.agentic-sdlc" recover
+```
+
+Recovery rolls forward only while each target is provably still in the recorded before-state or already in the expected after-state. An externally modified target produces a persistent `CONFLICT` instead of being overwritten.
+
+See `docs/12_TRANSACTION_RECOVERY.md` for the full transaction and failure contract.
+
 ## Execution authority
 
 If the project uses identity/execution-authority surfaces:
@@ -281,7 +295,8 @@ The synthetic lifecycle physically exercises:
 - dependency blocking;
 - capacity interruption/resume;
 - authority release/reacquire;
-- checkpoint/currentness promotion;
+- fault-injected checkpoint/currentness recovery;
+- external recovery-conflict preservation;
 - exact review freeze;
 - independent review;
 - post-review invalidation;

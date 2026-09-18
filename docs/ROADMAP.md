@@ -71,17 +71,35 @@ Implemented:
 - end-to-end runtime self-test;
 - optional portable runtime installation via `--with-runtime`.
 
-Known bounded limitation:
+## v0.4 — Transactional currentness and crash recovery
 
-- multi-file currentness transitions use atomic file replacement and exclusive process locking, but do not yet use a write-ahead transaction journal across all files.
+Implemented:
 
-## v0.4 — Hardening and synthetic reference projects
+- transition-journal schema;
+- complete after-state staging before canonical mutation;
+- SHA-256 before/after ownership checks;
+- atomic target replacement with filesystem durability hardening;
+- exclusive mutation lock plus transaction ownership checks;
+- transactional campaign init;
+- transactional checkpoint/currentness promotion;
+- transactional execution-authority acquire/release;
+- transactional strategic terminal return;
+- explicit `campaignctl recover`;
+- read and mutation fail-closed behavior while a journal is pending;
+- independent validator rejection of pending transitions;
+- deterministic process-kill fault injection in CI;
+- roll-forward recovery after partial checkpoint commit;
+- adversarial external mutation test;
+- persistent `CONFLICT` instead of overwriting ambiguous external state;
+- cleanup of pre-journal orphan stages after preparation errors.
+
+## v0.5 — Schema evolution and richer synthetic reference projects
 
 Next candidate work:
 
-- fail-closed multi-file transition journal / recovery;
 - schema migration/versioning framework;
 - stronger generic supersession/current-owner checks;
+- migration-path validation and reversible fixtures;
 - synthetic stateful backend reference;
 - synthetic multi-workstream reference;
 - synthetic artifact-heavy reference;

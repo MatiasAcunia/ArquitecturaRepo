@@ -354,18 +354,124 @@ def main() -> int:
             "Synthetic branch no longer needed after integration evidence.",
         )
 
-        must_pass(
-            control,
-            "checkpoint",
-            "--integrated-ref",
-            "candidate/ref-runtime-003",
-            "--summary",
-            "Create/read integration complete on synthetic candidate.",
+        conflict_control = Path(tmp) / "conflict_control"
+        shutil.copytree(control, conflict_control)
+
+        crash_env = os.environ.copy()
+        crash_env["AGENTIC_SDLC_TEST_CRASH_AFTER_APPLY"] = "2"
+        crashed = subprocess.run(
+            [
+                sys.executable,
+                str(CTL),
+                "--control-root",
+                str(control),
+                "checkpoint",
+                "--integrated-ref",
+                "candidate/ref-runtime-003",
+                "--summary",
+                "Create/read integration complete on synthetic candidate.",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            env=crash_env,
         )
+        if crashed.returncode != 91:
+            raise AssertionError(
+                "checkpoint fault injection did not terminate at the requested boundary\n"
+                + crashed.stdout
+                + "\n"
+                + crashed.stderr
+            )
+
+        journal = control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json"
+        if not journal.exists():
+            raise AssertionError("fault-injected checkpoint did not leave a recovery journal")
+
+        pending_validation = run(str(VALIDATOR), "--root", str(control))
+        pending_output = pending_validation.stdout + "\n" + pending_validation.stderr
+        if pending_validation.returncode == 0:
+            raise AssertionError("validator accepted a pending multi-file transaction")
+        if "pending multi-file transition" not in pending_output:
+            raise AssertionError(
+                "validator did not identify the pending transition journal\n"
+                + pending_output
+            )
+
+        must_fail(
+            control,
+            "pending transition journal",
+            "show",
+        )
+        must_pass(control, "recover")
+        if journal.exists():
+            raise AssertionError("successful recovery left CURRENT_TRANSACTION.json behind")
+
+        recovered_validation = run(str(VALIDATOR), "--root", str(control))
+        if recovered_validation.returncode != 0:
+            raise AssertionError(
+                "recovered checkpoint failed independent validation\n"
+                + recovered_validation.stdout
+                + "\n"
+                + recovered_validation.stderr
+            )
 
         authority = load(state_dir / "EXECUTION_AUTHORITY_CURRENT.json")
         if authority["checkpoint_ref"] != "CHECKPOINT_0001":
             raise AssertionError("checkpoint did not reconcile active execution authority")
+
+        conflict_env = os.environ.copy()
+        conflict_env["AGENTIC_SDLC_TEST_CRASH_AFTER_APPLY"] = "1"
+        conflict_crash = subprocess.run(
+            [
+                sys.executable,
+                str(CTL),
+                "--control-root",
+                str(conflict_control),
+                "checkpoint",
+                "--integrated-ref",
+                "candidate/ref-conflict-004",
+                "--summary",
+                "Synthetic conflict recovery probe.",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            env=conflict_env,
+        )
+        if conflict_crash.returncode != 91:
+            raise AssertionError("conflict fixture did not crash after the first applied target")
+
+        conflict_runtime_path = (
+            conflict_control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json"
+        )
+        external_runtime = load(conflict_runtime_path)
+        external_runtime["campaign_falsifiers"].append("EXTERNAL_INTERFERENCE_PROBE")
+        save(conflict_runtime_path, external_runtime)
+
+        conflict_recovery = ctl(conflict_control, "recover")
+        conflict_output = conflict_recovery.stdout + "\n" + conflict_recovery.stderr
+        if conflict_recovery.returncode == 0:
+            raise AssertionError("recovery overwrote an externally modified transaction target")
+        if "neither transaction before nor after state" not in conflict_output:
+            raise AssertionError(
+                "recovery did not report the external-hash conflict\n" + conflict_output
+            )
+
+        preserved = load(conflict_runtime_path)
+        if "EXTERNAL_INTERFERENCE_PROBE" not in preserved["campaign_falsifiers"]:
+            raise AssertionError("conflict recovery overwrote external runtime state")
+
+        conflict_journal = load(
+            conflict_control
+            / "runtime"
+            / "transactions"
+            / "CURRENT_TRANSACTION.json"
+        )
+        if conflict_journal["status"] != "CONFLICT":
+            raise AssertionError("conflicted transaction was not persisted as CONFLICT")
 
         must_pass(
             control,
@@ -478,6 +584,9 @@ def main() -> int:
     print("- dependency blocking/release verified")
     print("- capacity checkpoint/resume verified")
     print("- authority release/reacquire verified")
+    print("- fault-injected checkpoint recovered by durable journal")
+    print("- pending transaction rejected by independent validator")
+    print("- external recovery conflict failed closed without overwrite")
     print("- checkpoint currentness reconciled")
     print("- review freeze invalidation verified")
     print("- exact-candidate strategic terminal verified")

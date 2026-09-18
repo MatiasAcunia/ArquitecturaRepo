@@ -24,6 +24,7 @@ SCHEMA_BY_VERSION = {
     "starter-profiles-0.1": "profiles.schema.json",
     "starter-profile-selection-0.1": "profile-selection.schema.json",
     "campaign-runtime-0.1": "campaign-runtime.schema.json",
+    "transition-journal-0.1": "transition-journal.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {
@@ -673,6 +674,19 @@ def validate_campaign_runtime(
                     f"{sorted(unfinished)}"
                 )
 
+
+def validate_transition_journals(
+    buckets: dict[str, list[tuple[Path, dict[str, Any]]]],
+    errors: list[str],
+) -> None:
+    for path, journal in buckets.get("transition-journal-0.1", []):
+        if path.name == "CURRENT_TRANSACTION.json":
+            errors.append(
+                f"{rel(path)}: pending multi-file transition "
+                f"{journal.get('transaction_id')!r} status={journal.get('status')!r}; "
+                "run campaignctl recover before accepting currentness"
+            )
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Validate Agentic SDLC JSON contracts and cross-file relationships."
@@ -696,6 +710,7 @@ def main() -> int:
     validate_bootstrap(target_root, buckets, errors)
     validate_terminals(buckets, errors)
     validate_campaign_runtime(buckets, errors)
+    validate_transition_journals(buckets, errors)
 
     if errors:
         print("PROJECT VALIDATION FAILED")
