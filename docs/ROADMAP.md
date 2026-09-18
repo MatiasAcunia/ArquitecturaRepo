@@ -190,25 +190,34 @@ Implemented:
 
 ## v1.0 — Transfer-hardened public starter
 
-Release procedure:
+Stable release boundary.
 
-1. compact v0.9 to its clean milestone;
-2. require full CI success on that exact clean commit;
-3. apply metadata/status-only 1.0 release changes;
-4. run the complete v1 release gate on the exact 1.0 commit;
-5. if any gate fails, do not declare 1.0.
+Release properties:
 
-No new generic feature is authorized between v0.9 gate closure and 1.0.
+- exact clean v0.9 release candidate passed the complete v1 evidence gate;
+- structure-only public boundary is machine-checked;
+- canonical contract instances validate;
+- negative/falsification fixtures reject known invalid states;
+- all public profiles scaffold and remain proportional;
+- schema evolution supports explicit forward/reverse/idempotent paths;
+- canonical ownership/currentness/supersession are mechanically checked;
+- fresh contexts reconstruct deterministic legal posture without chat memory;
+- a physical SQLite reference proves persistent state/idempotency/recovery behavior;
+- six unrelated synthetic project shapes pass adoption without application-file mutation;
+- campaign execution is resumable and crash-recoverable;
+- local control-state locking/journaling/recovery uses one shared primitive;
+- the complete release definition of done is executable with `tools/verify_v1_release.py`.
 
-## v1.0 — Transfer-hardened public starter
+Claim boundary:
 
-Target properties:
+- this is a generic starter with tested synthetic transfer evidence;
+- it is not proof of universal autonomous correctness;
+- real projects still own product, runtime, security, rights, perceptual/human and release gates.
 
-- unrelated forks can install the starter without source-project institutional memory;
-- governance burden remains bounded;
-- setup does not require technical client rescue;
-- currentness/identity/terminal relationships are machine-checkable where useful;
-- documentation matches executable reference mechanisms;
-- optional complexity can be removed cleanly for small projects.
+Post-1.0 rule:
 
-Product version numbers do not imply universal autonomy or generalization claims.
+- architecture feature work stops by default;
+- future changes are driven by reproducible defects, compatibility/security issues or demonstrated generic adoption failures;
+- do not add roles, policies or examples merely to continue version iteration.
+
+Formal open-source licensing remains a separate repository-owner decision.

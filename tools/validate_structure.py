@@ -81,6 +81,7 @@ REQUIRED_PATHS = [
     "docs/16_TRANSFER_ADOPTION.md",
     "docs/17_V1_RELEASE_GATES.md",
     "docs/18_RELEASE_CANDIDATE_HARDENING.md",
+    "docs/19_V1_RELEASE.md",
     "examples/minimal/PRODUCT_STATE_CURRENT.json",
     "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
     "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
@@ -141,6 +142,21 @@ def validate_version(errors: list[str]) -> None:
     manifest = json.loads((ROOT / "state/STARTER_MANIFEST.json").read_text(encoding="utf-8"))
     if manifest.get("version") != version:
         fail(f"VERSION ({version}) != manifest version ({manifest.get('version')})", errors)
+
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", version)
+    if match is None:
+        fail(f"VERSION must be semantic MAJOR.MINOR.PATCH: {version!r}", errors)
+    else:
+        major = int(match.group(1))
+        expected_status = (
+            "PUBLIC_STARTER_PREVIEW" if major == 0 else "PUBLIC_STARTER_STABLE"
+        )
+        if manifest.get("status") != expected_status:
+            fail(
+                f"VERSION {version} requires manifest status {expected_status!r}; "
+                f"found {manifest.get('status')!r}",
+                errors,
+            )
     policy = manifest.get("content_policy", {})
     if policy.get("structure_only") is not True:
         fail("manifest content policy must set structure_only=true", errors)

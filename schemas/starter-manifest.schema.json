@@ -28,7 +28,10 @@
       "minLength": 1
     },
     "status": {
-      "const": "PUBLIC_STARTER_PREVIEW"
+      "enum": [
+        "PUBLIC_STARTER_PREVIEW",
+        "PUBLIC_STARTER_STABLE"
+      ]
     },
     "content_policy": {
       "type": "object",

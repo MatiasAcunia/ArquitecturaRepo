@@ -213,7 +213,7 @@ CI applies the workflow to six unrelated synthetic project shapes: SMALL, STATEF
 
 See `docs/16_TRANSFER_ADOPTION.md`.
 
-## Release-candidate hardening
+## Stable release and release gates
 
 Runtime, schema migration and adoption now share `tools/state_tx.py` for local locking/durable transaction semantics instead of maintaining parallel implementations.
 
@@ -225,7 +225,7 @@ python tools/verify_v1_release.py
 
 The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, resumable campaign runtime and hardening/bounded governance.
 
-See `docs/17_V1_RELEASE_GATES.md` and `docs/18_RELEASE_CANDIDATE_HARDENING.md`.
+See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md` and `docs/19_V1_RELEASE.md`.
 
 ## Repository map
 
@@ -259,7 +259,7 @@ See `docs/17_V1_RELEASE_GATES.md` and `docs/18_RELEASE_CANDIDATE_HARDENING.md`.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
 - `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/18_RELEASE_CANDIDATE_HARDENING.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer and release-gate guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/19_V1_RELEASE.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer and stable-release guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -274,9 +274,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.9.0 — PUBLIC STARTER PREVIEW`
+`v1.0.0 — PUBLIC STARTER STABLE`
 
-v0.9 is the release candidate: duplicated local transaction/locking primitives are centralized, governance proportionality is frozen by tests, and the complete v1 definition of done is executable. No new generic feature is planned before 1.0.
+v1.0 is the stable architecture boundary: the complete machine-readable release gate passes, transfer/adoption is exercised across all public profiles, and future architecture changes are defect- or evidence-driven rather than version-driven.
 
 ## License
 

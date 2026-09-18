@@ -1,7 +1,7 @@
 {
   "starter": "agentic-sdlc-starter",
-  "version": "0.9.0",
-  "status": "PUBLIC_STARTER_PREVIEW",
+  "version": "1.0.0",
+  "status": "PUBLIC_STARTER_STABLE",
   "content_policy": {
     "structure_only": true,
     "project_specific_source_data_allowed": false,
