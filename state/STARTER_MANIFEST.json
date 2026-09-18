@@ -1,0 +1,67 @@
+{
+  "starter": "agentic-sdlc-starter",
+  "version": "0.1.4",
+  "status": "PUBLIC_STARTER_PREVIEW",
+  "content_policy": {
+    "structure_only": true,
+    "project_specific_source_data_allowed": false,
+    "real_source_names_allowed": false,
+    "real_source_repositories_allowed": false,
+    "real_source_branches_allowed": false,
+    "real_source_identifiers_allowed": false,
+    "real_source_provider_economics_allowed": false
+  },
+  "core_role_model": [
+    "CLIENT_EXTERNAL",
+    "I1_MASTER_OWNER",
+    "I2_PROJECT_WORKSTREAM_PLANNER",
+    "I3_ENGINEERING_CAMPAIGN_LEAD",
+    "I4_EXECUTION_TEAM_MEMBER"
+  ],
+  "profiles": [
+    "SMALL",
+    "STATEFUL",
+    "ARTIFACT_HEAVY",
+    "MULTI_WORKSTREAM",
+    "MULTI_PRODUCT",
+    "HIGH_CONSEQUENCE"
+  ],
+  "machine_readable_contracts": [
+    "PRODUCT_STATE",
+    "CAMPAIGN_CHARTER",
+    "CAMPAIGN_CHECKPOINT",
+    "CAMPAIGN_TERMINAL",
+    "IDENTITY_REGISTRY",
+    "EXECUTION_AUTHORITY",
+    "CURRENT_BOOTSTRAP",
+    "INTERACTION_RECORD",
+    "STARTER_MANIFEST"
+  ],
+  "claim_boundary": "Generic engineering starter; each fork must validate its own mechanisms and product gates.",
+  "fresh_context_required": true,
+  "one_concern_one_owner": true,
+  "worker_pass_is_acceptance": false,
+  "core_protocols": [
+    "AUTHORITY_MODEL",
+    "CLIENT_BOUNDARY",
+    "IDENTITY_AND_EXECUTION_AUTHORITY",
+    "CURRENTNESS_RECONSTRUCTION",
+    "PLANNER_KERNEL",
+    "PRODUCT_MODEL_AND_THEORY_LOADING",
+    "CAMPAIGN_CHARTER_STANDARD",
+    "EXECUTION_TEAM_OS",
+    "CAPABILITY_DAG_AND_ISOLATION",
+    "CAPABILITY_LIFECYCLE_AND_EVIDENCE",
+    "REVIEW_FREEZE_AND_TERMINAL_INTEGRITY"
+  ],
+  "optional_protocols": [
+    "MASTER_OWNER_OS",
+    "STATE_DB_LINEAGE_AND_IDEMPOTENCY",
+    "STORAGE_AND_ARTIFACT_LIFECYCLE",
+    "CAPACITY_DEADLINES_AND_RESUME",
+    "COST_CAPACITY_AND_EXTERNAL_SERVICES",
+    "SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS",
+    "SYSTEMIC_ESCALATION_AND_ANTI_CHURN",
+    "INTERACTION_LEDGER"
+  ]
+}

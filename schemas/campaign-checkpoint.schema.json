@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:campaign-checkpoint:0.1",
+  "title": "Campaign Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "checkpoint_id",
+    "exact_integrated_ref",
+    "charter_status",
+    "created_at",
+    "tactical_dag",
+    "evidence_refs",
+    "resume_procedure"
+  ],
+  "properties": {
+    "schema_version": {"const": "campaign-checkpoint-0.1"},
+    "campaign_id": {"type": "string", "minLength": 1},
+    "checkpoint_id": {"type": "string", "minLength": 1},
+    "exact_integrated_ref": {"type": "string", "minLength": 1},
+    "charter_status": {"enum": ["VALID", "INVALIDATED", "UNKNOWN"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "completed_capability_delta": {"type": "string"},
+    "tactical_dag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["done", "active", "ready", "blocked"],
+      "properties": {
+        "done": {"type": "array", "items": {"type": "string"}},
+        "active": {"type": "array", "items": {"type": "string"}},
+        "ready": {"type": "array", "items": {"type": "string"}},
+        "blocked": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "rejected_approaches": {"type": "array", "items": {"type": "string"}},
+    "resource_locks": {"type": "array", "items": {"type": "string"}},
+    "current_falsifiers": {"type": "array", "items": {"type": "string"}},
+    "resume_procedure": {"type": "string", "minLength": 1},
+    "strategic_return_required": {"type": "boolean"}
+  }
+}

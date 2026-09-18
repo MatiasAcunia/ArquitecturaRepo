@@ -1,0 +1,35 @@
+{
+  "schema_version": "product-state-0.1",
+  "product_or_workstream": "EXAMPLE_TASK_APP",
+  "state_version": "1",
+  "status": "CURRENT",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "current_code_ref": "example/ref",
+  "product_objective": "Create and complete tasks through a small web application.",
+  "requirement_refs": ["REQ-001", "REQ-002"],
+  "open_product_questions": [],
+  "currentness_set": [
+    "AGENTS.md",
+    "examples/minimal/CLIENT_REQUIREMENTS_CURRENT.md",
+    "examples/minimal/PRODUCT_STATE_CURRENT.json"
+  ],
+  "capabilities": [
+    {
+      "id": "CAPABILITY_TASK_CRUD",
+      "owner": "TASK_SERVICE",
+      "physical_state": "NOT_IMPLEMENTED",
+      "gate": "STATIC_STRUCTURAL",
+      "dependencies": [],
+      "evidence_refs": []
+    }
+  ],
+  "active_campaign": null,
+  "current_gate": "STATIC_STRUCTURAL",
+  "strongest_evidence_refs": [],
+  "blockers": [],
+  "next_legal_boundary": "Planner may define the first campaign charter for task creation/completion.",
+  "forbidden_actions": [
+    "Claim runtime acceptance before implementation and physical execution.",
+    "Deploy externally without CLIENT authorization."
+  ]
+}

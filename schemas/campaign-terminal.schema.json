@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:campaign-terminal:0.1",
+  "title": "Campaign Terminal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "exact_candidate_ref",
+    "terminal_type",
+    "capability_claim",
+    "evidence",
+    "known_limitations",
+    "strategic_return_reason"
+  ],
+  "properties": {
+    "schema_version": {"const": "campaign-terminal-0.1"},
+    "campaign_id": {"type": "string", "minLength": 1},
+    "exact_candidate_ref": {"type": "string", "minLength": 1},
+    "terminal_type": {
+      "enum": [
+        "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+        "QUALITY_GATE_READY_FOR_PLANNER_OR_HUMAN_DECISION",
+        "REPLAN_REQUIRED__CHARTER_INVALIDATED",
+        "BLOCKED_EXTERNAL_OR_AUTHORITY",
+        "CAPACITY_CHECKPOINT__RESUMABLE",
+        "NO_FUNCTIONAL_UNLOCK__CAMPAIGN_EXHAUSTED"
+      ]
+    },
+    "capability_claim": {"type": "string", "minLength": 1},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "static_structural": {"type": "array", "items": {"type": "string"}},
+        "unit_property": {"type": "array", "items": {"type": "string"}},
+        "integration": {"type": "array", "items": {"type": "string"}},
+        "state_currentness_recovery": {"type": "array", "items": {"type": "string"}},
+        "runtime_physical": {"type": "array", "items": {"type": "string"}},
+        "semantic_generalization": {"type": "array", "items": {"type": "string"}},
+        "security_rights_privacy": {"type": "array", "items": {"type": "string"}},
+        "perceptual_human": {"type": "array", "items": {"type": "string"}},
+        "release_live": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "independent_review": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["reviewer_identity", "reviewed_candidate_ref", "verdict", "falsification_summary"],
+      "properties": {
+        "reviewer_identity": {"type": "string", "minLength": 1},
+        "reviewed_candidate_ref": {"type": "string", "minLength": 1},
+        "verdict": {"type": "string", "minLength": 1},
+        "falsification_summary": {"type": "string", "minLength": 1}
+      }
+    },
+    "known_limitations": {"type": "array", "items": {"type": "string"}},
+    "in_scope_rework_remaining": {"type": "array", "items": {"type": "string"}},
+    "strategic_return_reason": {"type": "string", "minLength": 1}
+  }
+}

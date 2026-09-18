@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:execution-authority:0.1",
+  "title": "Execution Authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated_at",
+    "authority_status",
+    "campaign_id",
+    "campaign_lead_actor_id",
+    "current_run_id",
+    "baseline_ref",
+    "checkpoint_ref",
+    "allowed_write_surfaces",
+    "protected_surfaces",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "execution-authority-0.1"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "authority_status": {"enum": ["NONE", "ACTIVE", "HOLD", "EXPIRED", "SUPERSEDED"]},
+    "campaign_id": {"type": ["string", "null"]},
+    "campaign_lead_actor_id": {"type": ["string", "null"]},
+    "current_run_id": {"type": ["string", "null"]},
+    "baseline_ref": {"type": ["string", "null"]},
+    "checkpoint_ref": {"type": ["string", "null"]},
+    "allowed_write_surfaces": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "protected_surfaces": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "expires_at": {"type": ["string", "null"], "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"authority_status": {"const": "ACTIVE"}},
+        "required": ["authority_status"]
+      },
+      "then": {
+        "properties": {
+          "campaign_id": {"type": "string", "minLength": 1},
+          "campaign_lead_actor_id": {"type": "string", "minLength": 1},
+          "current_run_id": {"type": "string", "minLength": 1},
+          "baseline_ref": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  ]
+}

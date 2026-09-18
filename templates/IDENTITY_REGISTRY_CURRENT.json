@@ -1,0 +1,14 @@
+{
+  "schema_version": "identity-registry-0.1",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "actors": [
+    {
+      "actor_id": "PLANNER_PROJECT_ALPHA_001",
+      "role_class": "I2_PROJECT_WORKSTREAM_PLANNER",
+      "scope": "PROJECT_ALPHA",
+      "status": "ACTIVE",
+      "current_run_id": null,
+      "supersedes_actor_id": null
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "execution-authority-0.1",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "authority_status": "NONE",
+  "campaign_id": null,
+  "campaign_lead_actor_id": null,
+  "current_run_id": null,
+  "baseline_ref": null,
+  "checkpoint_ref": null,
+  "allowed_write_surfaces": [],
+  "protected_surfaces": [],
+  "expires_at": null
+}

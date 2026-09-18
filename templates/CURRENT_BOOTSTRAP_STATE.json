@@ -1,0 +1,18 @@
+{
+  "schema_version": "starter-bootstrap-0.1",
+  "status": "UNTRUSTED_CONTEXT | READY | HOLD",
+  "product_or_workstream": "",
+  "observed_code_ref": "",
+  "observed_at": "",
+  "role": "",
+  "kernel_version": "",
+  "requirements_ref": "",
+  "product_state_ref": "",
+  "active_campaign_ref": null,
+  "active_checkpoint_or_terminal_ref": null,
+  "current_gate": "",
+  "strongest_evidence_refs": [],
+  "next_legal_boundary": "",
+  "forbidden_actions": [],
+  "unresolved_currentness": []
+}

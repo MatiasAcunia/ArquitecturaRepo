@@ -1,0 +1,43 @@
+{
+  "schema_version": "campaign-charter-0.1",
+  "campaign_id": "CAMPAIGN_001",
+  "product_or_workstream": "EXAMPLE_TASK_APP",
+  "capability": "CAPABILITY_TASK_CRUD",
+  "baseline_ref": "example/ref",
+  "critical_path_relevance": "First user-visible capability.",
+  "goal": {
+    "current_capability": "No executable task create/complete workflow exists.",
+    "required_capability": "A user can create a task and mark it complete through the application."
+  },
+  "architecture_envelope": {
+    "owners": ["TASK_SERVICE", "TASK_UI"],
+    "fixed_interfaces": ["Task identity and completion state remain explicit product concepts."],
+    "allowed_interface_evolution": ["Private implementation details may change inside the campaign."],
+    "state_semantics": ["Task completion must be persisted consistently if persistence is introduced."],
+    "protected_boundaries": ["CLIENT product requirements may not be redefined by implementation."]
+  },
+  "resource_envelope": {
+    "allowed_write_surfaces": ["application source", "tests", "campaign-local evidence"],
+    "protected_surfaces": ["CLIENT requirements", "unrelated project state"],
+    "shared_resources": [],
+    "external_authority_gates": ["Production deployment requires CLIENT authorization."]
+  },
+  "verification_gates": [
+    "UNIT_PROPERTY",
+    "INTEGRATION",
+    "RUNTIME_PHYSICAL",
+    "PERCEPTUAL_HUMAN"
+  ],
+  "independent_review_required": true,
+  "charter_invalidation_events": [
+    "CLIENT changes the required task workflow materially.",
+    "Live evidence shows the selected capability boundary is incompatible with the target architecture."
+  ],
+  "done_when": [
+    "Task creation and completion work end-to-end on the exact candidate.",
+    "Required automated tests pass.",
+    "Independent review is bound to the exact candidate.",
+    "Representative runtime evidence exists.",
+    "The product is ready for the applicable product/human gate."
+  ]
+}

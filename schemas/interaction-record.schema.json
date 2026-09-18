@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:interaction-record:0.1",
+  "title": "Material Interaction Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "interaction_id",
+    "timestamp",
+    "actor",
+    "target",
+    "classification",
+    "intent_strength",
+    "content_status",
+    "content_or_factual_summary",
+    "affected_product_or_workstream",
+    "normalized_into",
+    "supersedes",
+    "evidence_refs"
+  ],
+  "properties": {
+    "interaction_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string"},
+    "actor": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "classification": {
+      "enum": [
+        "CLIENT_COMPATIBLE",
+        "CLIENT_TECHNICAL_ESCAPE",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "intent_strength": {
+      "enum": [
+        "HARD_REQUIREMENT",
+        "EXPLICIT_DECISION",
+        "QUALITY_BAR",
+        "STRONG_PREFERENCE",
+        "DIRECTION",
+        "IMPLEMENTATION_SUGGESTION",
+        "OPEN_QUESTION"
+      ]
+    },
+    "content_status": {
+      "enum": [
+        "verbatim_available",
+        "summarized_from_evidence",
+        "unavailable"
+      ]
+    },
+    "content_or_factual_summary": {"type": "string"},
+    "affected_product_or_workstream": {"type": "string"},
+    "normalized_into": {"type": "string"},
+    "supersedes": {"type": "array", "items": {"type": "string"}},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "interaction_id": "YYYYMMDD-HHMM-short-id",
+  "timestamp": "ISO-8601",
+  "actor": "CLIENT",
+  "target": "PLANNER_OR_OWNER",
+  "classification": "CLIENT_COMPATIBLE | CLIENT_TECHNICAL_ESCAPE | NOT_APPLICABLE",
+  "intent_strength": "HARD_REQUIREMENT | EXPLICIT_DECISION | QUALITY_BAR | STRONG_PREFERENCE | DIRECTION | IMPLEMENTATION_SUGGESTION | OPEN_QUESTION",
+  "content_status": "verbatim_available | summarized_from_evidence | unavailable",
+  "content_or_factual_summary": "",
+  "affected_product_or_workstream": "",
+  "normalized_into": "",
+  "supersedes": [],
+  "evidence_refs": []
+}

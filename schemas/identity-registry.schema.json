@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:identity-registry:0.1",
+  "title": "Identity Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "updated_at", "actors"],
+  "properties": {
+    "schema_version": {"const": "identity-registry-0.1"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "actors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actor_id",
+          "role_class",
+          "scope",
+          "status",
+          "current_run_id",
+          "supersedes_actor_id"
+        ],
+        "properties": {
+          "actor_id": {"type": "string", "minLength": 1},
+          "role_class": {
+            "enum": [
+              "I1_MASTER_OWNER",
+              "I2_PROJECT_WORKSTREAM_PLANNER",
+              "I3_ENGINEERING_CAMPAIGN_LEAD",
+              "I4_EXECUTION_TEAM_MEMBER"
+            ]
+          },
+          "scope": {"type": "string", "minLength": 1},
+          "status": {"enum": ["ACTIVE", "INACTIVE", "SUPERSEDED", "HOLD"]},
+          "current_run_id": {"type": ["string", "null"]},
+          "supersedes_actor_id": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}
