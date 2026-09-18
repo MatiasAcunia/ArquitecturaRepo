@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:architecture-feedback-report:0.1",
+  "title": "Agentic SDLC Architecture Feedback Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "starter_version",
+    "trigger",
+    "profile",
+    "runtime_enabled",
+    "control",
+    "project_baseline",
+    "runtime",
+    "process",
+    "privacy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "architecture-feedback-report-0.1"
+    },
+    "starter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trigger": {
+      "enum": [
+        "WEEKLY",
+        "MONTHLY",
+        "MANUAL"
+      ]
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_enabled": {
+      "type": "boolean"
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_passed",
+        "bootstrap_status",
+        "currentness_verified",
+        "product_status",
+        "owner_count",
+        "capability_count",
+        "active_campaign",
+        "pending_transition"
+      ],
+      "properties": {
+        "validation_passed": {
+          "type": "boolean"
+        },
+        "bootstrap_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "currentness_verified": {
+          "type": "boolean"
+        },
+        "product_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "active_campaign": {
+          "type": "boolean"
+        },
+        "pending_transition": {
+          "type": "boolean"
+        }
+      }
+    },
+    "project_baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "present",
+        "ready",
+        "technical_status",
+        "machine_assessment_status",
+        "network_mode",
+        "delivery_status",
+        "milestone_count",
+        "overdue_milestone_count",
+        "schedule_change_count"
+      ],
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "ready": {
+          "type": "boolean"
+        },
+        "technical_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "machine_assessment_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "network_mode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "delivery_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "milestone_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overdue_milestone_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "schedule_change_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "present",
+        "campaign_status",
+        "work_status_counts",
+        "retry_events",
+        "failure_events",
+        "hold_events",
+        "review_invalidation_events",
+        "recovery_events"
+      ],
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "campaign_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "work_status_counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "retry_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failure_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hold_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "review_invalidation_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recovery_events": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operating_review_rating"
+      ],
+      "properties": {
+        "operating_review_rating": {
+          "enum": [
+            "GOOD",
+            "MIXED",
+            "POOR",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "free_text_included",
+        "project_identifiers_included",
+        "code_or_paths_included",
+        "requirements_content_included",
+        "credentials_included"
+      ],
+      "properties": {
+        "mode": {
+          "const": "STRICT_METADATA_ONLY"
+        },
+        "free_text_included": {
+          "const": false
+        },
+        "project_identifiers_included": {
+          "const": false
+        },
+        "code_or_paths_included": {
+          "const": false
+        },
+        "requirements_content_included": {
+          "const": false
+        },
+        "credentials_included": {
+          "const": false
+        }
+      }
+    }
+  }
+}
