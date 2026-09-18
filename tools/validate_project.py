@@ -30,6 +30,8 @@ SCHEMA_BY_VERSION = {
     "owner-registry-0.1": "owner-registry.schema.json",
     "technical-baseline-0.1": "technical-baseline.schema.json",
     "delivery-plan-0.1": "delivery-plan.schema.json",
+    "architecture-feedback-config-0.1": "architecture-feedback-config.schema.json",
+    "architecture-feedback-report-0.1": "architecture-feedback-report.schema.json",
     "v1-release-criteria-0.1": "v1-release-criteria.schema.json",
     "workspace-lifecycle-0.1": "workspace-lifecycle.schema.json",
 }
