@@ -27,6 +27,7 @@ SCHEMA_BY_VERSION = {
     "campaign-runtime-0.1": "campaign-runtime.schema.json",
     "transition-journal-0.1": "transition-journal.schema.json",
     "migration-registry-0.1": "migration-registry.schema.json",
+    "owner-registry-0.1": "owner-registry.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {
@@ -339,8 +340,14 @@ def validate_bootstrap(
         buckets.get("starter-bootstrap-0.1", [])
         + buckets.get("starter-bootstrap-0.2", [])
     )
+    bootstrap_by_product = one_by_key(
+        records,
+        "product_or_workstream",
+        "bootstrap owner",
+        errors,
+    )
 
-    for path, bootstrap in records:
+    for path, bootstrap in bootstrap_by_product.values():
         version = bootstrap["schema_version"]
         product_id = bootstrap["product_or_workstream"]
         product_record = products.get(product_id)
@@ -718,6 +725,226 @@ def validate_campaign_runtime(
                 )
 
 
+
+def validate_owner_registries(
+    target_root: Path,
+    buckets: dict[str, list[tuple[Path, dict[str, Any]]]],
+    errors: list[str],
+) -> None:
+    registries = one_by_key(
+        buckets.get("owner-registry-0.1", []),
+        "product_or_workstream",
+        "owner registry",
+        errors,
+    )
+    products = one_by_key(
+        buckets.get("product-state-0.1", []),
+        "product_or_workstream",
+        "Product State owner",
+        errors,
+    )
+    bootstrap_records = (
+        buckets.get("starter-bootstrap-0.1", [])
+        + buckets.get("starter-bootstrap-0.2", [])
+    )
+    bootstraps = one_by_key(
+        bootstrap_records,
+        "product_or_workstream",
+        "bootstrap owner",
+        errors,
+    )
+
+    def refs_equivalent(left: str, right: str) -> bool:
+        left_candidates = [(target_root / left).resolve(), (REPO_ROOT / left).resolve()]
+        right_candidates = [(target_root / right).resolve(), (REPO_ROOT / right).resolve()]
+        return any(a == b for a in left_candidates for b in right_candidates)
+
+    def path_matches_ref(path_value: Path, ref_value: str) -> bool:
+        resolved = path_value.resolve()
+        return resolved in {
+            (target_root / ref_value).resolve(),
+            (REPO_ROOT / ref_value).resolve(),
+        }
+
+    for product_id, (path, registry) in registries.items():
+        product_record = products.get(product_id)
+        if product_record is None:
+            errors.append(
+                f"{rel(path)}: owner registry product {product_id!r} has no Product State"
+            )
+            product = None
+            currentness_set: set[str] = set()
+        else:
+            _, product = product_record
+            currentness_set = set(product.get("currentness_set", []))
+
+        owners: dict[str, dict[str, Any]] = {}
+        concerns: dict[str, list[dict[str, Any]]] = defaultdict(list)
+
+        for owner in registry.get("owners", []):
+            owner_id = owner["owner_id"]
+            if owner_id in owners:
+                errors.append(f"{rel(path)}: duplicate owner_id {owner_id!r}")
+            else:
+                owners[owner_id] = owner
+            concerns[owner["concern_id"]].append(owner)
+
+            if owner["status"] == "CURRENT":
+                if owner["surface_type"] != "EXTERNAL":
+                    if not resolve_ref(target_root, owner["surface_ref"]):
+                        errors.append(
+                            f"{rel(path)}: CURRENT owner {owner_id!r} surface does not "
+                            f"resolve: {owner['surface_ref']}"
+                        )
+                if owner["required_in_currentness_set"]:
+                    if product is None:
+                        errors.append(
+                            f"{rel(path)}: CURRENT owner {owner_id!r} requires "
+                            "currentness but Product State is unavailable"
+                        )
+                    elif owner["surface_ref"] not in currentness_set:
+                        errors.append(
+                            f"{rel(path)}: CURRENT owner {owner_id!r} surface "
+                            f"{owner['surface_ref']!r} is required in Product State "
+                            "Currentness Set but is absent"
+                        )
+            elif owner["required_in_currentness_set"]:
+                errors.append(
+                    f"{rel(path)}: SUPERSEDED owner {owner_id!r} cannot be required "
+                    "in the Currentness Set"
+                )
+
+        for concern_id, entries in concerns.items():
+            current = [entry for entry in entries if entry["status"] == "CURRENT"]
+            if len(current) != 1:
+                errors.append(
+                    f"{rel(path)}: concern {concern_id!r} must have exactly one "
+                    f"CURRENT owner; found {len(current)}"
+                )
+
+        for owner_id, owner in owners.items():
+            for old_id in owner.get("supersedes_owner_ids", []):
+                old = owners.get(old_id)
+                if old is None:
+                    errors.append(
+                        f"{rel(path)}: owner {owner_id!r} supersedes unknown owner "
+                        f"{old_id!r}"
+                    )
+                    continue
+                if old["concern_id"] != owner["concern_id"]:
+                    errors.append(
+                        f"{rel(path)}: owner {owner_id!r} cannot supersede {old_id!r} "
+                        "from a different concern"
+                    )
+                if old["status"] != "SUPERSEDED":
+                    errors.append(
+                        f"{rel(path)}: superseded target {old_id!r} is not marked "
+                        "SUPERSEDED"
+                    )
+                if old.get("superseded_by_owner_id") != owner_id:
+                    errors.append(
+                        f"{rel(path)}: supersession link {owner_id!r}->{old_id!r} "
+                        "is not reciprocal"
+                    )
+
+            successor_id = owner.get("superseded_by_owner_id")
+            if owner["status"] == "SUPERSEDED":
+                successor = owners.get(successor_id)
+                if successor is None:
+                    errors.append(
+                        f"{rel(path)}: SUPERSEDED owner {owner_id!r} points to unknown "
+                        f"successor {successor_id!r}"
+                    )
+                else:
+                    if successor["concern_id"] != owner["concern_id"]:
+                        errors.append(
+                            f"{rel(path)}: SUPERSEDED owner {owner_id!r} successor "
+                            "belongs to a different concern"
+                        )
+                    if owner_id not in successor.get("supersedes_owner_ids", []):
+                        errors.append(
+                            f"{rel(path)}: SUPERSEDED owner {owner_id!r} successor "
+                            f"{successor_id!r} does not reciprocally supersede it"
+                        )
+            elif successor_id is not None:
+                errors.append(
+                    f"{rel(path)}: CURRENT owner {owner_id!r} cannot have "
+                    "superseded_by_owner_id"
+                )
+
+        current_by_concern = {
+            concern_id: [entry for entry in entries if entry["status"] == "CURRENT"][0]
+            for concern_id, entries in concerns.items()
+            if len([entry for entry in entries if entry["status"] == "CURRENT"]) == 1
+        }
+
+        registry_owner = current_by_concern.get("CANONICAL_OWNER_REGISTRY")
+        if registry_owner and not path_matches_ref(path, registry_owner["surface_ref"]):
+            errors.append(
+                f"{rel(path)}: CANONICAL_OWNER_REGISTRY surface "
+                f"{registry_owner['surface_ref']!r} does not point to this registry"
+            )
+
+        if product_record is not None:
+            product_owner = current_by_concern.get("PRODUCT_STATE")
+            if product_owner and not path_matches_ref(
+                product_record[0], product_owner["surface_ref"]
+            ):
+                errors.append(
+                    f"{rel(path)}: PRODUCT_STATE owner surface "
+                    f"{product_owner['surface_ref']!r} does not point to Product State"
+                )
+
+        bootstrap_record = bootstraps.get(product_id)
+        if bootstrap_record is not None:
+            bootstrap_path_value, bootstrap = bootstrap_record
+            bootstrap_owner = current_by_concern.get("CURRENT_BOOTSTRAP")
+            if bootstrap_owner and not path_matches_ref(
+                bootstrap_path_value, bootstrap_owner["surface_ref"]
+            ):
+                errors.append(
+                    f"{rel(path)}: CURRENT_BOOTSTRAP owner surface "
+                    f"{bootstrap_owner['surface_ref']!r} does not point to current bootstrap"
+                )
+
+            requirements_owner = current_by_concern.get("CLIENT_REQUIREMENTS")
+            if requirements_owner and not refs_equivalent(
+                requirements_owner["surface_ref"], bootstrap["requirements_ref"]
+            ):
+                errors.append(
+                    f"{rel(path)}: CLIENT_REQUIREMENTS owner surface "
+                    f"{requirements_owner['surface_ref']!r} != bootstrap requirements_ref "
+                    f"{bootstrap['requirements_ref']!r}"
+                )
+
+            product_owner = current_by_concern.get("PRODUCT_STATE")
+            if product_owner and not refs_equivalent(
+                product_owner["surface_ref"], bootstrap["product_state_ref"]
+            ):
+                errors.append(
+                    f"{rel(path)}: PRODUCT_STATE owner surface "
+                    f"{product_owner['surface_ref']!r} != bootstrap product_state_ref "
+                    f"{bootstrap['product_state_ref']!r}"
+                )
+
+        for owner_id in owners:
+            seen: set[str] = set()
+            cursor = owner_id
+            while True:
+                if cursor in seen:
+                    errors.append(
+                        f"{rel(path)}: supersession cycle detected at owner {cursor!r}"
+                    )
+                    break
+                seen.add(cursor)
+                owner = owners.get(cursor)
+                if owner is None:
+                    break
+                successor = owner.get("superseded_by_owner_id")
+                if successor is None:
+                    break
+                cursor = successor
+
 def validate_transition_journals(
     buckets: dict[str, list[tuple[Path, dict[str, Any]]]],
     errors: list[str],
@@ -753,6 +980,7 @@ def main() -> int:
     validate_bootstrap(target_root, buckets, errors)
     validate_terminals(buckets, errors)
     validate_campaign_runtime(buckets, errors)
+    validate_owner_registries(target_root, buckets, errors)
     validate_transition_journals(buckets, errors)
 
     if errors:

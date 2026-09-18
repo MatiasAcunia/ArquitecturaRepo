@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:owner-registry:0.1",
+  "title": "Agentic SDLC Canonical Owner Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_or_workstream",
+    "updated_at",
+    "owners"
+  ],
+  "properties": {
+    "schema_version": {"const": "owner-registry-0.1"},
+    "product_or_workstream": {"type": "string", "minLength": 1},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "owners": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "owner_id",
+          "concern_id",
+          "scope",
+          "status",
+          "surface_ref",
+          "surface_type",
+          "required_in_currentness_set",
+          "supersedes_owner_ids",
+          "superseded_by_owner_id"
+        ],
+        "properties": {
+          "owner_id": {"type": "string", "minLength": 1},
+          "concern_id": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1},
+          "status": {"enum": ["CURRENT", "SUPERSEDED"]},
+          "surface_ref": {"type": "string", "minLength": 1},
+          "surface_type": {"enum": ["FILE", "DIRECTORY", "EXTERNAL"]},
+          "required_in_currentness_set": {"type": "boolean"},
+          "supersedes_owner_ids": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "superseded_by_owner_id": {"type": ["string", "null"]}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "CURRENT"}}},
+            "then": {
+              "properties": {
+                "superseded_by_owner_id": {"type": "null"}
+              }
+            }
+          },
+          {
+            "if": {"properties": {"status": {"const": "SUPERSEDED"}}},
+            "then": {
+              "properties": {
+                "superseded_by_owner_id": {"type": "string", "minLength": 1},
+                "required_in_currentness_set": {"const": false}
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

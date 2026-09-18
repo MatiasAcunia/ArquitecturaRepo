@@ -36,6 +36,7 @@ It provides:
 - optional durable Campaign Lead runtime/controller;
 - fail-closed multi-file transition journaling and crash recovery;
 - backward-compatible schema evolution with explicit migrations;
+- canonical owner registry with verifiable supersession lineage;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -181,6 +182,16 @@ The first real evolved contract is `CURRENT_BOOTSTRAP`: legacy `starter-bootstra
 
 See `docs/13_SCHEMA_EVOLUTION.md`.
 
+## Canonical ownership
+
+New scaffolds include `state/OWNER_REGISTRY_CURRENT.json` for durable control-layer concerns. Each represented concern must have exactly one CURRENT owner; older owners remain explicit SUPERSEDED lineage.
+
+Validation binds CURRENT local owners to physical surfaces and, where declared, Product State currentness. Known concerns are also cross-checked against bootstrap/Product State refs. Dangling lineage, one-sided supersession, cycles, cross-concern supersession and duplicate CURRENT owners fail validation.
+
+Existing forks without an owner registry remain supported; this is an extensible ownership mechanism, not a forced rewrite of old projects.
+
+See `docs/14_CANONICAL_OWNERSHIP.md`.
+
 ## Repository map
 
 - `AGENTS.md` — root instructions.
@@ -198,10 +209,11 @@ See `docs/13_SCHEMA_EVOLUTION.md`.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
 - `tools/selftest_migrations.py` — forward/reverse/idempotence/lossy-downgrade migration self-test.
+- `tools/selftest_ownership.py` — owner/currentness/supersession falsification self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/13_SCHEMA_EVOLUTION.md` — architecture, adaptation, validation, runtime, recovery and schema-evolution guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/14_CANONICAL_OWNERSHIP.md` — architecture, adaptation, validation, runtime, recovery, schema evolution and ownership guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -216,9 +228,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.5.0 — PUBLIC STARTER PREVIEW`
+`v0.6.0 — PUBLIC STARTER PREVIEW`
 
-v0.5 adds backward-compatible schema evolution, explicit migration planning/execution and a real bootstrap v0.1→v0.2 migration with lossless reverse checks. Every fork still has to establish its own product truth and gates.
+v0.6 adds a generic canonical-owner registry with currentness binding and mechanically verified supersession lineage for extensible project state. Every fork still has to establish its own product truth and gates.
 
 ## License
 

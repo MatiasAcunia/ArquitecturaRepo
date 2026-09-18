@@ -38,6 +38,7 @@ def build_currentness_set(include_identity: bool) -> list[str]:
         "state/CLIENT_REQUIREMENTS_CURRENT.md",
         "state/PRODUCT_STATE_CURRENT.json",
         "state/CURRENT_BOOTSTRAP_STATE.json",
+        "state/OWNER_REGISTRY_CURRENT.json",
         "governance/PROJECT_OVERLAY.md",
     ]
     if include_identity:
@@ -255,6 +256,112 @@ This file is a fail-closed starting point. Do not convert placeholders or implem
             },
         )
 
+    owner_entries = [
+        {
+            "owner_id": "OWNER_AGENT_ENTRYPOINT_001",
+            "concern_id": "AGENT_ENTRYPOINT",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "AGENTS.md",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+        {
+            "owner_id": "OWNER_CLIENT_REQUIREMENTS_001",
+            "concern_id": "CLIENT_REQUIREMENTS",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "state/CLIENT_REQUIREMENTS_CURRENT.md",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+        {
+            "owner_id": "OWNER_PRODUCT_STATE_001",
+            "concern_id": "PRODUCT_STATE",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "state/PRODUCT_STATE_CURRENT.json",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+        {
+            "owner_id": "OWNER_CURRENT_BOOTSTRAP_001",
+            "concern_id": "CURRENT_BOOTSTRAP",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "state/CURRENT_BOOTSTRAP_STATE.json",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+        {
+            "owner_id": "OWNER_PROJECT_OVERLAY_001",
+            "concern_id": "PROJECT_OVERLAY",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "governance/PROJECT_OVERLAY.md",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+        {
+            "owner_id": "OWNER_CANONICAL_REGISTRY_001",
+            "concern_id": "CANONICAL_OWNER_REGISTRY",
+            "scope": product_id,
+            "status": "CURRENT",
+            "surface_ref": "state/OWNER_REGISTRY_CURRENT.json",
+            "surface_type": "FILE",
+            "required_in_currentness_set": True,
+            "supersedes_owner_ids": [],
+            "superseded_by_owner_id": None,
+        },
+    ]
+    if include_identity:
+        owner_entries.extend(
+            [
+                {
+                    "owner_id": "OWNER_IDENTITY_REGISTRY_001",
+                    "concern_id": "IDENTITY_REGISTRY",
+                    "scope": product_id,
+                    "status": "CURRENT",
+                    "surface_ref": "state/IDENTITY_REGISTRY_CURRENT.json",
+                    "surface_type": "FILE",
+                    "required_in_currentness_set": True,
+                    "supersedes_owner_ids": [],
+                    "superseded_by_owner_id": None,
+                },
+                {
+                    "owner_id": "OWNER_EXECUTION_AUTHORITY_001",
+                    "concern_id": "EXECUTION_AUTHORITY",
+                    "scope": product_id,
+                    "status": "CURRENT",
+                    "surface_ref": "state/EXECUTION_AUTHORITY_CURRENT.json",
+                    "surface_type": "FILE",
+                    "required_in_currentness_set": True,
+                    "supersedes_owner_ids": [],
+                    "superseded_by_owner_id": None,
+                },
+            ]
+        )
+
+    write_json(
+        control / "state" / "OWNER_REGISTRY_CURRENT.json",
+        {
+            "schema_version": "owner-registry-0.1",
+            "product_or_workstream": product_id,
+            "updated_at": now,
+            "owners": owner_entries,
+        },
+    )
+
     overlay = f"""# Project / Workstream Overlay
 
 Status: DRAFT / HOLD
@@ -283,6 +390,7 @@ UNRECONSTRUCTED. Load material product/domain theory from live project evidence 
 | Product State | state/PRODUCT_STATE_CURRENT.json |
 | Client requirements | state/CLIENT_REQUIREMENTS_CURRENT.md |
 | Bootstrap/currentness | state/CURRENT_BOOTSTRAP_STATE.json |
+| Canonical owner graph | state/OWNER_REGISTRY_CURRENT.json |
 | Active campaign authority | UNSET |
 | Acceptance evidence | UNSET |
 
@@ -319,9 +427,10 @@ Before material mutation read:
 1. state/CLIENT_REQUIREMENTS_CURRENT.md
 2. state/PRODUCT_STATE_CURRENT.json
 3. state/CURRENT_BOOTSTRAP_STATE.json
-4. governance/PROJECT_OVERLAY.md
-5. applicable files under protocols/
-6. live project code/state/runtime evidence
+4. state/OWNER_REGISTRY_CURRENT.json
+5. governance/PROJECT_OVERLAY.md
+6. applicable files under protocols/
+7. live project code/state/runtime evidence
 
 Do not treat this scaffold as evidence that the product is implemented.
 
@@ -359,6 +468,7 @@ Planner owns strategy. Campaign Lead owns tactics inside a valid charter. Worker
 - CLIENT requirements owner;
 - Product State owner;
 - bootstrap/currentness state;
+- canonical owner registry;
 - project overlay;
 - campaign templates;
 - fresh-context probe;

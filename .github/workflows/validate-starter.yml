@@ -37,5 +37,7 @@ jobs:
         run: python tools/selftest_scaffold.py
       - name: Exercise schema migrations
         run: python tools/selftest_migrations.py
+      - name: Exercise canonical ownership graph
+        run: python tools/selftest_ownership.py
       - name: Exercise resumable campaign runtime
         run: python tools/selftest_runtime.py

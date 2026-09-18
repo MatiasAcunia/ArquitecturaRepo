@@ -116,16 +116,34 @@ Implemented:
 - portable migration tool and registry in generated control layers;
 - CI forward/reverse/idempotence/failure self-test.
 
-## v0.6 — Ownership hardening and richer synthetic reference projects
+## v0.6 — Canonical ownership and supersession
+
+Implemented:
+
+- generic owner-registry schema;
+- owner registry generated in new project scaffolds;
+- exactly one CURRENT owner per represented concern;
+- physical surface resolution for CURRENT local owners;
+- owner-to-Product-State Currentness Set binding;
+- known-contract alignment for Product State, bootstrap and CLIENT requirements;
+- reciprocal supersession lineage;
+- same-concern supersession enforcement;
+- dangling-owner detection;
+- supersession-cycle detection;
+- cross-version duplicate bootstrap-owner detection;
+- valid owner replacement fixture;
+- adversarial ownership/supersession CI self-test.
+
+## v0.7 — Synthetic reference systems
 
 Next candidate work:
 
-- stronger generic supersession/current-owner checks;
-- explicit owner registry/current-owner graph for extensible project state;
 - synthetic stateful backend reference;
 - synthetic multi-workstream reference;
 - synthetic artifact-heavy reference;
-- synthetic high-consequence/external-action reference.
+- synthetic high-consequence/external-action reference;
+- fresh-context transfer tests across those profiles;
+- measure which optional mechanisms actually reduce reconstruction/execution failure.
 
 Examples must remain synthetic and structure-only.
 

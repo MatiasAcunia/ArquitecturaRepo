@@ -6,6 +6,7 @@
       "optional_protocols": [],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP"
       ]
     },
@@ -16,6 +17,7 @@
       ],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP"
       ]
     },
@@ -28,6 +30,7 @@
       ],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP"
       ]
     },
@@ -39,6 +42,7 @@
       ],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP",
         "IDENTITY_REGISTRY",
         "EXECUTION_AUTHORITY"
@@ -53,6 +57,7 @@
       ],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP",
         "IDENTITY_REGISTRY",
         "EXECUTION_AUTHORITY"
@@ -70,6 +75,7 @@
       ],
       "recommended_current_contracts": [
         "PRODUCT_STATE",
+        "OWNER_REGISTRY",
         "CURRENT_BOOTSTRAP",
         "IDENTITY_REGISTRY",
         "EXECUTION_AUTHORITY",
