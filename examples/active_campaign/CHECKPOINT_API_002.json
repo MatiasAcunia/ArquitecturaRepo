@@ -1,0 +1,37 @@
+{
+  "schema_version": "campaign-checkpoint-0.1",
+  "campaign_id": "CAMPAIGN_API_001",
+  "checkpoint_id": "CHECKPOINT_API_002",
+  "exact_integrated_ref": "candidate/ref-002",
+  "charter_status": "VALID",
+  "created_at": "2030-02-01T12:00:00Z",
+  "completed_capability_delta": "Create/read path implemented and unit-verified; integration verification remains active.",
+  "tactical_dag": {
+    "done": [
+      "implement note identity",
+      "implement create path",
+      "implement read path",
+      "unit verification"
+    ],
+    "active": [
+      "integration verification"
+    ],
+    "ready": [
+      "runtime physical verification",
+      "independent terminal review"
+    ],
+    "blocked": []
+  },
+  "evidence_refs": [
+    "evidence/unit-pass",
+    "evidence/integration-partial"
+  ],
+  "rejected_approaches": [],
+  "resource_locks": [],
+  "current_falsifiers": [
+    "created note cannot be read by returned identity",
+    "restart loses accepted note state"
+  ],
+  "resume_procedure": "Reconstruct campaign authority, verify candidate/ref-002 remains current, then continue integration verification.",
+  "strategic_return_required": false
+}

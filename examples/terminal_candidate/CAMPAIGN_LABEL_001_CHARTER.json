@@ -1,0 +1,58 @@
+{
+  "schema_version": "campaign-charter-0.1",
+  "campaign_id": "CAMPAIGN_LABEL_001",
+  "product_or_workstream": "EXAMPLE_LABEL_API",
+  "capability": "CAPABILITY_LABEL_API",
+  "baseline_ref": "baseline/ref-t1",
+  "critical_path_relevance": "First executable label API capability.",
+  "goal": {
+    "current_capability": "No complete label create/read API exists.",
+    "required_capability": "Create and read labels end-to-end through the API."
+  },
+  "architecture_envelope": {
+    "owners": ["LABEL_SERVICE"],
+    "fixed_interfaces": [
+      "Label identity is stable.",
+      "Create returns an identity that read can consume."
+    ],
+    "allowed_interface_evolution": [
+      "Private implementation details may change."
+    ],
+    "state_semantics": [
+      "A successfully created label remains readable by its returned identity."
+    ],
+    "protected_boundaries": [
+      "CLIENT requirements cannot be redefined by implementation."
+    ]
+  },
+  "resource_envelope": {
+    "allowed_write_surfaces": [
+      "application source",
+      "tests",
+      "campaign-local evidence"
+    ],
+    "protected_surfaces": [
+      "CLIENT requirements"
+    ],
+    "shared_resources": [],
+    "external_authority_gates": [
+      "External deployment remains unauthorized."
+    ]
+  },
+  "verification_gates": [
+    "UNIT_PROPERTY",
+    "INTEGRATION",
+    "RUNTIME_PHYSICAL"
+  ],
+  "independent_review_required": true,
+  "charter_invalidation_events": [
+    "CLIENT materially changes label semantics.",
+    "Physical evidence falsifies the capability boundary."
+  ],
+  "done_when": [
+    "Create/read works on the exact candidate.",
+    "Unit and integration verification pass.",
+    "Representative runtime evidence exists.",
+    "Independent review is bound to the exact candidate."
+  ]
+}

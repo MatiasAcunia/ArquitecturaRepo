@@ -2,7 +2,7 @@
 
 This roadmap is for the public architecture repository itself. It is not a promise of autonomous background work.
 
-## v0.1 — Core structure preview
+## v0.1 — Core structure
 
 Implemented:
 
@@ -24,35 +24,44 @@ Implemented:
 - security/privacy/rights/external-action boundaries;
 - systemic escalation/anti-churn;
 - interaction provenance;
-- fork/install/re-anchor/fresh-context prompts;
-- synthetic minimal example;
-- machine-readable schemas for current state/campaign/identity/bootstrap/interaction/manifest;
-- structure-only CI validator.
+- machine-readable contracts;
+- installation/re-anchor/fresh-context prompts.
 
-## v0.2 — Stronger executable validation
+## v0.2 — Executable validation and scaffolding
 
-Candidate additions:
+Implemented:
 
-- validate example instances against JSON Schemas in CI;
-- relationship-graph checks across Product State -> execution authority -> checkpoint -> terminal;
-- stale/superseded currentness checks;
-- duplicate-current-owner detection;
-- generated bootstrap package from a project profile;
-- schema migration/versioning rules.
+- JSON Schema validation for public contracts;
+- relationship checks across Product State, charter, identity, execution authority, checkpoint, bootstrap and terminal;
+- duplicate-current-owner checks for mechanically identifiable owners;
+- Currentness Set ref validation;
+- exact-candidate review/evidence checks;
+- positive synthetic examples for pre-campaign, active-campaign and terminal states;
+- adversarial negative fixtures that must fail;
+- machine-readable installation profiles;
+- fail-closed project scaffold generator;
+- all-profile scaffold self-test;
+- CI enforcement for the full executable validation surface.
+
+Not yet implemented:
+
+- schema migration/versioning framework;
+- generic relationship rules for arbitrary project-specific custom state.
 
 ## v0.3 — Minimal reference runtime
 
-Candidate additions:
+Next candidate work:
 
 - resumable campaign controller;
-- tactical work-unit state;
-- resource/write-set isolation;
-- independent-review orchestration;
-- checkpoint/recovery;
+- persisted tactical work-unit state;
 - append/reprioritize/retire tactical work;
-- typed strategic terminals.
+- resource/write-set isolation;
+- execution-authority transitions;
+- checkpoint/recovery;
+- typed strategic terminals;
+- independent-review lifecycle hooks.
 
-The runtime should remain optional. Projects must be able to use the architecture without adopting a specific orchestration engine.
+The runtime must remain optional. Projects must be able to use the architecture without adopting a specific orchestration engine.
 
 ## v0.4 — Synthetic reference projects
 

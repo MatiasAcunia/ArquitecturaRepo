@@ -1,0 +1,46 @@
+{
+  "schema_version": "product-state-0.1",
+  "product_or_workstream": "EXAMPLE_NOTE_API",
+  "state_version": "2",
+  "status": "CURRENT",
+  "updated_at": "2030-02-01T12:00:00Z",
+  "current_code_ref": "candidate/ref-002",
+  "product_objective": "Create and read notes through a JSON API.",
+  "requirement_refs": ["REQ-API-001", "REQ-API-002"],
+  "open_product_questions": [],
+  "currentness_set": [
+    "CLIENT_REQUIREMENTS_CURRENT.md",
+    "PRODUCT_STATE_CURRENT.json",
+    "IDENTITY_REGISTRY_CURRENT.json",
+    "EXECUTION_AUTHORITY_CURRENT.json",
+    "CAMPAIGN_API_001_CHARTER.json",
+    "CHECKPOINT_API_002.json",
+    "CURRENT_BOOTSTRAP_STATE.json"
+  ],
+  "capabilities": [
+    {
+      "id": "CAPABILITY_NOTE_API",
+      "owner": "NOTE_SERVICE",
+      "physical_state": "ACTIVE_CAMPAIGN",
+      "gate": "INTEGRATION",
+      "dependencies": [],
+      "evidence_refs": ["evidence/unit-pass", "evidence/integration-partial"]
+    }
+  ],
+  "active_campaign": {
+    "campaign_id": "CAMPAIGN_API_001",
+    "charter_ref": "CAMPAIGN_API_001_CHARTER.json",
+    "checkpoint_or_terminal_ref": "CHECKPOINT_API_002"
+  },
+  "current_gate": "INTEGRATION",
+  "strongest_evidence_refs": [
+    "evidence/unit-pass",
+    "evidence/integration-partial"
+  ],
+  "blockers": [],
+  "next_legal_boundary": "Continue the same campaign through integration and runtime verification.",
+  "forbidden_actions": [
+    "Claim runtime acceptance before runtime evidence exists.",
+    "Publish externally."
+  ]
+}

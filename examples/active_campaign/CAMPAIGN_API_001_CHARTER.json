@@ -1,0 +1,58 @@
+{
+  "schema_version": "campaign-charter-0.1",
+  "campaign_id": "CAMPAIGN_API_001",
+  "product_or_workstream": "EXAMPLE_NOTE_API",
+  "capability": "CAPABILITY_NOTE_API",
+  "baseline_ref": "baseline/ref-001",
+  "critical_path_relevance": "First executable API capability.",
+  "goal": {
+    "current_capability": "No complete note create/read API exists.",
+    "required_capability": "Create and read notes end-to-end through the API."
+  },
+  "architecture_envelope": {
+    "owners": ["NOTE_SERVICE"],
+    "fixed_interfaces": [
+      "Note identity is stable.",
+      "Create returns an identity that read can consume."
+    ],
+    "allowed_interface_evolution": [
+      "Private storage and routing implementation may change."
+    ],
+    "state_semantics": [
+      "A successfully created note must be readable by its returned identity."
+    ],
+    "protected_boundaries": [
+      "CLIENT requirements cannot be redefined by implementation."
+    ]
+  },
+  "resource_envelope": {
+    "allowed_write_surfaces": [
+      "application source",
+      "tests",
+      "campaign-local evidence"
+    ],
+    "protected_surfaces": [
+      "CLIENT requirements"
+    ],
+    "shared_resources": [],
+    "external_authority_gates": [
+      "External deployment remains unauthorized."
+    ]
+  },
+  "verification_gates": [
+    "UNIT_PROPERTY",
+    "INTEGRATION",
+    "RUNTIME_PHYSICAL"
+  ],
+  "independent_review_required": true,
+  "charter_invalidation_events": [
+    "CLIENT materially changes note semantics.",
+    "Physical evidence falsifies the note-service capability boundary."
+  ],
+  "done_when": [
+    "Create/read works on the exact candidate.",
+    "Unit and integration verification pass.",
+    "Representative runtime evidence exists.",
+    "Independent review is bound to the exact terminal candidate."
+  ]
+}

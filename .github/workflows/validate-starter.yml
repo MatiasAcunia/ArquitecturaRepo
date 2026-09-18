@@ -15,5 +15,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate structure-only starter
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check "jsonschema>=4.23,<5"
+      - name: Validate repository structure
         run: python tools/validate_structure.py
+      - name: Validate starter manifest contract
+        run: python tools/validate_project.py --root state
+      - name: Validate profile definitions
+        run: python tools/validate_project.py --root profiles
+      - name: Validate minimal synthetic project
+        run: python tools/validate_project.py --root examples/minimal
+      - name: Validate active-campaign synthetic project
+        run: python tools/validate_project.py --root examples/active_campaign
+      - name: Validate terminal-candidate synthetic project
+        run: python tools/validate_project.py --root examples/terminal_candidate
+      - name: Falsify validator with negative fixtures
+        run: python tools/selftest_validation.py
+      - name: Generate and validate all scaffold profiles
+        run: python tools/selftest_scaffold.py

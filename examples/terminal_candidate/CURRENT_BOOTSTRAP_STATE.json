@@ -1,0 +1,23 @@
+{
+  "schema_version": "starter-bootstrap-0.1",
+  "status": "READY",
+  "product_or_workstream": "EXAMPLE_LABEL_API",
+  "observed_code_ref": "candidate/ref-t3",
+  "observed_at": "2030-03-01T12:00:00Z",
+  "role": "I2_PROJECT_WORKSTREAM_PLANNER",
+  "kernel_version": "starter-v0.2",
+  "requirements_ref": "CLIENT_REQUIREMENTS_CURRENT.md",
+  "product_state_ref": "PRODUCT_STATE_CURRENT.json",
+  "active_campaign_ref": "CAMPAIGN_LABEL_001",
+  "active_checkpoint_or_terminal_ref": "TERMINAL_LABEL_001",
+  "current_gate": "PLANNER_ACCEPTANCE",
+  "strongest_evidence_refs": [
+    "evidence/runtime-complete",
+    "evidence/independent-review"
+  ],
+  "next_legal_boundary": "Review the exact terminal candidate at the strategic acceptance boundary.",
+  "forbidden_actions": [
+    "Mutate the reviewed candidate without a new freeze/review lifecycle."
+  ],
+  "unresolved_currentness": []
+}

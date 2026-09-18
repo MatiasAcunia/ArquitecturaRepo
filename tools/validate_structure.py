@@ -44,6 +44,13 @@ REQUIRED_PATHS = [
     "schemas/current-bootstrap.schema.json",
     "schemas/interaction-record.schema.json",
     "schemas/starter-manifest.schema.json",
+    "schemas/profiles.schema.json",
+    "schemas/profile-selection.schema.json",
+    "profiles/profiles.json",
+    "tools/validate_project.py",
+    "tools/selftest_validation.py",
+    "tools/scaffold_project.py",
+    "tools/selftest_scaffold.py",
     "templates/PROJECT_OVERLAY.md",
     "templates/INSTALLATION_REPORT.md",
     "templates/MASTER_OWNER_HANDOFF_CURRENT.md",
@@ -51,6 +58,10 @@ REQUIRED_PATHS = [
     "templates/EXECUTION_AUTHORITY_CURRENT.json",
     "docs/08_REFERENCE_PROJECT_LAYOUT.md",
     "docs/09_ADAPTATION_DECISION_TREE.md",
+    "docs/10_EXECUTABLE_VALIDATION.md",
+    "examples/minimal/PRODUCT_STATE_CURRENT.json",
+    "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
+    "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
 ]
 
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)

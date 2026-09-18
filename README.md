@@ -16,32 +16,54 @@ The starter defines four internal engineering roles:
 
 with the CLIENT outside the engineering organization.
 
-It also provides:
+It provides:
 
-- durable CLIENT intent and requirements;
-- Product State separated from Engineering State;
+- durable CLIENT intent and Product State;
 - repository-first fresh-context reconstruction;
 - currentness, supersession and fail-closed rules;
-- strategic capability planning instead of patch-by-patch prompting;
-- persistent engineering campaigns that survive model/session changes;
-- dynamic tactical DAGs owned by the Campaign Lead;
-- independent exact-candidate review;
-- distinct verification gates: unit, integration, state/currentness, runtime, semantic, perceptual, security/rights, release;
-- checkpoint/recovery semantics;
-- interaction provenance so product decisions made in chat do not disappear;
-- templates for requirements, Product State, campaign charters, checkpoints and terminals;
-- ready-to-paste prompts for adapting the architecture to another project.
+- identity/run/execution-authority separation;
+- strategic capability planning;
+- persistent engineering campaigns;
+- dynamic tactical DAGs;
+- exact-candidate independent review;
+- distinct verification gates;
+- state/DB/lineage/idempotency semantics;
+- checkpoint/recovery/capacity semantics;
+- optional storage, cost, security/privacy/rights and MASTER OWNER modules;
+- machine-readable schemas;
+- cross-file relationship validation;
+- fail-closed scaffolding by project profile;
+- positive and adversarial CI fixtures.
 
 ## Quick start
 
-1. Fork this repository.
-2. Give your coding/repository agent read/write access to the fork and to the project you want to manage.
-3. Paste the prompt in `prompts/INSTALL_THIS_SDLC.md`.
-4. Let the agent perform read-only discovery first.
-5. Answer only genuine product/client questions. Do not become its debugger or technical project manager.
-6. Require the agent to persist the adapted architecture and run a fresh-context reconstruction test before beginning material implementation.
+### Option A — ask an agent to adapt the architecture
 
-For an existing project with substantial history, use `prompts/REANCHOR_EXISTING_PROJECT.md`.
+1. Fork this repository.
+2. Give the agent access to the fork and the target project.
+3. Paste `prompts/INSTALL_THIS_SDLC.md`.
+4. Require read-only discovery before material mutation.
+5. Run the fresh-context probe before claiming installation success.
+
+### Option B — create a fail-closed scaffold first
+
+```bash
+python tools/scaffold_project.py \
+  --target "../my-project" \
+  --profile SMALL \
+  --product-id PROJECT_ALPHA \
+  --objective "Describe the client-visible product objective."
+```
+
+Then validate it:
+
+```bash
+python tools/validate_project.py --root "../my-project/.agentic-sdlc"
+```
+
+The generated control layer starts in `HOLD / UNTRUSTED_CONTEXT`. It does not invent live code, campaign or acceptance state.
+
+For a project with substantial existing history, use `prompts/REANCHOR_EXISTING_PROJECT.md`.
 
 ## Architecture in one picture
 
@@ -49,8 +71,8 @@ For an existing project with substantial history, use `prompts/REANCHOR_EXISTING
 CLIENT / PRODUCT OWNER
         |
         v
-I1  MASTER OWNER
-    system/process coherence
+I1  MASTER OWNER                     optional as a separate active role
+    shared system/process coherence
         |
         v
 I2  PROJECT / WORKSTREAM PLANNER
@@ -89,46 +111,78 @@ A fresh agent must be able to reconstruct the same legal next action from durabl
 9. Progress means capability unlock, gate advance or real risk reduction — not commits, prompts, tests or token volume.
 10. The CLIENT should not be required to reconcile technical state.
 11. Material product decisions made in conversation must become durable state.
-12. Governance must pay rent. Do not add a process layer unless it prevents or detects a real failure class.
+12. Governance must pay rent.
+
+## Profiles
+
+Public profiles:
+
+- `SMALL`
+- `STATEFUL`
+- `ARTIFACT_HEAVY`
+- `MULTI_WORKSTREAM`
+- `MULTI_PRODUCT`
+- `HIGH_CONSEQUENCE`
+
+Profiles select optional mechanism families. They do not manufacture project-specific authority.
+
+See `docs/06_SCALING_PROFILES.md` and `docs/09_ADAPTATION_DECISION_TREE.md`.
+
+## Executable validation
+
+Version 0.2 validates more than JSON syntax.
+
+Current checks include:
+
+- JSON Schema validation;
+- Product State -> campaign charter consistency;
+- capability ownership references;
+- Currentness Set path resolution;
+- actor/run/execution-authority consistency;
+- checkpoint/current-ref consistency;
+- bootstrap/Product State consistency;
+- terminal/review exact-candidate consistency;
+- evidence coverage for required charter gates;
+- duplicate current owner detection for mechanically identifiable owners.
+
+CI also runs negative fixtures that must fail.
+
+See `docs/10_EXECUTABLE_VALIDATION.md`.
 
 ## Repository map
 
-- `AGENTS.md` — root instructions for agents entering this starter.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` — complete conceptual map.
-- `docs/01_FORK_AND_BOOTSTRAP.md` — adaptation procedure.
-- `docs/02_RESEARCH_BASIS_AND_LIMITS.md` — evidence philosophy and claim boundaries.
-- `docs/03_MECHANISM_SELECTION.md` — generic mechanism-selection criteria.
-- `docs/04_FAILURE_MODES.md` — failure classes the architecture is designed to contain.
-- `docs/05_MINIMUM_VIABLE_PROFILE.md` — smallest useful installation.
-- `docs/06_SCALING_PROFILES.md` — when to add stateful/artifact/workstream/portfolio/high-consequence mechanisms.
-- `docs/07_FRESH_CONTEXT_TEST.md` — reconstruction acceptance test.
-- `docs/08_REFERENCE_PROJECT_LAYOUT.md` — reference ownership/layout patterns.
-- `docs/09_ADAPTATION_DECISION_TREE.md` — profile/mechanism selection logic.
-- `docs/ROADMAP.md` — planned evolution after v0.1.
+- `AGENTS.md` — root instructions.
 - `protocols/` — reusable operating semantics.
-- `templates/` — canonical state/charter/identity/installation templates.
-- `prompts/` — installation, reconstruction and optional MASTER OWNER prompts.
-- `schemas/` — machine-readable state/campaign/identity contracts.
-- `examples/minimal/` — fully synthetic small-project example.
+- `schemas/` — machine-readable contracts.
+- `templates/` — current-state/campaign/identity/installation templates.
+- `profiles/` — machine-readable installation profiles.
+- `prompts/` — install, re-anchor, fresh-context and MASTER OWNER prompts.
+- `tools/validate_structure.py` — starter structure/leak validator.
+- `tools/validate_project.py` — schema + relationship validator.
+- `tools/scaffold_project.py` — fail-closed project scaffold generator.
+- `tools/selftest_validation.py` — adversarial validator self-test.
+- `tools/selftest_scaffold.py` — all-profile scaffold self-test.
+- `examples/minimal/` — pre-campaign example.
+- `examples/active_campaign/` — active campaign/currentness example.
+- `examples/terminal_candidate/` — exact-candidate terminal/review example.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/10_EXECUTABLE_VALIDATION.md` — architecture, adaptation and validation guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
-- `tools/validate_structure.py` — structure/JSON/leak-safety validator.
 
 ## What this is not
 
 - not a guarantee of autonomous software development;
 - not a universal architecture proven across arbitrary projects;
-- not permission to hide uncertainty behind more agents;
 - not a reason to create extra agents when one agent is sufficient;
-- not a substitute for tests, runtime evidence or human product judgment;
-- not a project snapshot or a historical data export.
+- not a substitute for product-specific tests/runtime/security/perceptual evidence;
+- not a project snapshot or historical data export.
 
-This repository contains only reusable structure, generic protocols, templates and synthetic guidance. It intentionally excludes project-specific names, repositories, branches, identifiers, providers, costs, product counts, artifacts and historical state.
+This repository contains only reusable structure, generic mechanisms and synthetic examples. It intentionally excludes project-specific names, repositories, branches, identifiers, providers, costs, quantities, artifacts and historical state.
 
 ## Status
 
-`v0.1.4 — PUBLIC STARTER PREVIEW`
+`v0.2.0 — PUBLIC STARTER PREVIEW`
 
-The architecture is usable as a starter, but every fork must validate the mechanisms in its own environment.
+v0.2 adds executable validation and fail-closed scaffolding. Every fork still has to establish its own product truth and gates.
 
 ## License
 

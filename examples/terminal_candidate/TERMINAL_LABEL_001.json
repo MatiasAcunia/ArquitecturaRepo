@@ -1,0 +1,29 @@
+{
+  "schema_version": "campaign-terminal-0.1",
+  "campaign_id": "CAMPAIGN_LABEL_001",
+  "exact_candidate_ref": "candidate/ref-t3",
+  "terminal_type": "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+  "capability_claim": "Label create/read works end-to-end on the exact candidate.",
+  "evidence": {
+    "static_structural": [],
+    "unit_property": ["evidence/unit-complete"],
+    "integration": ["evidence/integration-complete"],
+    "state_currentness_recovery": [],
+    "runtime_physical": ["evidence/runtime-complete"],
+    "semantic_generalization": [],
+    "security_rights_privacy": [],
+    "perceptual_human": [],
+    "release_live": []
+  },
+  "independent_review": {
+    "reviewer_identity": "REVIEWER_LABEL_001",
+    "reviewed_candidate_ref": "candidate/ref-t3",
+    "verdict": "PASS_FOR_PLANNER_REVIEW",
+    "falsification_summary": "Reviewer independently checked the charter gates against the exact candidate and found no blocking defect."
+  },
+  "known_limitations": [
+    "External deployment is outside this campaign."
+  ],
+  "in_scope_rework_remaining": [],
+  "strategic_return_reason": "All charter verification gates are evidenced and the exact candidate is ready for Planner acceptance."
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "identity-registry-0.1",
+  "updated_at": "2030-03-01T12:00:00Z",
+  "actors": [
+    {
+      "actor_id": "PLANNER_LABEL_API_001",
+      "role_class": "I2_PROJECT_WORKSTREAM_PLANNER",
+      "scope": "EXAMPLE_LABEL_API",
+      "status": "ACTIVE",
+      "current_run_id": "RUN_I2_T3",
+      "supersedes_actor_id": null
+    },
+    {
+      "actor_id": "CAMPAIGN_LEAD_LABEL_API_001",
+      "role_class": "I3_ENGINEERING_CAMPAIGN_LEAD",
+      "scope": "CAMPAIGN_LABEL_001",
+      "status": "INACTIVE",
+      "current_run_id": null,
+      "supersedes_actor_id": null
+    }
+  ]
+}

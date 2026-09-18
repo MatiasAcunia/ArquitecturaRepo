@@ -1,0 +1,24 @@
+{
+  "schema_version": "starter-bootstrap-0.1",
+  "status": "READY",
+  "product_or_workstream": "EXAMPLE_NOTE_API",
+  "observed_code_ref": "candidate/ref-002",
+  "observed_at": "2030-02-01T12:00:00Z",
+  "role": "I3_ENGINEERING_CAMPAIGN_LEAD",
+  "kernel_version": "starter-v0.2",
+  "requirements_ref": "CLIENT_REQUIREMENTS_CURRENT.md",
+  "product_state_ref": "PRODUCT_STATE_CURRENT.json",
+  "active_campaign_ref": "CAMPAIGN_API_001",
+  "active_checkpoint_or_terminal_ref": "CHECKPOINT_API_002",
+  "current_gate": "INTEGRATION",
+  "strongest_evidence_refs": [
+    "evidence/unit-pass",
+    "evidence/integration-partial"
+  ],
+  "next_legal_boundary": "Continue integration verification in the same campaign.",
+  "forbidden_actions": [
+    "Open a new campaign for ordinary in-charter defects.",
+    "Claim runtime acceptance before runtime evidence exists."
+  ],
+  "unresolved_currentness": []
+}

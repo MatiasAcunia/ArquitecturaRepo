@@ -1,0 +1,80 @@
+{
+  "schema_version": "starter-profiles-0.1",
+  "profiles": {
+    "SMALL": {
+      "description": "Single product, low persistent-state and external-action complexity.",
+      "optional_protocols": [],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP"
+      ]
+    },
+    "STATEFUL": {
+      "description": "Product with persistent state, migrations, recovery or durable jobs.",
+      "optional_protocols": [
+        "STATE_DB_LINEAGE_AND_IDEMPOTENCY"
+      ],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP"
+      ]
+    },
+    "ARTIFACT_HEAVY": {
+      "description": "Product that generates many, large or expensive artifacts.",
+      "optional_protocols": [
+        "STATE_DB_LINEAGE_AND_IDEMPOTENCY",
+        "STORAGE_AND_ARTIFACT_LIFECYCLE",
+        "COST_CAPACITY_AND_EXTERNAL_SERVICES"
+      ],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP"
+      ]
+    },
+    "MULTI_WORKSTREAM": {
+      "description": "One final product with multiple independently planned workstreams.",
+      "optional_protocols": [
+        "SYSTEMIC_ESCALATION_AND_ANTI_CHURN",
+        "INTERACTION_LEDGER"
+      ],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP",
+        "IDENTITY_REGISTRY",
+        "EXECUTION_AUTHORITY"
+      ]
+    },
+    "MULTI_PRODUCT": {
+      "description": "Multiple products sharing a development system or portfolio owner.",
+      "optional_protocols": [
+        "MASTER_OWNER_OS",
+        "SYSTEMIC_ESCALATION_AND_ANTI_CHURN",
+        "INTERACTION_LEDGER"
+      ],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP",
+        "IDENTITY_REGISTRY",
+        "EXECUTION_AUTHORITY"
+      ]
+    },
+    "HIGH_CONSEQUENCE": {
+      "description": "Material security, privacy, financial, rights or irreversible external risk.",
+      "optional_protocols": [
+        "STATE_DB_LINEAGE_AND_IDEMPOTENCY",
+        "CAPACITY_DEADLINES_AND_RESUME",
+        "COST_CAPACITY_AND_EXTERNAL_SERVICES",
+        "SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS",
+        "SYSTEMIC_ESCALATION_AND_ANTI_CHURN",
+        "INTERACTION_LEDGER"
+      ],
+      "recommended_current_contracts": [
+        "PRODUCT_STATE",
+        "CURRENT_BOOTSTRAP",
+        "IDENTITY_REGISTRY",
+        "EXECUTION_AUTHORITY",
+        "INTERACTION_RECORD"
+      ]
+    }
+  }
+}
