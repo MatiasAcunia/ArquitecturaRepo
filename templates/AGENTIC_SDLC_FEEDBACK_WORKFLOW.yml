@@ -41,6 +41,13 @@ jobs:
             echo "trigger=MONTHLY" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Install Agentic SDLC validation dependency
+        if: steps.resolve.outputs.control_root != ''
+        shell: bash
+        run: |
+          CONTROL_ROOT="${{ steps.resolve.outputs.control_root }}"
+          python -m pip install --disable-pip-version-check -r "$CONTROL_ROOT/requirements-validation.txt"
+
       - name: Generate strict metadata-only report
         id: generate
         if: steps.resolve.outputs.control_root != ''
