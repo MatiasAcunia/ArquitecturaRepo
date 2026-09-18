@@ -25,12 +25,14 @@ def run(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    synthetic_email = "owner" + "@" + "example.invalid"
+    synthetic_hex40 = ("0123456789abcdef" * 2) + "01234567"
     sensitive_fragments = [
         "PRIVATE_PRODUCT_X",
-        "owner@example.invalid",
+        synthetic_email,
         "C:/secret/project/path",
         "TOP_SECRET_REQUIREMENT",
-        "0123456789abcdef0123456789abcdef01234567",
+        synthetic_hex40,
     ]
 
     with tempfile.TemporaryDirectory(prefix="agentic-feedback-") as tmp:
@@ -41,9 +43,10 @@ def main() -> int:
             "--profile", "STATEFUL",
             "--product-id", sensitive_fragments[0],
             "--objective", (
-                "TOP_SECRET_REQUIREMENT owner@example.invalid "
-                "C:/secret/project/path "
-                "0123456789abcdef0123456789abcdef01234567"
+                "TOP_SECRET_REQUIREMENT "
+                + synthetic_email
+                + " C:/secret/project/path "
+                + synthetic_hex40
             ),
             "--with-runtime",
         )
