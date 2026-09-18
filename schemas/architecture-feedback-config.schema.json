@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:architecture-feedback-config:0.1",
+  "title": "Agentic SDLC Architecture Feedback Config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "enabled",
+    "cadence",
+    "artifact_enabled",
+    "external_submission_enabled",
+    "privacy_mode"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "architecture-feedback-config-0.1"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "cadence": {
+      "enum": [
+        "WEEKLY",
+        "MONTHLY"
+      ]
+    },
+    "artifact_enabled": {
+      "type": "boolean"
+    },
+    "external_submission_enabled": {
+      "type": "boolean"
+    },
+    "privacy_mode": {
+      "const": "STRICT_METADATA_ONLY"
+    }
+  }
+}
