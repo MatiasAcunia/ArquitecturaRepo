@@ -257,5 +257,10 @@ Implemented:
 - project-local Agentic SDLC operating review for real-use/pilot evidence;
 - campaign runtime fail-closed baseline guard for new scaffolds;
 - fresh-context reconstruction includes technical/delivery baseline state.
+- privacy-preserving recurring architecture feedback;
+- weekly/monthly managed GitHub Actions schedule;
+- metadata-only artifact enabled by default with visible opt-out;
+- external feedback submission disabled by default and explicitly opt-in;
+- non-leakage self-test for project identifiers/content/paths/credentials.
 
 This is an evidence-driven capability addition, not a restart of open-ended architecture iteration.
