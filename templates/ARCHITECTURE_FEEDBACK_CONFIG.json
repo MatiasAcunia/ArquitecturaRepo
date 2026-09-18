@@ -1,0 +1,8 @@
+{
+  "schema_version": "architecture-feedback-config-0.1",
+  "enabled": true,
+  "cadence": "WEEKLY",
+  "artifact_enabled": true,
+  "external_submission_enabled": false,
+  "privacy_mode": "STRICT_METADATA_ONLY"
+}
