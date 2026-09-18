@@ -96,6 +96,7 @@ def main() -> int:
                 "workspace_gc.py",
                 "baseline_guard.py",
                 "project_status.py",
+                "architecture_feedback.py",
             ):
                 if not (control / "tools" / portable_tool).exists():
                     raise AssertionError(
@@ -105,6 +106,7 @@ def main() -> int:
                 "state/TECHNICAL_BASELINE_CURRENT.json",
                 "state/DELIVERY_PLAN_CURRENT.json",
                 "governance/AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md",
+                "feedback/ARCHITECTURE_FEEDBACK_CONFIG.json",
             ):
                 if not (control / baseline_surface).exists():
                     raise AssertionError(
@@ -151,6 +153,12 @@ def main() -> int:
                 )
             if json.loads(reconstruction.stdout)["posture"] != "UNTRUSTED_CONTEXT":
                 raise AssertionError(f"{profile}: fresh reconstruction posture is not UNTRUSTED_CONTEXT")
+            if not (
+                target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+            ).exists():
+                raise AssertionError(
+                    f"{profile}: managed privacy feedback workflow missing by default"
+                )
             if (control / "tools" / "campaignctl.py").exists():
                 raise AssertionError(f"{profile}: campaign runtime installed without --with-runtime")
 
@@ -237,6 +245,7 @@ def main() -> int:
     print("- discovery/adoption/recovery tools are self-contained")
     print("- delta-sync/commit-boundary/local-GC tools are self-contained")
     print("- product-baseline/status tools are self-contained and fresh baseline starts blocked")
+    print("- privacy-preserving architecture feedback exporter/workflow are installed by default")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0
