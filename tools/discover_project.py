@@ -10,6 +10,22 @@ from pathlib import Path
 from typing import Any
 
 EXCLUDED_DIRS = {".git", ".agentic-sdlc", "__pycache__", ".venv", "venv", "node_modules"}
+MANAGED_FEEDBACK_WORKFLOW = ".github/workflows/agentic-sdlc-feedback.yml"
+MANAGED_FEEDBACK_MARKER = "Managed by Agentic SDLC starter"
+
+
+def is_managed_control_file(project: Path, path: Path) -> bool:
+    try:
+        relative = str(path.relative_to(project)).replace(os.sep, "/")
+    except ValueError:
+        return False
+    if relative != MANAGED_FEEDBACK_WORKFLOW:
+        return False
+    try:
+        head = path.read_text(encoding="utf-8")[:512]
+    except Exception:
+        return False
+    return MANAGED_FEEDBACK_MARKER in head
 
 
 def sha256(path: Path) -> str:
@@ -27,6 +43,8 @@ def inventory(project: Path) -> dict[str, Any]:
         root_path = Path(root)
         for name in sorted(names):
             path = root_path / name
+            if is_managed_control_file(project, path):
+                continue
             try:
                 relative = path.relative_to(project)
                 stat = path.stat()
