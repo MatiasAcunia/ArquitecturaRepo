@@ -171,17 +171,34 @@ Implemented:
 - fault-injected adoption crash and recovery;
 - no technical CLIENT editing of Product State/bootstrap/owners/currentness.
 
-## v0.9 — Hardening and release-candidate reduction
+## v0.9 — Hardening and release candidate
 
-Next candidate work:
+Implemented:
 
-- remove duplicated transaction/locking implementations where safe;
-- define machine-readable v1 release criteria;
-- make one command execute the complete release evidence suite;
-- measure required-vs-optional mechanism burden;
-- remove stale roadmap/documentation claims;
-- run clean-install/reconstruct/adopt probes from final artifacts;
-- freeze new features unless a release criterion is still unproven.
+- centralized local control-state locking/journaling/recovery in `state_tx.py`;
+- Campaign Lead runtime delegates transaction/recovery semantics to the shared primitive;
+- schema migrations delegate locking/durable writes to the shared primitive;
+- adoption uses the same shared primitive;
+- static hardening test prevents duplicate primitive reintroduction;
+- all Python tools compile in hardening CI;
+- SMALL has zero optional protocols and heavy mechanisms remain optional;
+- machine-readable v1 release criteria;
+- canonical contract-instance release test;
+- one-command complete v1 release verifier;
+- documented feature-freeze/stopping rule;
+- complete v1 release gate passes on the release-candidate tree.
+
+## v1.0 — Transfer-hardened public starter
+
+Release procedure:
+
+1. compact v0.9 to its clean milestone;
+2. require full CI success on that exact clean commit;
+3. apply metadata/status-only 1.0 release changes;
+4. run the complete v1 release gate on the exact 1.0 commit;
+5. if any gate fails, do not declare 1.0.
+
+No new generic feature is authorized between v0.9 gate closure and 1.0.
 
 ## v1.0 — Transfer-hardened public starter
 

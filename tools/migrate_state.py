@@ -3,16 +3,19 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
-import tempfile
-import time
 from collections import deque
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable
 
 from jsonschema import Draft202012Validator, FormatChecker
+
+from state_tx import (
+    StateTransactionError,
+    atomic_json,
+    journal_path,
+    state_lock,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_DIR = ROOT / "schemas"
@@ -35,32 +38,6 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
-def fsync_dir(path: Path) -> None:
-    if os.name == "nt":
-        return
-    fd = os.open(path, os.O_RDONLY)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
-
-
-def atomic_json(path: Path, data: dict[str, Any]) -> None:
-    payload = json.dumps(data, indent=2) + "\n"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(payload)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(tmp_name, path)
-        fsync_dir(path.parent)
-    finally:
-        if os.path.exists(tmp_name):
-            os.unlink(tmp_name)
-
-
 def file_bytes(path: Path) -> bytes:
     try:
         return path.read_bytes()
@@ -68,66 +45,8 @@ def file_bytes(path: Path) -> bytes:
         raise MigrationError(f"missing migration target: {path}")
 
 
-@contextmanager
-def migration_lock(control: Path, timeout: float):
-    lock_path = control / "runtime" / ".campaignctl.lock"
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    handle = open(lock_path, "a+b")
-    acquired = False
-    deadline = time.monotonic() + max(timeout, 0.0)
-
-    try:
-        if os.name == "nt":
-            import msvcrt
-
-            handle.seek(0, os.SEEK_END)
-            if handle.tell() == 0:
-                handle.write(b"0")
-                handle.flush()
-            while True:
-                try:
-                    handle.seek(0)
-                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-                    acquired = True
-                    break
-                except OSError:
-                    if time.monotonic() >= deadline:
-                        raise MigrationError(
-                            f"campaign/state lock busy: {lock_path}; timeout={timeout:.3f}s"
-                        )
-                    time.sleep(0.05)
-        else:
-            import fcntl
-
-            while True:
-                try:
-                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    acquired = True
-                    break
-                except BlockingIOError:
-                    if time.monotonic() >= deadline:
-                        raise MigrationError(
-                            f"campaign/state lock busy: {lock_path}; timeout={timeout:.3f}s"
-                        )
-                    time.sleep(0.05)
-
-        yield
-    finally:
-        if acquired:
-            if os.name == "nt":
-                import msvcrt
-
-                handle.seek(0)
-                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
-
-                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-        handle.close()
-
-
 def pending_transaction(control: Path) -> Path:
-    return control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json"
+    return journal_path(control)
 
 
 def resolve_internal(control: Path, value: str) -> Path:
@@ -336,7 +255,7 @@ def cmd_apply(args: argparse.Namespace) -> None:
     control = Path(args.control_root).resolve()
     target = resolve_internal(control, args.file)
 
-    with migration_lock(control, args.lock_timeout):
+    with state_lock(control, args.lock_timeout):
         pending = pending_transaction(control)
         if pending.exists():
             raise MigrationError(
@@ -434,7 +353,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         args.func(args)
-    except MigrationError as exc:
+    except (MigrationError, StateTransactionError) as exc:
         print(f"MIGRATION FAILED: {exc}", file=sys.stderr)
         return 1
     return 0

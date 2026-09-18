@@ -28,6 +28,7 @@ SCHEMA_BY_VERSION = {
     "transition-journal-0.1": "transition-journal.schema.json",
     "migration-registry-0.1": "migration-registry.schema.json",
     "owner-registry-0.1": "owner-registry.schema.json",
+    "v1-release-criteria-0.1": "v1-release-criteria.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {

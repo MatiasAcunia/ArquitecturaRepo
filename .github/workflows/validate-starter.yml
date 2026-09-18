@@ -47,3 +47,7 @@ jobs:
         run: python tools/selftest_adoption.py
       - name: Exercise resumable campaign runtime
         run: python tools/selftest_runtime.py
+      - name: Exercise hardening
+        run: python tools/selftest_hardening.py
+      - name: Verify complete v1 release gate
+        run: python tools/verify_v1_release.py

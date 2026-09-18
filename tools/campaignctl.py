@@ -2,18 +2,20 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import os
-import shutil
 import sys
-import tempfile
-import time
-import uuid
-from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from state_tx import (
+    StateTransactionError,
+    atomic_json,
+    journal_path,
+    recover as recover_pending_transaction,
+    state_lock as campaign_lock,
+    write_json_set as transaction_write_json,
+)
 
 TERMINAL_WORK_STATUSES = {"DONE", "PARKED", "SUPERSEDED", "CANCELLED"}
 READINESS_TERMINALS = {
@@ -34,66 +36,6 @@ class CampaignError(Exception):
     pass
 
 
-@contextmanager
-def campaign_lock(control: Path, timeout: float):
-    lock_path = control / "runtime" / ".campaignctl.lock"
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    handle = open(lock_path, "a+b")
-    acquired = False
-    deadline = time.monotonic() + max(timeout, 0.0)
-
-    try:
-        if os.name == "nt":
-            import msvcrt
-
-            handle.seek(0, os.SEEK_END)
-            if handle.tell() == 0:
-                handle.write(b"0")
-                handle.flush()
-            while True:
-                try:
-                    handle.seek(0)
-                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-                    acquired = True
-                    break
-                except OSError:
-                    if time.monotonic() >= deadline:
-                        raise CampaignError(
-                            f"campaign lock busy: {lock_path}; "
-                            f"timeout={timeout:.3f}s"
-                        )
-                    time.sleep(0.05)
-        else:
-            import fcntl
-
-            while True:
-                try:
-                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    acquired = True
-                    break
-                except BlockingIOError:
-                    if time.monotonic() >= deadline:
-                        raise CampaignError(
-                            f"campaign lock busy: {lock_path}; "
-                            f"timeout={timeout:.3f}s"
-                        )
-                    time.sleep(0.05)
-
-        yield
-    finally:
-        if acquired:
-            if os.name == "nt":
-                import msvcrt
-
-                handle.seek(0)
-                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
-
-                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-        handle.close()
-
-
 def now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -108,262 +50,6 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise CampaignError(f"expected JSON object at {path}")
     return data
-
-
-def atomic_json(path: Path, data: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(data, indent=2) + "\n"
-    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(payload)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(tmp_name, path)
-        fsync_dir(path.parent)
-    finally:
-        if os.path.exists(tmp_name):
-            os.unlink(tmp_name)
-
-
-def sha256_bytes(payload: bytes) -> str:
-    return hashlib.sha256(payload).hexdigest()
-
-
-def sha256_file(path: Path) -> str | None:
-    if not path.exists():
-        return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def fsync_dir(path: Path) -> None:
-    if os.name == "nt":
-        return
-    fd = os.open(path, os.O_RDONLY)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
-
-
-def durable_bytes(path: Path, payload: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "wb") as handle:
-        handle.write(payload)
-        handle.flush()
-        os.fsync(handle.fileno())
-    fsync_dir(path.parent)
-
-
-def journal_path(control: Path) -> Path:
-    return control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json"
-
-
-def transaction_stage_dir(control: Path, transaction_id: str) -> Path:
-    return control / "runtime" / "transactions" / transaction_id
-
-
-def internal_relative_path(control: Path, path: Path) -> str:
-    resolved_control = control.resolve()
-    resolved_path = path.resolve()
-    try:
-        return str(resolved_path.relative_to(resolved_control))
-    except ValueError:
-        raise CampaignError(f"transaction target escapes control root: {path}")
-
-
-def cleanup_transaction_files(control: Path, journal: dict[str, Any]) -> None:
-    tx_dir = transaction_stage_dir(control, journal["transaction_id"])
-    if tx_dir.exists():
-        shutil.rmtree(tx_dir)
-        fsync_dir(tx_dir.parent)
-    current = journal_path(control)
-    if current.exists():
-        current.unlink()
-        fsync_dir(current.parent)
-
-
-def mark_transaction_conflict(
-    control: Path,
-    journal: dict[str, Any],
-    reason: str,
-) -> None:
-    journal["status"] = "CONFLICT"
-    journal["conflict_reason"] = reason
-    journal["updated_at"] = now()
-    atomic_json(journal_path(control), journal)
-
-
-def recover_pending_transaction(control: Path) -> str | None:
-    path = journal_path(control)
-    if not path.exists():
-        return None
-
-    journal = load_json(path)
-    if journal.get("schema_version") != "transition-journal-0.1":
-        raise CampaignError(f"unsupported transition journal: {path}")
-    if journal.get("status") == "CONFLICT":
-        raise CampaignError(
-            f"transaction conflict requires manual reconciliation: "
-            f"{journal.get('conflict_reason')}"
-        )
-
-    for op in journal["operations"]:
-        target = control / op["path"]
-        stage = control / op["stage_ref"]
-        current_hash = sha256_file(target)
-
-        if current_hash == op["after_sha256"]:
-            op["applied"] = True
-            continue
-
-        if op["before_exists"]:
-            if current_hash != op["before_sha256"]:
-                reason = (
-                    f"{op['path']}: target hash is neither transaction before nor after state"
-                )
-                mark_transaction_conflict(control, journal, reason)
-                raise CampaignError(reason)
-        elif target.exists():
-            reason = f"{op['path']}: target unexpectedly exists during recovery"
-            mark_transaction_conflict(control, journal, reason)
-            raise CampaignError(reason)
-
-        stage_hash = sha256_file(stage)
-        if stage_hash != op["after_sha256"]:
-            reason = (
-                f"{op['path']}: staged payload missing or hash-mismatched during recovery"
-            )
-            mark_transaction_conflict(control, journal, reason)
-            raise CampaignError(reason)
-
-        target.parent.mkdir(parents=True, exist_ok=True)
-        os.replace(stage, target)
-        fsync_dir(target.parent)
-        op["applied"] = True
-        journal["status"] = "COMMITTING"
-        journal["updated_at"] = now()
-        atomic_json(path, journal)
-
-    for op in journal["operations"]:
-        target = control / op["path"]
-        if sha256_file(target) != op["after_sha256"]:
-            reason = f"{op['path']}: after-state verification failed"
-            mark_transaction_conflict(control, journal, reason)
-            raise CampaignError(reason)
-
-    journal["status"] = "COMMITTED"
-    journal["updated_at"] = now()
-    atomic_json(path, journal)
-    txid = journal["transaction_id"]
-    cleanup_transaction_files(control, journal)
-    return txid
-
-
-def transaction_write_json(
-    control: Path,
-    label: str,
-    writes: list[tuple[Path, dict[str, Any]]],
-) -> str:
-    if not writes:
-        raise CampaignError("transaction requires at least one write")
-
-    if journal_path(control).exists():
-        raise CampaignError(
-            "pending transition exists; run campaignctl recover before starting another mutation"
-        )
-
-    txid = uuid.uuid4().hex
-    tx_dir = transaction_stage_dir(control, txid)
-    tx_dir.mkdir(parents=True, exist_ok=False)
-    fsync_dir(tx_dir.parent)
-
-    operations: list[dict[str, Any]] = []
-    seen_paths: set[str] = set()
-    try:
-        for index, (target, data) in enumerate(writes, start=1):
-            rel_target = internal_relative_path(control, target)
-            if rel_target in seen_paths:
-                raise CampaignError(f"duplicate transaction target: {rel_target}")
-            seen_paths.add(rel_target)
-
-            payload = (json.dumps(data, indent=2) + "\n").encode("utf-8")
-            stage = tx_dir / f"op_{index:04d}.json"
-            durable_bytes(stage, payload)
-            before_exists = target.exists()
-            operations.append(
-                {
-                    "path": rel_target,
-                    "before_exists": before_exists,
-                    "before_sha256": sha256_file(target) if before_exists else None,
-                    "after_sha256": sha256_bytes(payload),
-                    "stage_ref": internal_relative_path(control, stage),
-                    "applied": False,
-                }
-            )
-    except Exception:
-        if tx_dir.exists():
-            shutil.rmtree(tx_dir)
-            fsync_dir(tx_dir.parent)
-        raise
-
-    created = now()
-    journal = {
-        "schema_version": "transition-journal-0.1",
-        "transaction_id": txid,
-        "label": label,
-        "status": "PREPARED",
-        "created_at": created,
-        "updated_at": created,
-        "operations": operations,
-        "conflict_reason": None,
-    }
-    atomic_json(journal_path(control), journal)
-
-    journal["status"] = "COMMITTING"
-    journal["updated_at"] = now()
-    atomic_json(journal_path(control), journal)
-
-    crash_after_raw = os.getenv("AGENTIC_SDLC_TEST_CRASH_AFTER_APPLY")
-    crash_after = int(crash_after_raw) if crash_after_raw else None
-    applied_count = 0
-
-    for op in journal["operations"]:
-        target = control / op["path"]
-        stage = control / op["stage_ref"]
-        current_hash = sha256_file(target)
-
-        if op["before_exists"]:
-            if current_hash != op["before_sha256"]:
-                reason = f"{op['path']}: target changed after transaction preparation"
-                mark_transaction_conflict(control, journal, reason)
-                raise CampaignError(reason)
-        elif target.exists():
-            reason = f"{op['path']}: target appeared after transaction preparation"
-            mark_transaction_conflict(control, journal, reason)
-            raise CampaignError(reason)
-
-        if sha256_file(stage) != op["after_sha256"]:
-            reason = f"{op['path']}: staged payload failed integrity check"
-            mark_transaction_conflict(control, journal, reason)
-            raise CampaignError(reason)
-
-        target.parent.mkdir(parents=True, exist_ok=True)
-        os.replace(stage, target)
-        fsync_dir(target.parent)
-        op["applied"] = True
-        applied_count += 1
-        journal["updated_at"] = now()
-        atomic_json(journal_path(control), journal)
-
-        if crash_after is not None and applied_count == crash_after:
-            os._exit(91)
-
-    journal["status"] = "COMMITTED"
-    journal["updated_at"] = now()
-    atomic_json(journal_path(control), journal)
-    cleanup_transaction_files(control, journal)
-    return txid
 
 
 def require_no_pending_transaction(control: Path) -> None:
@@ -1438,7 +1124,7 @@ def main() -> int:
                         "pending transition exists; run campaignctl recover before another mutation"
                     )
                 args.func(args)
-    except CampaignError as exc:
+    except (CampaignError, StateTransactionError) as exc:
         print(f"CAMPAIGNCTL FAILED: {exc}", file=sys.stderr)
         return 1
     return 0

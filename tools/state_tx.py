@@ -303,7 +303,10 @@ def write_state_set(
     atomic_json(journal_path(control), journal)
 
     crash_raw = os.getenv("AGENTIC_SDLC_TX_CRASH_AFTER_APPLY")
-    crash_after = int(crash_raw) if crash_raw else None
+    legacy_crash_raw = os.getenv("AGENTIC_SDLC_TEST_CRASH_AFTER_APPLY")
+    selected_crash_raw = crash_raw or legacy_crash_raw
+    crash_after = int(selected_crash_raw) if selected_crash_raw else None
+    crash_exit_code = 92 if crash_raw else 91
     applied = 0
 
     for operation in journal["operations"]:
@@ -335,7 +338,7 @@ def write_state_set(
         atomic_json(journal_path(control), journal)
 
         if crash_after is not None and applied == crash_after:
-            os._exit(92)
+            os._exit(crash_exit_code)
 
     journal["status"] = "COMMITTED"
     journal["updated_at"] = now_iso()

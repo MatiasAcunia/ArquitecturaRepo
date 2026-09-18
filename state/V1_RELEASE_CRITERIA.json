@@ -1,0 +1,62 @@
+{
+  "schema_version": "v1-release-criteria-0.1",
+  "release": "1.0",
+  "policy": "Every required gate must pass on the exact release candidate. A green lower-level gate cannot substitute for another gate.",
+  "gates": [
+    {
+      "id": "STRUCTURE_AND_PUBLIC_BOUNDARY",
+      "purpose": "Repository structure, structure-only content policy, schema integrity, internal links and version/manifest coherence.",
+      "command": "python tools/validate_structure.py"
+    },
+    {
+      "id": "CORE_CONTRACT_INSTANCES",
+      "purpose": "Starter manifest, profiles, migration registry and canonical synthetic control examples validate against their declared contracts.",
+      "command": "python tools/selftest_contracts.py"
+    },
+    {
+      "id": "VALIDATION_FALSIFICATION",
+      "purpose": "Positive lifecycle fixtures pass and known invalid currentness/authority/evidence states fail.",
+      "command": "python tools/selftest_validation.py"
+    },
+    {
+      "id": "PROFILE_AND_SCAFFOLD_TRANSFER",
+      "purpose": "All public profiles scaffold, validate and remain proportional; SMALL remains minimal.",
+      "command": "python tools/selftest_scaffold.py"
+    },
+    {
+      "id": "SCHEMA_EVOLUTION",
+      "purpose": "Forward/reverse/idempotent schema migration works and lossy downgrade/pending-transaction cases fail closed.",
+      "command": "python tools/selftest_migrations.py"
+    },
+    {
+      "id": "CANONICAL_OWNERSHIP",
+      "purpose": "One-current-owner semantics, currentness binding and supersession lineage are mechanically enforced.",
+      "command": "python tools/selftest_ownership.py"
+    },
+    {
+      "id": "FRESH_CONTEXT_RECONSTRUCTION",
+      "purpose": "Fresh contexts deterministically reconstruct trusted, active and strategic-return postures and fail through invalid state.",
+      "command": "python tools/selftest_reconstruction.py"
+    },
+    {
+      "id": "PHYSICAL_STATEFUL_REFERENCE",
+      "purpose": "A real SQLite reference proves idempotency, rollback, restart persistence, concurrency and binding to control-state currentness.",
+      "command": "python tools/selftest_stateful_reference.py"
+    },
+    {
+      "id": "CROSS_PROFILE_ADOPTION",
+      "purpose": "Six unrelated project shapes install/adopt without application mutation, technical CLIENT file editing or profile over-installation.",
+      "command": "python tools/selftest_adoption.py"
+    },
+    {
+      "id": "RESUMABLE_CAMPAIGN_RUNTIME",
+      "purpose": "Campaign execution, authority, locking, crash recovery, review freeze and strategic terminals survive adversarial tests.",
+      "command": "python tools/selftest_runtime.py"
+    },
+    {
+      "id": "HARDENING_AND_BOUNDED_GOVERNANCE",
+      "purpose": "Shared primitives stay centralized, tools compile and optional governance remains optional.",
+      "command": "python tools/selftest_hardening.py"
+    }
+  ]
+}

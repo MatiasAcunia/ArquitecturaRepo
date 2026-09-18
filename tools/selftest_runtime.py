@@ -133,7 +133,7 @@ def main() -> int:
 
             must_fail(
                 control,
-                "campaign lock busy",
+                "lock busy",
                 "--lock-timeout",
                 "0.10",
                 "add",
