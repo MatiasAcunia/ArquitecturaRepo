@@ -35,6 +35,7 @@ It provides:
 - fail-closed scaffolding by project profile;
 - optional durable Campaign Lead runtime/controller;
 - fail-closed multi-file transition journaling and crash recovery;
+- backward-compatible schema evolution with explicit migrations;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -170,6 +171,16 @@ Critical currentness transitions are staged and journaled before canonical files
 
 See `docs/11_REFERENCE_RUNTIME.md` and `docs/12_TRANSACTION_RECOVERY.md`.
 
+## Schema evolution
+
+State formats evolve explicitly rather than being rewritten in place. The migration registry keeps legacy and latest versions separate, new scaffolds emit the latest schema, and existing supported versions continue to validate until compatibility is intentionally retired.
+
+`tools/migrate_state.py` supports read-only planning, explicit apply, reversible migration when a lossless reverse exists, idempotent re-apply, and fail-closed downgrade when newer semantics cannot be represented by the old contract.
+
+The first real evolved contract is `CURRENT_BOOTSTRAP`: legacy `starter-bootstrap-0.1` remains supported while new scaffolds emit structured `starter-bootstrap-0.2`.
+
+See `docs/13_SCHEMA_EVOLUTION.md`.
+
 ## Repository map
 
 - `AGENTS.md` — root instructions.
@@ -182,13 +193,15 @@ See `docs/11_REFERENCE_RUNTIME.md` and `docs/12_TRANSACTION_RECOVERY.md`.
 - `tools/validate_project.py` — schema + relationship validator.
 - `tools/scaffold_project.py` — fail-closed project scaffold generator.
 - `tools/campaignctl.py` — optional durable Campaign Lead runtime.
+- `tools/migrate_state.py` — explicit state-schema migration planner/executor.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
+- `tools/selftest_migrations.py` — forward/reverse/idempotence/lossy-downgrade migration self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/12_TRANSACTION_RECOVERY.md` — architecture, adaptation, validation, runtime and recovery guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/13_SCHEMA_EVOLUTION.md` — architecture, adaptation, validation, runtime, recovery and schema-evolution guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -203,9 +216,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v0.4.0 — PUBLIC STARTER PREVIEW`
+`v0.5.0 — PUBLIC STARTER PREVIEW`
 
-v0.4 adds fail-closed multi-file transaction journaling, explicit crash recovery and adversarial external-conflict handling. Every fork still has to establish its own product truth and gates.
+v0.5 adds backward-compatible schema evolution, explicit migration planning/execution and a real bootstrap v0.1→v0.2 migration with lossless reverse checks. Every fork still has to establish its own product truth and gates.
 
 ## License
 

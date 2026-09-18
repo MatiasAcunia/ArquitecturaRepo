@@ -1,0 +1,18 @@
+{
+  "schema_version": "migration-registry-0.1",
+  "latest_versions": {
+    "CURRENT_BOOTSTRAP": "starter-bootstrap-0.2"
+  },
+  "migrations": [
+    {
+      "migration_id": "current-bootstrap-0.1-to-0.2",
+      "contract": "CURRENT_BOOTSTRAP",
+      "from_version": "starter-bootstrap-0.1",
+      "to_version": "starter-bootstrap-0.2",
+      "from_schema": "current-bootstrap-v0.1.schema.json",
+      "to_schema": "current-bootstrap.schema.json",
+      "handler": "bootstrap_0_1_to_0_2",
+      "reverse_handler": "bootstrap_0_2_to_0_1"
+    }
+  ]
+}

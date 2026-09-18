@@ -20,11 +20,13 @@ SCHEMA_BY_VERSION = {
     "campaign-terminal-0.1": "campaign-terminal.schema.json",
     "identity-registry-0.1": "identity-registry.schema.json",
     "execution-authority-0.1": "execution-authority.schema.json",
-    "starter-bootstrap-0.1": "current-bootstrap.schema.json",
+    "starter-bootstrap-0.1": "current-bootstrap-v0.1.schema.json",
+    "starter-bootstrap-0.2": "current-bootstrap.schema.json",
     "starter-profiles-0.1": "profiles.schema.json",
     "starter-profile-selection-0.1": "profile-selection.schema.json",
     "campaign-runtime-0.1": "campaign-runtime.schema.json",
     "transition-journal-0.1": "transition-journal.schema.json",
+    "migration-registry-0.1": "migration-registry.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {
@@ -333,7 +335,13 @@ def validate_bootstrap(
         errors,
     )
 
-    for path, bootstrap in buckets.get("starter-bootstrap-0.1", []):
+    records = (
+        buckets.get("starter-bootstrap-0.1", [])
+        + buckets.get("starter-bootstrap-0.2", [])
+    )
+
+    for path, bootstrap in records:
+        version = bootstrap["schema_version"]
         product_id = bootstrap["product_or_workstream"]
         product_record = products.get(product_id)
         if product_record is None:
@@ -341,22 +349,51 @@ def validate_bootstrap(
             continue
 
         _, state = product_record
-        if bootstrap["status"] == "READY" and bootstrap.get("unresolved_currentness"):
-            errors.append(f"{rel(path)}: READY bootstrap cannot have unresolved_currentness")
 
-        if bootstrap.get("observed_code_ref") and bootstrap["observed_code_ref"] != state["current_code_ref"]:
+        if version == "starter-bootstrap-0.1":
+            unresolved = list(bootstrap.get("unresolved_currentness", []))
+        else:
+            currentness = bootstrap.get("currentness", {})
+            unresolved = list(currentness.get("unresolved", []))
+            if bootstrap["status"] == "READY" and currentness.get("verified") is not True:
+                errors.append(f"{rel(path)}: READY bootstrap v0.2 must set currentness.verified=true")
+            if currentness.get("verified") is True and currentness.get("verified_at") is None:
+                errors.append(
+                    f"{rel(path)}: verified bootstrap v0.2 must set currentness.verified_at"
+                )
+            for ref in currentness.get("source_refs", []):
+                if not resolve_ref(target_root, ref):
+                    errors.append(
+                        f"{rel(path)}: currentness source_ref does not resolve: {ref}"
+                    )
+
+        if bootstrap["status"] == "READY" and unresolved:
+            errors.append(f"{rel(path)}: READY bootstrap cannot have unresolved currentness")
+
+        if (
+            bootstrap.get("observed_code_ref")
+            and bootstrap["observed_code_ref"] != state["current_code_ref"]
+        ):
             errors.append(
                 f"{rel(path)}: observed_code_ref {bootstrap['observed_code_ref']!r} "
                 f"!= Product State current_code_ref {state['current_code_ref']!r}"
             )
 
-        if bootstrap.get("product_state_ref") and not resolve_ref(target_root, bootstrap["product_state_ref"]):
+        if (
+            bootstrap.get("product_state_ref")
+            and not resolve_ref(target_root, bootstrap["product_state_ref"])
+        ):
             errors.append(
-                f"{rel(path)}: product_state_ref does not resolve: {bootstrap['product_state_ref']}"
+                f"{rel(path)}: product_state_ref does not resolve: "
+                f"{bootstrap['product_state_ref']}"
             )
-        if bootstrap.get("requirements_ref") and not resolve_ref(target_root, bootstrap["requirements_ref"]):
+        if (
+            bootstrap.get("requirements_ref")
+            and not resolve_ref(target_root, bootstrap["requirements_ref"])
+        ):
             errors.append(
-                f"{rel(path)}: requirements_ref does not resolve: {bootstrap['requirements_ref']}"
+                f"{rel(path)}: requirements_ref does not resolve: "
+                f"{bootstrap['requirements_ref']}"
             )
 
         active = state.get("active_campaign")
@@ -369,7 +406,8 @@ def validate_bootstrap(
 
         if bootstrap.get("active_campaign_ref") != active["campaign_id"]:
             errors.append(
-                f"{rel(path)}: active_campaign_ref {bootstrap.get('active_campaign_ref')!r} "
+                f"{rel(path)}: active_campaign_ref "
+                f"{bootstrap.get('active_campaign_ref')!r} "
                 f"!= Product State active campaign {active['campaign_id']!r}"
             )
 
@@ -381,9 +419,14 @@ def validate_bootstrap(
                 f"!= Product State pointer {state_pointer!r}"
             )
 
-        if current_pointer and current_pointer not in checkpoints and active["campaign_id"] not in terminals:
+        if (
+            current_pointer
+            and current_pointer not in checkpoints
+            and active["campaign_id"] not in terminals
+        ):
             errors.append(
-                f"{rel(path)}: active checkpoint/terminal pointer {current_pointer!r} does not resolve"
+                f"{rel(path)}: active checkpoint/terminal pointer "
+                f"{current_pointer!r} does not resolve"
             )
 
 

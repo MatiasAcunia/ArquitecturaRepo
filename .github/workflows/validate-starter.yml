@@ -23,6 +23,8 @@ jobs:
         run: python tools/validate_project.py --root state
       - name: Validate profile definitions
         run: python tools/validate_project.py --root profiles
+      - name: Validate migration registry
+        run: python tools/validate_project.py --root migrations
       - name: Validate minimal synthetic project
         run: python tools/validate_project.py --root examples/minimal
       - name: Validate active-campaign synthetic project
@@ -33,5 +35,7 @@ jobs:
         run: python tools/selftest_validation.py
       - name: Generate and validate all scaffold profiles
         run: python tools/selftest_scaffold.py
+      - name: Exercise schema migrations
+        run: python tools/selftest_migrations.py
       - name: Exercise resumable campaign runtime
         run: python tools/selftest_runtime.py

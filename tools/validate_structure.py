@@ -42,19 +42,24 @@ REQUIRED_PATHS = [
     "schemas/identity-registry.schema.json",
     "schemas/execution-authority.schema.json",
     "schemas/current-bootstrap.schema.json",
+    "schemas/current-bootstrap-v0.1.schema.json",
     "schemas/interaction-record.schema.json",
     "schemas/starter-manifest.schema.json",
     "schemas/profiles.schema.json",
     "schemas/profile-selection.schema.json",
     "schemas/campaign-runtime.schema.json",
     "schemas/transition-journal.schema.json",
+    "schemas/migration-registry.schema.json",
     "profiles/profiles.json",
+    "migrations/registry.json",
     "tools/validate_project.py",
     "tools/selftest_validation.py",
     "tools/scaffold_project.py",
     "tools/selftest_scaffold.py",
     "tools/campaignctl.py",
     "tools/selftest_runtime.py",
+    "tools/migrate_state.py",
+    "tools/selftest_migrations.py",
     "templates/PROJECT_OVERLAY.md",
     "templates/INSTALLATION_REPORT.md",
     "templates/MASTER_OWNER_HANDOFF_CURRENT.md",
@@ -65,6 +70,7 @@ REQUIRED_PATHS = [
     "docs/10_EXECUTABLE_VALIDATION.md",
     "docs/11_REFERENCE_RUNTIME.md",
     "docs/12_TRANSACTION_RECOVERY.md",
+    "docs/13_SCHEMA_EVOLUTION.md",
     "examples/minimal/PRODUCT_STATE_CURRENT.json",
     "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
     "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
@@ -170,12 +176,52 @@ def validate_internal_links(errors: list[str]) -> None:
                 fail(f"broken internal markdown link: {path.relative_to(ROOT)} -> {target}", errors)
 
 
+
+def validate_migration_registry(errors: list[str]) -> None:
+    registry_path = ROOT / "migrations" / "registry.json"
+    if not registry_path.exists():
+        fail("missing migration registry", errors)
+        return
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    manifest = json.loads(
+        (ROOT / "state/STARTER_MANIFEST.json").read_text(encoding="utf-8")
+    )
+    declared_latest = manifest.get("latest_schema_versions", {})
+
+    for contract, version in registry.get("latest_versions", {}).items():
+        if declared_latest.get(contract) != version:
+            fail(
+                f"manifest latest schema for {contract} "
+                f"({declared_latest.get(contract)!r}) != migration registry ({version!r})",
+                errors,
+            )
+
+    seen_ids: set[str] = set()
+    for migration in registry.get("migrations", []):
+        migration_id = migration.get("migration_id")
+        if migration_id in seen_ids:
+            fail(f"duplicate migration_id: {migration_id}", errors)
+        seen_ids.add(migration_id)
+
+        for key in ("from_schema", "to_schema"):
+            schema_name = migration.get(key)
+            if not schema_name or not (ROOT / "schemas" / schema_name).exists():
+                fail(
+                    f"migration {migration_id!r} references missing {key}: {schema_name!r}",
+                    errors,
+                )
+
+        if migration.get("from_version") == migration.get("to_version"):
+            fail(f"migration {migration_id!r} has identical from/to version", errors)
+
 def main() -> int:
     errors: list[str] = []
     validate_required_paths(errors)
     parse_json_files(errors)
     validate_schemas(errors)
     validate_version(errors)
+    validate_migration_registry(errors)
     validate_structure_only(errors)
     validate_internal_links(errors)
 

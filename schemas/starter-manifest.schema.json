@@ -20,9 +20,16 @@
     "worker_pass_is_acceptance"
   ],
   "properties": {
-    "starter": {"const": "agentic-sdlc-starter"},
-    "version": {"type": "string", "minLength": 1},
-    "status": {"const": "PUBLIC_STARTER_PREVIEW"},
+    "starter": {
+      "const": "agentic-sdlc-starter"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "PUBLIC_STARTER_PREVIEW"
+    },
     "content_policy": {
       "type": "object",
       "additionalProperties": false,
@@ -36,23 +43,81 @@
         "real_source_provider_economics_allowed"
       ],
       "properties": {
-        "structure_only": {"const": true},
-        "project_specific_source_data_allowed": {"const": false},
-        "real_source_names_allowed": {"const": false},
-        "real_source_repositories_allowed": {"const": false},
-        "real_source_branches_allowed": {"const": false},
-        "real_source_identifiers_allowed": {"const": false},
-        "real_source_provider_economics_allowed": {"const": false}
+        "structure_only": {
+          "const": true
+        },
+        "project_specific_source_data_allowed": {
+          "const": false
+        },
+        "real_source_names_allowed": {
+          "const": false
+        },
+        "real_source_repositories_allowed": {
+          "const": false
+        },
+        "real_source_branches_allowed": {
+          "const": false
+        },
+        "real_source_identifiers_allowed": {
+          "const": false
+        },
+        "real_source_provider_economics_allowed": {
+          "const": false
+        }
       }
     },
-    "core_role_model": {"type": "array", "minItems": 4, "items": {"type": "string"}},
-    "profiles": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "machine_readable_contracts": {"type": "array", "items": {"type": "string"}},
-    "core_protocols": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "optional_protocols": {"type": "array", "items": {"type": "string"}},
-    "claim_boundary": {"type": "string", "minLength": 1},
-    "fresh_context_required": {"const": true},
-    "one_concern_one_owner": {"const": true},
-    "worker_pass_is_acceptance": {"const": false}
+    "core_role_model": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "string"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "machine_readable_contracts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "core_protocols": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "optional_protocols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "claim_boundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fresh_context_required": {
+      "const": true
+    },
+    "one_concern_one_owner": {
+      "const": true
+    },
+    "worker_pass_is_acceptance": {
+      "const": false
+    },
+    "latest_schema_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
   }
 }

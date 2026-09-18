@@ -1,6 +1,6 @@
 {
   "starter": "agentic-sdlc-starter",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "PUBLIC_STARTER_PREVIEW",
   "content_policy": {
     "structure_only": true,
@@ -39,7 +39,8 @@
     "INTERACTION_RECORD",
     "STARTER_MANIFEST",
     "PROFILE_DEFINITIONS",
-    "PROFILE_SELECTION"
+    "PROFILE_SELECTION",
+    "MIGRATION_REGISTRY"
   ],
   "claim_boundary": "Generic engineering starter; each fork must validate its own mechanisms and product gates.",
   "fresh_context_required": true,
@@ -67,5 +68,8 @@
     "SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS",
     "SYSTEMIC_ESCALATION_AND_ANTI_CHURN",
     "INTERACTION_LEDGER"
-  ]
+  ],
+  "latest_schema_versions": {
+    "CURRENT_BOOTSTRAP": "starter-bootstrap-0.2"
+  }
 }

@@ -63,6 +63,12 @@ def main() -> int:
                 raise AssertionError(f"{profile}: scaffold must start Product State in HOLD")
             if bootstrap["status"] != "UNTRUSTED_CONTEXT":
                 raise AssertionError(f"{profile}: scaffold must start UNTRUSTED_CONTEXT")
+            if bootstrap["schema_version"] != "starter-bootstrap-0.2":
+                raise AssertionError(f"{profile}: scaffold must emit bootstrap v0.2")
+            if bootstrap["currentness"]["verified"] is not False:
+                raise AssertionError(f"{profile}: fresh scaffold must not claim verified currentness")
+            if not bootstrap["currentness"]["unresolved"]:
+                raise AssertionError(f"{profile}: fresh scaffold must retain unresolved currentness")
 
             profile_state = json.loads(
                 (control / "PROFILE.json").read_text(encoding="utf-8")
@@ -77,6 +83,25 @@ def main() -> int:
                 raise AssertionError(f"{profile}: copied validator missing")
             if not (control / "requirements-validation.txt").exists():
                 raise AssertionError(f"{profile}: validation requirements missing")
+            if not (control / "tools" / "migrate_state.py").exists():
+                raise AssertionError(f"{profile}: copied migration tool missing")
+            if not (control / "migrations" / "registry.json").exists():
+                raise AssertionError(f"{profile}: migration registry missing")
+            migration_plan = run(
+                str(control / "tools" / "migrate_state.py"),
+                "--control-root",
+                str(control),
+                "plan",
+                "--file",
+                "state/CURRENT_BOOTSTRAP_STATE.json",
+            )
+            if migration_plan.returncode != 0:
+                raise AssertionError(
+                    f"{profile}: copied migration tool cannot plan current bootstrap\n"
+                    f"{migration_plan.stdout}\n{migration_plan.stderr}"
+                )
+            if json.loads(migration_plan.stdout)["steps"] != []:
+                raise AssertionError(f"{profile}: fresh bootstrap should already be latest")
             if (control / "tools" / "campaignctl.py").exists():
                 raise AssertionError(f"{profile}: campaign runtime installed without --with-runtime")
 
@@ -157,6 +182,8 @@ def main() -> int:
     print("- MULTI_PRODUCT includes MASTER OWNER + fail-closed authority")
     print("- HIGH_CONSEQUENCE includes security/privacy/rights protocol")
     print("- copied validator is self-contained")
+    print("- generated bootstrap uses latest v0.2 contract")
+    print("- copied migration registry/tool are self-contained")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0

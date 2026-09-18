@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:migration-registry:0.1",
+  "title": "Agentic SDLC Schema Migration Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "latest_versions", "migrations"],
+  "properties": {
+    "schema_version": {"const": "migration-registry-0.1"},
+    "latest_versions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "migrations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "migration_id",
+          "contract",
+          "from_version",
+          "to_version",
+          "from_schema",
+          "to_schema",
+          "handler",
+          "reverse_handler"
+        ],
+        "properties": {
+          "migration_id": {"type": "string", "minLength": 1},
+          "contract": {"type": "string", "minLength": 1},
+          "from_version": {"type": "string", "minLength": 1},
+          "to_version": {"type": "string", "minLength": 1},
+          "from_schema": {"type": "string", "minLength": 1},
+          "to_schema": {"type": "string", "minLength": 1},
+          "handler": {"type": "string", "minLength": 1},
+          "reverse_handler": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

@@ -115,6 +115,14 @@ def create_scaffold(
         ROOT / "requirements-validation.txt",
         control / "requirements-validation.txt",
     )
+    copy_file(
+        ROOT / "tools" / "migrate_state.py",
+        control / "tools" / "migrate_state.py",
+    )
+    copy_file(
+        ROOT / "migrations" / "registry.json",
+        control / "migrations" / "registry.json",
+    )
     if with_runtime:
         copy_file(
             ROOT / "tools" / "campaignctl.py",
@@ -190,7 +198,7 @@ This file is a fail-closed starting point. Do not convert placeholders or implem
     write_json(control / "state" / "PRODUCT_STATE_CURRENT.json", product_state)
 
     bootstrap = {
-        "schema_version": "starter-bootstrap-0.1",
+        "schema_version": "starter-bootstrap-0.2",
         "status": "UNTRUSTED_CONTEXT",
         "product_or_workstream": product_id,
         "observed_code_ref": "UNRECONSTRUCTED",
@@ -207,9 +215,17 @@ This file is a fail-closed starting point. Do not convert placeholders or implem
         "forbidden_actions": [
             "Material mutation while bootstrap status is UNTRUSTED_CONTEXT."
         ],
-        "unresolved_currentness": [
-            "Exact live code/runtime authority is unknown."
-        ],
+        "currentness": {
+            "verified": False,
+            "verified_at": None,
+            "source_refs": [
+                "state/CLIENT_REQUIREMENTS_CURRENT.md",
+                "state/PRODUCT_STATE_CURRENT.json"
+            ],
+            "unresolved": [
+                "Exact live code/runtime authority is unknown."
+            ]
+        },
     }
     write_json(control / "state" / "CURRENT_BOOTSTRAP_STATE.json", bootstrap)
 

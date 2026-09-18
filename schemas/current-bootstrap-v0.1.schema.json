@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:current-bootstrap:0.1",
+  "title": "Current Bootstrap State v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "product_or_workstream",
+    "observed_code_ref",
+    "observed_at",
+    "role",
+    "kernel_version",
+    "requirements_ref",
+    "product_state_ref",
+    "active_campaign_ref",
+    "active_checkpoint_or_terminal_ref",
+    "current_gate",
+    "strongest_evidence_refs",
+    "next_legal_boundary",
+    "forbidden_actions",
+    "unresolved_currentness"
+  ],
+  "properties": {
+    "schema_version": {"const": "starter-bootstrap-0.1"},
+    "status": {"enum": ["UNTRUSTED_CONTEXT", "READY", "HOLD"]},
+    "product_or_workstream": {"type": "string"},
+    "observed_code_ref": {"type": "string"},
+    "observed_at": {"type": "string"},
+    "role": {"type": "string"},
+    "kernel_version": {"type": "string"},
+    "requirements_ref": {"type": "string"},
+    "product_state_ref": {"type": "string"},
+    "active_campaign_ref": {"type": ["string", "null"]},
+    "active_checkpoint_or_terminal_ref": {"type": ["string", "null"]},
+    "current_gate": {"type": "string"},
+    "strongest_evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "next_legal_boundary": {"type": "string"},
+    "forbidden_actions": {"type": "array", "items": {"type": "string"}},
+    "unresolved_currentness": {"type": "array", "items": {"type": "string"}}
+  }
+}

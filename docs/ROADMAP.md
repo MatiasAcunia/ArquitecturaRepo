@@ -93,13 +93,35 @@ Implemented:
 - persistent `CONFLICT` instead of overwriting ambiguous external state;
 - cleanup of pre-journal orphan stages after preparation errors.
 
-## v0.5 — Schema evolution and richer synthetic reference projects
+## v0.5 — Backward-compatible schema evolution
+
+Implemented:
+
+- versioned migration-registry contract;
+- manifest-declared latest schema versions;
+- preserved legacy bootstrap v0.1 schema;
+- structured bootstrap v0.2 currentness contract;
+- simultaneous validator support for v0.1 and v0.2;
+- explicit read-only migration planning;
+- graph-based forward/reverse migration path resolution;
+- source-schema validation before each migration step;
+- destination-schema validation after each migration step;
+- atomic durable migration writes;
+- shared state lock with the campaign runtime;
+- migration blocking while a campaign transaction journal is live;
+- idempotent apply when already at target;
+- exact representable v0.2→v0.1 reverse migration;
+- fail-closed rejection of lossy downgrade;
+- new scaffolds emitting bootstrap v0.2;
+- portable migration tool and registry in generated control layers;
+- CI forward/reverse/idempotence/failure self-test.
+
+## v0.6 — Ownership hardening and richer synthetic reference projects
 
 Next candidate work:
 
-- schema migration/versioning framework;
 - stronger generic supersession/current-owner checks;
-- migration-path validation and reversible fixtures;
+- explicit owner registry/current-owner graph for extensible project state;
 - synthetic stateful backend reference;
 - synthetic multi-workstream reference;
 - synthetic artifact-heavy reference;
