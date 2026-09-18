@@ -32,14 +32,15 @@ Before material adaptation or planning:
 2. `protocols/CLIENT_BOUNDARY.md`
 3. `protocols/IDENTITY_AND_EXECUTION_AUTHORITY.md`
 4. `protocols/CURRENTNESS_RECONSTRUCTION.md`
-5. `protocols/PLANNER_KERNEL.md`
-6. `protocols/CAMPAIGN_CHARTER_STANDARD.md`
-7. `protocols/EXECUTION_TEAM_OS.md`
-8. `protocols/PRODUCT_MODEL_AND_THEORY_LOADING.md`
-9. `protocols/CAPABILITY_DAG_AND_ISOLATION.md`
-10. `protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md`
-11. `protocols/REVIEW_FREEZE_AND_TERMINAL_INTEGRITY.md`
-12. load optional modules only when the selected profile requires them:
+5. `protocols/REPOSITORY_EFFICIENCY_AND_WORKSPACE_HYGIENE.md`
+6. `protocols/PLANNER_KERNEL.md`
+7. `protocols/CAMPAIGN_CHARTER_STANDARD.md`
+8. `protocols/EXECUTION_TEAM_OS.md`
+9. `protocols/PRODUCT_MODEL_AND_THEORY_LOADING.md`
+10. `protocols/CAPABILITY_DAG_AND_ISOLATION.md`
+11. `protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md`
+12. `protocols/REVIEW_FREEZE_AND_TERMINAL_INTEGRITY.md`
+13. load optional modules only when the selected profile requires them:
    - `protocols/MASTER_OWNER_OS.md`
    - `protocols/STATE_DB_LINEAGE_AND_IDEMPOTENCY.md`
    - `protocols/STORAGE_AND_ARTIFACT_LIFECYCLE.md`
@@ -48,7 +49,7 @@ Before material adaptation or planning:
    - `protocols/SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS.md`
    - `protocols/SYSTEMIC_ESCALATION_AND_ANTI_CHURN.md`
    - `protocols/INTERACTION_LEDGER.md`
-13. target-project current requirements/state/code/evidence.
+14. target-project current requirements/state/code/evidence.
 
 For installation, follow `prompts/INSTALL_THIS_SDLC.md`.
 
@@ -96,6 +97,10 @@ The Planner emits strategic capability charters.
 Inside a valid charter, I3 owns implementation, tactical decomposition, retries, in-scope refactors/migrations, tests, independent review, integration, hardening, checkpoints and recovery.
 
 Do not create a new Planner pass/campaign because an ordinary test, reviewer or implementation attempt failed.
+
+Canonical Git history is not a worker activity log. I4 workers do not create canonical commits by default; I3/controller integrates causally complete candidates. A tactical assignment/test/retry is not itself a commit boundary.
+
+When a trustworthy clone and known baseline already exist, refresh remote currentness delta-first with an exact branch fetch. Do not default to git pull, reclone, or full-repository reread after every bounded change.
 
 ## Acceptance rule
 

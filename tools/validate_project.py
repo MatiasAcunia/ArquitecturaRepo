@@ -29,6 +29,7 @@ SCHEMA_BY_VERSION = {
     "migration-registry-0.1": "migration-registry.schema.json",
     "owner-registry-0.1": "owner-registry.schema.json",
     "v1-release-criteria-0.1": "v1-release-criteria.schema.json",
+    "workspace-lifecycle-0.1": "workspace-lifecycle.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {

@@ -169,6 +169,19 @@ Requires:
 - injected crash recovery;
 - fail-closed external recovery conflict.
 
+### REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE
+
+Requires:
+
+- exact-branch remote refresh without pull/merge/local-HEAD mutation;
+- changed-path delta from a known baseline;
+- I4 canonical commit authority rejected by default;
+- I3 coherent-candidate boundary accepted;
+- marker-owned GC dry-run by default;
+- expired pre-authorized local workspace deletion;
+- protected, future, dirty and unmarked workspace preservation;
+- explicit-root containment.
+
 ### HARDENING_AND_BOUNDED_GOVERNANCE
 
 Requires:

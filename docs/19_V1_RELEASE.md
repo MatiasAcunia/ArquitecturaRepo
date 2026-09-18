@@ -31,7 +31,10 @@ The starter provides a tested generic control architecture for:
 - explicit, preflighted, retry-idempotent adoption;
 - physical stateful reference evidence;
 - six-shape transfer/adoption tests;
-- bounded governance and centralized control primitives.
+- bounded governance and centralized control primitives;
+- causal commit-boundary discipline;
+- exact-branch delta-first repository refresh;
+- marker-owned fail-closed local workspace cleanup.
 
 ## Release evidence
 
@@ -53,7 +56,8 @@ The executable release verifier covers:
 8. physical stateful reference;
 9. cross-profile adoption;
 10. resumable campaign runtime;
-11. hardening and bounded governance.
+11. repository efficiency and local workspace hygiene;
+12. hardening and bounded governance.
 
 No one gate substitutes for another.
 

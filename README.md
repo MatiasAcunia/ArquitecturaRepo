@@ -42,6 +42,9 @@ It provides:
 - six-shape fail-closed transfer/adoption workflow;
 - centralized control-state transaction/recovery primitives;
 - executable v1 release criteria and stopping rule;
+- hard commit-boundary / anti-commit-mania discipline;
+- exact-branch delta-first repository refresh;
+- marker-owned local workspace lifecycle and fail-closed GC;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -128,6 +131,9 @@ A fresh agent must be able to reconstruct the same legal next action from durabl
 10. The CLIENT should not be required to reconcile technical state.
 11. Material product decisions made in conversation must become durable state.
 12. Governance must pay rent.
+13. Git history records meaningful integration/recovery/authority boundaries, not every tactical action.
+14. Known-baseline repository refresh is delta-first; fresh context does not imply fresh clone.
+15. System-owned local workspaces have explicit lifecycle/cleanup authority.
 
 ## Profiles
 
@@ -225,7 +231,7 @@ python tools/verify_v1_release.py
 
 The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, resumable campaign runtime and hardening/bounded governance.
 
-See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md` and `docs/19_V1_RELEASE.md`.
+See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `docs/19_V1_RELEASE.md` and `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md`.
 
 ## Repository map
 
@@ -245,6 +251,9 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md` and 
 - `tools/apply_adoption.py` — preflighted, journaled adoption promotion.
 - `tools/state_tx.py` — canonical local control-state transaction/recovery engine shared by runtime, migrations and adoption.
 - `tools/verify_v1_release.py` — executable complete v1 release gate.
+- `tools/repo_delta.py` — exact-branch fetch + changed-path currentness without pull/merge.
+- `tools/commit_guard.py` — canonical commit role/boundary preflight.
+- `tools/workspace_gc.py` — marker-owned fail-closed local workspace GC.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
@@ -255,11 +264,12 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md` and 
 - `tools/selftest_adoption.py` — six-shape adoption, proportionality and crash-recovery self-test.
 - `tools/selftest_contracts.py` — canonical contract-instance validation suite.
 - `tools/selftest_hardening.py` — primitive-centralization and bounded-governance self-test.
+- `tools/selftest_repository_hygiene.py` — commit/delta-sync/local-GC adversarial self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
 - `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/19_V1_RELEASE.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer and stable-release guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer, repository efficiency and stable-release guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -274,9 +284,9 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 ## Status
 
-`v1.0.0 — PUBLIC STARTER STABLE`
+`v1.0.1 — PUBLIC STARTER STABLE`
 
-v1.0 is the stable architecture boundary: the complete machine-readable release gate passes, transfer/adoption is exercised across all public profiles, and future architecture changes are defect- or evidence-driven rather than version-driven.
+v1.0.1 is a defect-driven stable patch: it hardens commit granularity, delta-first repository currentness and marker-owned local workspace cleanup without changing the role topology or product-authority model.
 
 ## License
 

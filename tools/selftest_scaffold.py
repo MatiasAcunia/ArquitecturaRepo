@@ -91,11 +91,16 @@ def main() -> int:
                 "state_tx.py",
                 "discover_project.py",
                 "apply_adoption.py",
+                "repo_delta.py",
+                "commit_guard.py",
+                "workspace_gc.py",
             ):
                 if not (control / "tools" / portable_tool).exists():
                     raise AssertionError(
                         f"{profile}: copied adoption tool missing: {portable_tool}"
                     )
+            if not (control / "templates" / "WORKSPACE_LIFECYCLE.json").exists():
+                raise AssertionError(f"{profile}: workspace lifecycle template missing")
             if not (control / "migrations" / "registry.json").exists():
                 raise AssertionError(f"{profile}: migration registry missing")
             migration_plan = run(
@@ -209,6 +214,7 @@ def main() -> int:
     print("- copied migration registry/tool are self-contained")
     print("- copied reconstruction tool is self-contained")
     print("- discovery/adoption/recovery tools are self-contained")
+    print("- delta-sync/commit-boundary/local-GC tools are self-contained")
     print("- campaign runtime remains opt-in and portable")
     print("- accidental overwrite is rejected")
     return 0

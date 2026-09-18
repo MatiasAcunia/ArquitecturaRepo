@@ -221,3 +221,23 @@ Post-1.0 rule:
 - do not add roles, policies or examples merely to continue version iteration.
 
 Formal open-source licensing remains a separate repository-owner decision.
+
+
+## v1.0.1 — Repository efficiency and local hygiene defect patch
+
+Implemented from observed operational failure classes:
+
+- hard canonical commit-boundary authority; I4 does not own canonical commits by default;
+- explicit anti-`COMMIT_MANIA` semantics;
+- exact-branch, no-tags, no-submodule delta refresh without `git pull`;
+- changed-path context reacquisition from a known baseline;
+- portable `repo_delta.py` in generated scaffolds;
+- portable `commit_guard.py` in generated scaffolds;
+- workspace lifecycle marker/schema/template;
+- dry-run-first marker-owned `workspace_gc.py`;
+- protected/quarantine/unexpired/dirty/unmarked cleanup blocks;
+- Git-aware linked-worktree cleanup;
+- adversarial repository-hygiene self-test;
+- v1 release gate extended to cover these failure classes.
+
+This is a defect-driven patch under the post-1.0 stopping rule; role topology and product authority are unchanged.

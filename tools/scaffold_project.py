@@ -136,6 +136,15 @@ def create_scaffold(
         ROOT / "tools" / "apply_adoption.py",
         control / "tools" / "apply_adoption.py",
     )
+    for portable_tool in ("repo_delta.py", "commit_guard.py", "workspace_gc.py"):
+        copy_file(
+            ROOT / "tools" / portable_tool,
+            control / "tools" / portable_tool,
+        )
+    copy_file(
+        ROOT / "templates" / "WORKSPACE_LIFECYCLE.json",
+        control / "templates" / "WORKSPACE_LIFECYCLE.json",
+    )
     copy_file(
         ROOT / "migrations" / "registry.json",
         control / "migrations" / "registry.json",
@@ -453,6 +462,12 @@ Do not treat this scaffold as evidence that the product is implemented.
 Material mutation remains forbidden while Product State is HOLD or bootstrap status is UNTRUSTED_CONTEXT unless a narrowly scoped recovery action is explicitly authorized.
 
 Planner owns strategy. Campaign Lead owns tactics inside a valid charter. Worker PASS is evidence, not acceptance.
+
+I4 workers do not create canonical commits by default. I3/controller owns ordinary candidate integration. Tactical assignments/tests/retries are not commit boundaries.
+
+With a trusted local baseline, refresh remote state delta-first; do not default to git pull, reclone or reread of the entire repository.
+
+System-created local workspaces should be lifecycle-marked and cleaned only through explicit safe-delete authority.
 """
     write_text(control / "AGENTS.md", agents)
 

@@ -54,6 +54,11 @@
       "command": "python tools/selftest_runtime.py"
     },
     {
+      "id": "REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE",
+      "purpose": "Canonical commit authority, exact-branch delta refresh and fail-closed marker-owned local workspace cleanup survive adversarial tests.",
+      "command": "python tools/selftest_repository_hygiene.py"
+    },
+    {
       "id": "HARDENING_AND_BOUNDED_GOVERNANCE",
       "purpose": "Shared primitives stay centralized, tools compile and optional governance remains optional.",
       "command": "python tools/selftest_hardening.py"
