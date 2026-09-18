@@ -29,6 +29,19 @@ def run(
     )
 
 
+def is_managed_feedback_workflow(project: Path, path: Path) -> bool:
+    try:
+        relative = str(path.relative_to(project)).replace(os.sep, "/")
+    except ValueError:
+        return False
+    if relative != ".github/workflows/agentic-sdlc-feedback.yml":
+        return False
+    try:
+        return "Managed by Agentic SDLC starter" in path.read_text(encoding="utf-8")[:512]
+    except Exception:
+        return False
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -39,6 +52,8 @@ def application_snapshot(project: Path) -> dict[str, str]:
         if not path.is_file():
             continue
         if ".agentic-sdlc" in path.parts or ".git" in path.parts:
+            continue
+        if is_managed_feedback_workflow(project, path):
             continue
         result[str(path.relative_to(project))] = sha256(path)
     return result

@@ -171,6 +171,23 @@ Requires new project scaffolds to prove before material campaign initialization:
 
 Legacy installations that do not yet materialize these baseline surfaces retain backward-compatible runtime behavior until they deliberately adopt the mechanism.
 
+### PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK
+
+Requires:
+
+- managed weekly/monthly schedule support;
+- metadata-only report contract;
+- local artifact generation enabled by default;
+- external submission disabled by default;
+- one-command/config opt-out;
+- install-time schedule opt-out;
+- no stable project tracking identifier;
+- no project/repository name, product id, requirements text, code, paths, SHAs, free text, users, emails or credentials;
+- adversarial synthetic secret/path/identifier strings do not leak;
+- cadence mismatch skips cleanly;
+- `enabled=false` emits nothing;
+- external submission requires explicit config plus repository-level opt-in.
+
 ### RESUMABLE_CAMPAIGN_RUNTIME
 
 Requires:

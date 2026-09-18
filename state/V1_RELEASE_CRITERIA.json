@@ -54,6 +54,11 @@
       "command": "python tools/selftest_project_baseline.py"
     },
     {
+      "id": "PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK",
+      "purpose": "Recurring architecture feedback is metadata-only, opt-out, externally opt-in, schema-valid and does not leak project identifiers/content/paths/credentials.",
+      "command": "python tools/selftest_architecture_feedback.py"
+    },
+    {
       "id": "RESUMABLE_CAMPAIGN_RUNTIME",
       "purpose": "Campaign execution, authority, locking, crash recovery, review freeze and strategic terminals survive adversarial tests.",
       "command": "python tools/selftest_runtime.py"

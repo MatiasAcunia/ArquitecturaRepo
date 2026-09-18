@@ -48,7 +48,8 @@ Required approach:
     - fresh-context result;
     - open HOLDs/falsifiers;
     - first legal campaign boundary.
-20. Run the starter/project validation available in the fork and fix structural/currentness defects before large implementation work.
+20. Disclose the installed architecture-feedback workflow to the CLIENT. Explain that local strict-metadata artifact generation is enabled by default, external submission is disabled by default, and the CLIENT can disable scheduling or report generation at any time. Never enable external submission without explicit CLIENT opt-in.
+21. Run the starter/project validation available in the fork and fix structural/currentness defects before large implementation work.
 
 Constraints:
 

@@ -47,6 +47,8 @@ jobs:
         run: python tools/selftest_adoption.py
       - name: Exercise product discovery and project baseline
         run: python tools/selftest_project_baseline.py
+      - name: Exercise privacy-preserving architecture feedback
+        run: python tools/selftest_architecture_feedback.py
       - name: Exercise resumable campaign runtime
         run: python tools/selftest_runtime.py
       - name: Exercise repository efficiency and local workspace hygiene

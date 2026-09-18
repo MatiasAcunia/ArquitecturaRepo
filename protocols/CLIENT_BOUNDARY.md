@@ -84,3 +84,16 @@ Do not request generic feedback every iteration.
 Before the first material campaign, ask one explicit baseline-confirmation question after presenting the complete current functional/non-functional/security/network/UI/data/cost/date/exclusion summary.
 
 That confirmation is not a legal signature and must not be used to transfer technical architecture responsibility to the CLIENT.
+
+
+## Architecture feedback consent
+
+Recurring architecture feedback is process-improvement telemetry, not product authority.
+
+A new scaffold may enable local strict-metadata report generation by default, but the CLIENT must be told that it exists and how to disable it.
+
+External submission is different: it requires explicit CLIENT opt-in.
+
+Do not treat silence as permission to transmit outside the repository's normal GitHub Actions artifact storage.
+
+The feedback exporter must not include project identifiers, requirement text, code, paths, SHAs, free text, users, emails or credentials.

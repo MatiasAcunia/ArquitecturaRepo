@@ -48,6 +48,7 @@ It provides:
 - hard commit-boundary / anti-commit-mania discipline;
 - exact-branch delta-first repository refresh;
 - marker-owned local workspace lifecycle and fail-closed GC;
+- privacy-preserving recurring architecture feedback with explicit opt-out;
 - positive and adversarial CI fixtures.
 
 ## Quick start
@@ -84,6 +85,20 @@ python tools/scaffold_project.py \
 ```
 
 Generated control layers carry their own schemas, validator and validation dependency declaration.
+
+New scaffolds also install a weekly architecture-feedback workflow by default. It generates only strict metadata and stores the report as a GitHub Actions artifact; external submission is disabled by default.
+
+Disable scheduling at install time with:
+
+```bash
+python tools/scaffold_project.py \
+  --target "../my-project" \
+  --profile SMALL \
+  --product-id PROJECT_ALPHA \
+  --no-feedback-workflow
+```
+
+Or later set `enabled` to `false` in `.agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json` or delete `.github/workflows/agentic-sdlc-feedback.yml`.
 
 For a project with substantial existing history, use `prompts/REANCHOR_EXISTING_PROJECT.md`.
 
@@ -225,6 +240,24 @@ CI applies the workflow to six unrelated synthetic project shapes: SMALL, STATEF
 
 See `docs/16_TRANSFER_ADOPTION.md`.
 
+## Privacy-preserving architecture feedback
+
+New scaffolds include `tools/architecture_feedback.py` and a managed scheduled workflow.
+
+Default behavior:
+
+- weekly strict-metadata report;
+- GitHub Actions artifact retained for 30 days;
+- read-only repository permission;
+- no external submission;
+- no project/repository names, product ids, requirements text, code, paths, SHAs, free text, users, emails or credentials.
+
+The report contains only allowlisted enums, booleans and counters useful for improving the architecture: validation/currentness state, profile, owner/capability counts, baseline readiness, network exposure category, milestone/overdue counts and generic runtime retry/failure/HOLD/recovery counters.
+
+External submission requires both `external_submission_enabled=true` in the control config and explicit repository variables for submission + endpoint. The starter does not request a personal access token.
+
+See `docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md`.
+
 ## Stable release and release gates
 
 Runtime, schema migration and adoption now share `tools/state_tx.py` for local locking/durable transaction semantics instead of maintaining parallel implementations.
@@ -235,9 +268,9 @@ The current v1 release definition is machine-readable at `state/V1_RELEASE_CRITE
 python tools/verify_v1_release.py
 ```
 
-The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, product-baseline readiness, resumable campaign runtime, repository hygiene and hardening/bounded governance.
+The release gate covers structure/public boundary, contract instances, falsification, profile proportionality, schema evolution, ownership, fresh-context reconstruction, physical stateful behavior, six-shape adoption, product-baseline readiness, privacy-preserving architecture feedback, resumable campaign runtime, repository hygiene and hardening/bounded governance.
 
-See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `docs/19_V1_RELEASE.md`, `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md` and `docs/21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md`.
+See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `docs/19_V1_RELEASE.md`, `docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md`, `docs/21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md` and `docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md`.
 
 ## Repository map
 
@@ -262,6 +295,7 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - `tools/workspace_gc.py` — marker-owned fail-closed local workspace GC.
 - `tools/baseline_guard.py` — pre-campaign requirements/technical/delivery baseline gate.
 - `tools/project_status.py` — derived human-facing project/date/status tracker.
+- `tools/architecture_feedback.py` — strict metadata-only recurring architecture feedback exporter.
 - `tools/selftest_validation.py` — adversarial validator self-test.
 - `tools/selftest_scaffold.py` — all-profile scaffold self-test.
 - `tools/selftest_runtime.py` — crash/recovery and runtime lifecycle self-test.
@@ -274,11 +308,12 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - `tools/selftest_hardening.py` — primitive-centralization and bounded-governance self-test.
 - `tools/selftest_repository_hygiene.py` — commit/delta-sync/local-GC adversarial self-test.
 - `tools/selftest_project_baseline.py` — product-discovery/stack/date baseline gate self-test.
+- `tools/selftest_architecture_feedback.py` — privacy, opt-out and non-leakage feedback self-test.
 - `examples/minimal/` — pre-campaign example.
 - `examples/active_campaign/` — active campaign/currentness example.
 - `examples/terminal_candidate/` — exact-candidate terminal/review example.
 - `examples/stateful_backend/` — physical stateful implementation + control-layer reference system.
-- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer, repository efficiency, product baselining and stable-release guidance.
+- `docs/00_ARCHITECTURE_OVERVIEW.md` through `docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md` — architecture, adaptation, validation, runtime, recovery, schema evolution, ownership, transfer, repository efficiency, product baselining, privacy feedback and stable-release guidance.
 - `state/STARTER_MANIFEST.json` — machine-readable starter identity.
 
 ## What this is not
@@ -295,7 +330,7 @@ This repository contains only reusable structure, generic mechanisms and synthet
 
 `v1.1.0 — PUBLIC STARTER STABLE`
 
-v1.1 adds a pre-campaign product-discovery baseline: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking and project-local operating-review evidence.
+v1.1 adds a pre-campaign product-discovery baseline plus privacy-preserving recurring architecture feedback: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking, project-local operating-review evidence and opt-out metadata-only feedback artifacts.
 
 ## License
 

@@ -61,6 +61,7 @@ def create_scaffold(
     objective: str,
     force: bool,
     with_runtime: bool,
+    install_feedback_workflow: bool,
 ) -> Path:
     if not target.exists():
         target.mkdir(parents=True, exist_ok=True)
@@ -146,6 +147,14 @@ def create_scaffold(
     copy_file(
         ROOT / "tools" / "project_status.py",
         control / "tools" / "project_status.py",
+    )
+    copy_file(
+        ROOT / "tools" / "architecture_feedback.py",
+        control / "tools" / "architecture_feedback.py",
+    )
+    copy_file(
+        ROOT / "templates" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
+        control / "feedback" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
     )
     for portable_tool in ("repo_delta.py", "commit_guard.py", "workspace_gc.py"):
         copy_file(
@@ -529,6 +538,17 @@ CLIENT confirmation means this document accurately represents the current produc
                 "superseded_by_owner_id": None,
             },
             {
+                "owner_id": "OWNER_ARCHITECTURE_FEEDBACK_CONFIG_001",
+                "concern_id": "ARCHITECTURE_FEEDBACK_CONFIG",
+                "scope": product_id,
+                "status": "CURRENT",
+                "surface_ref": "feedback/ARCHITECTURE_FEEDBACK_CONFIG.json",
+                "surface_type": "FILE",
+                "required_in_currentness_set": False,
+                "supersedes_owner_ids": [],
+                "superseded_by_owner_id": None,
+            },
+            {
                 "owner_id": "OWNER_SDLC_OPERATING_REVIEW_001",
                 "concern_id": "AGENTIC_SDLC_OPERATING_REVIEW",
                 "scope": product_id,
@@ -726,6 +746,21 @@ This is process-improvement evidence, not product authority.
 """,
     )
 
+    feedback_workflow_path = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+    feedback_workflow_status = "DISABLED_BY_INSTALL_OPTION"
+    if install_feedback_workflow:
+        template_path = ROOT / "templates" / "AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml"
+        if feedback_workflow_path.exists():
+            existing = feedback_workflow_path.read_text(encoding="utf-8")
+            if "Managed by Agentic SDLC starter" not in existing:
+                feedback_workflow_status = "SKIPPED_UNOWNED_COLLISION"
+            else:
+                copy_file(template_path, feedback_workflow_path)
+                feedback_workflow_status = "INSTALLED"
+        else:
+            copy_file(template_path, feedback_workflow_path)
+            feedback_workflow_status = "INSTALLED"
+
     runtime_report_line = (
         "- optional campaign runtime/controller;"
         if with_runtime
@@ -756,6 +791,7 @@ This is process-improvement evidence, not product authority.
 - product-discovery requirements baseline;
 - technical stack/security/network/deployment baseline;
 - dated delivery-plan surface;
+- privacy-preserving architecture feedback config/exporter;
 - bootstrap/currentness state;
 - canonical owner registry;
 - project overlay;
@@ -770,6 +806,8 @@ This is process-improvement evidence, not product authority.
 - fresh-context reconstruction: NOT_YET_EXERCISED
 - campaign execution: NOT_YET_AUTHORIZED
 - product acceptance: NOT_ESTABLISHED
+- architecture feedback workflow: {feedback_workflow_status}
+- architecture feedback external submission: DISABLED_BY_DEFAULT
 
 ## Open HOLDs
 
@@ -838,6 +876,19 @@ Validate this control layer with its copied validator:
 python {control_dir_name}/tools/validate_project.py --root .
 ```
 
+## Architecture feedback
+
+A strict metadata-only feedback exporter is enabled in `feedback/ARCHITECTURE_FEEDBACK_CONFIG.json`.
+
+- default cadence: weekly;
+- default delivery: GitHub Actions artifact only;
+- external submission: disabled by default;
+- no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials are included;
+- set `enabled` to `false` to disable report generation;
+- delete `.github/workflows/agentic-sdlc-feedback.yml` to remove scheduling entirely.
+
+The managed workflow status for this installation is: {feedback_workflow_status}.
+
 {runtime_readme_line}
 
 Do not claim installation success until the fresh-context probe has been exercised and the installation report is updated with physical evidence.
@@ -879,6 +930,11 @@ def main() -> int:
         action="store_true",
         help="Copy the optional campaign runtime/controller into the generated control layer.",
     )
+    parser.add_argument(
+        "--no-feedback-workflow",
+        action="store_true",
+        help="Do not install the managed scheduled architecture-feedback GitHub Actions workflow.",
+    )
     args = parser.parse_args()
 
     try:
@@ -890,6 +946,7 @@ def main() -> int:
             objective=args.objective,
             force=args.force,
             with_runtime=args.with_runtime,
+            install_feedback_workflow=not args.no_feedback_workflow,
         )
     except Exception as exc:
         print(f"SCAFFOLD FAILED: {exc}", file=sys.stderr)
