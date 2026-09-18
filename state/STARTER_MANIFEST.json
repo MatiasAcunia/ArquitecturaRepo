@@ -46,7 +46,9 @@
     "V1_RELEASE_CRITERIA",
     "WORKSPACE_LIFECYCLE",
     "TECHNICAL_BASELINE",
-    "DELIVERY_PLAN"
+    "DELIVERY_PLAN",
+    "ARCHITECTURE_FEEDBACK_CONFIG",
+    "ARCHITECTURE_FEEDBACK_REPORT"
   ],
   "claim_boundary": "Generic engineering starter; each fork must validate its own mechanisms and product gates.",
   "fresh_context_required": true,
