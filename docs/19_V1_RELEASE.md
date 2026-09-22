@@ -99,11 +99,7 @@ Those gates remain project-specific and fail closed when materially unresolved.
 
 ## License boundary
 
-This repository does not select an open-source license on behalf of the repository owner.
-
-Public availability and technical forkability are separate from legal reuse rights.
-
-A formal open-source license remains a repository-owner decision.
+The repository owner has published the original source code and documentation under the [MIT License](../LICENSE). The required copyright and permission notice must be retained in copies or substantial portions. Third-party assets, if present, require their own rights review; the repository license cannot grant rights the owner does not hold.
 
 ## Post-1.0 stopping rule
 
