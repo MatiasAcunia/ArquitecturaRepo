@@ -334,4 +334,4 @@ v1.1 adds a pre-campaign product-discovery baseline plus privacy-preserving recu
 
 ## License
 
-No explicit open-source license has been selected yet. The repository is public and intended to be forked for experimentation, but a formal reuse license should be selected before treating it as a fully licensed open-source distribution.
+The original source code and documentation in this repository are licensed under the [MIT License](LICENSE). You may use, adapt and redistribute them under its terms, including retention of the copyright and permission notice. Third-party assets or materials, if any, retain their own terms; this license does not grant rights to material not owned by the copyright holder.
