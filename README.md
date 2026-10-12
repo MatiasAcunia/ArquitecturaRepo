@@ -8,6 +8,8 @@ The core idea:
 
 This repository is not a prompt collection. It is an operating architecture for long-running agentic software development.
 
+**Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
+
 ## What you get
 
 The starter defines four internal engineering roles:
