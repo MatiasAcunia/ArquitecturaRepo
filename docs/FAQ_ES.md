@@ -84,7 +84,7 @@ El [README](../README.md) contiene el recorrido inicial, los perfiles y el mapa 
 
 ### 17. ¿Cómo reporto un error o cuento qué me funcionó?
 
-Abrí un [GitHub Issue](https://github.com/MatiasAcunia/ArquitecturaRepo/issues) y, si podés, incluí:
+En la pestaña **Issues** del repositorio, abrí una incidencia y, si podés, incluí:
 
 - Qué querías lograr y en qué tipo de proyecto.
 - Qué perfil/ruta de instalación usaste.
