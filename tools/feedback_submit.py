@@ -19,7 +19,8 @@ from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 from urllib.error import HTTPError, URLError
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError, SchemaError
+from architecture_feedback import ALLOWED_PROFILES, ALLOWED_STATUS_TOKENS, ALLOWED_REVIEW_RATINGS, safe_version
 
 
 MAX_REPORT_BYTES = 32768
@@ -61,6 +62,39 @@ def safe_endpoint(value: str) -> str:
     return value
 
 
+def validate_privacy_categories(report: dict) -> None:
+    if report.get("profile") not in ALLOWED_PROFILES:
+        raise FeedbackHold("UNRECOGNIZED_PROFILE_VALUE")
+    if report.get("starter_version") != safe_version(report.get("starter_version")):
+        raise FeedbackHold("UNRECOGNIZED_VERSION_VALUE")
+    fields = (
+        (report.get("control", {}), ("bootstrap_status", "product_status")),
+        (report.get("project_baseline", {}), (
+            "technical_status", "machine_assessment_status", "network_mode",
+            "delivery_status",
+        )),
+        (report.get("runtime", {}), ("campaign_status",)),
+    )
+    for container, keys in fields:
+        if not isinstance(container, dict):
+            raise FeedbackHold("NONOBJECT_METADATA")
+        for key in keys:
+            value = container.get(key)
+            if value is not None and value not in ALLOWED_STATUS_TOKENS:
+                raise FeedbackHold("FREE_TEXT_METADATA_VALUE_REFUSED")
+    runtime = report.get("runtime", {})
+    statuses = runtime.get("work_status_counts", {})
+    if not isinstance(statuses, dict) or any(
+        name not in ALLOWED_STATUS_TOKENS or
+        type(count) is not int or not (0 <= count <= 1000000)
+        for name, count in statuses.items()
+    ):
+        raise FeedbackHold("FREE_TEXT_METADATA_KEY_OR_COUNT_REFUSED")
+    process = report.get("process", {})
+    if process.get("operating_review_rating") not in ALLOWED_REVIEW_RATINGS:
+        raise FeedbackHold("FREE_TEXT_REVIEW_RATING_REFUSED")
+
+
 def submit(*, report_path: Path, config_path: Path, schema_path: Path,
            endpoint: str, repo_opt_in: str, opener=None) -> dict:
     try:
@@ -81,9 +115,10 @@ def submit(*, report_path: Path, config_path: Path, schema_path: Path,
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(report)
-    except (OSError, ValueError, TypeError, Exception) as exc:
+    except (OSError, ValueError, TypeError, UnicodeError, ValidationError, SchemaError) as exc:
         # Only a fixed category is logged; never echo project data or a token.
         raise FeedbackHold("REPORT_SCHEMA_INVALID:" + type(exc).__name__) from None
+    validate_privacy_categories(report)
     if report.get("privacy") != {
         "mode": "STRICT_METADATA_ONLY",
         "free_text_included": False,
