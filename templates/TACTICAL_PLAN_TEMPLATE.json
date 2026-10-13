@@ -1,0 +1,13 @@
+{
+  "schema_version": "agentic-tactical-plan-v1",
+  "campaign_id": "DERIVED_FROM_AUTHORIZED_GOAL",
+  "goal_digest": "DERIVED_FROM_AUTHORIZED_GOAL",
+  "revision": 0,
+  "steps": [],
+  "hypotheses": [],
+  "blockers": [],
+  "active_progress_minutes_since_review": 0,
+  "review_evidence_ref": "TO_BE_VERIFIED",
+  "plan_mode": "UNVERIFIED",
+  "progress_tool": "UNVERIFIED"
+}
