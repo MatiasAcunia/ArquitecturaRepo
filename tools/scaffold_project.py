@@ -884,10 +884,11 @@ python {control_dir_name}/tools/validate_project.py --root .
 
 A strict metadata-only feedback exporter is enabled in `feedback/ARCHITECTURE_FEEDBACK_CONFIG.json`.
 
-- default cadence: weekly;
-- default delivery: GitHub Actions artifact only;
-- external submission: disabled by default;
+- default cadence: monthly, automatic on GitHub Actions where supported;
+- default delivery: strict anonymous metadata artifact in this project's own Actions;
+- external submission: disabled until an explicit receiver and one-time opt-in are configured;
 - no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials are included;
+- this periodic feedback helps improve the starter's structure, error classification and installation defaults, not judge your product;
 - set `enabled` to `false` to disable report generation;
 - delete `.github/workflows/agentic-sdlc-feedback.yml` to remove scheduling entirely.
 
