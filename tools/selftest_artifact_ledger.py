@@ -123,6 +123,17 @@ def main() -> int:
             assert outside.read_bytes() == b"PRIVATE"
             link.unlink()
 
+        # Real Spanish filenames often contain accents and spaces.
+        localized = project / root / "música y voz 01.mp4"
+        localized.write_bytes(b"SAFE_REBUILDABLE_SAMPLE")
+        run(project, "reconcile", "--root", root)
+        run(project, "classify", "--path", root + "/música y voz 01.mp4",
+            "--owner", "I3", "--campaign", "CAMP_A",
+            "--category", "DERIVED_REBUILDABLE", "--safe-delete",
+            "--ttl-hours", "-1", "--review-closed")
+        assert run(project, "gc")["ready_count"] == 1
+        assert run(project, "gc", "--execute")["deleted_count"] == 1
+        assert not localized.exists()
         assert run(project, "init-root", "--root", root,
                    "--owner", "I4", "--campaign", "FOREIGN",
                    code=2)["status"] == "HOLD"

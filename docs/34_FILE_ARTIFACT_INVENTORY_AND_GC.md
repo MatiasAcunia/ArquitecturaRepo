@@ -108,3 +108,5 @@ blocked; interrupted-L3 reconciliation and disk recovery check on Windows.
 
 This capability remains candidate-only pending exact Linux/Windows CI and
 actual L3 adoption. The v1.2 release and governed-project transfer remain HOLD.
+
+Portable output filenames with Unicode letters and spaces are supported. Windows device-name aliases and trailing-dot/space paths remain invalid. Every file entry must match the registered root owner and campaign or the ledger fails closed.
