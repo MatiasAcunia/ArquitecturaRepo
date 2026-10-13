@@ -72,6 +72,11 @@ def create_scaffold(
     project_type: str = "OTHER",
 ) -> Path:
     selected_lang, selection_source = choose_language(language)
+    # Reject explicitly unsafe force on a non-existent root before creating
+    # a half-installed project directory. Existing project paths are checked
+    # below, without any destructive operation.
+    if force and not target.exists():
+        raise ValueError("UNSAFE_FORCE_HOLD: no project directory created")
     # Never allow a caller-provided control-dir to escape or replace the
     # project root. --force is legal only for a recognizable starter layer.
     if (not isinstance(control_dir_name, str)
@@ -79,6 +84,16 @@ def create_scaffold(
         or "/" in control_dir_name or "\\" in control_dir_name
         or ":" in control_dir_name or "\x00" in control_dir_name):
         raise ValueError("control-dir must be one safe directory name within target")
+    # Windows device names, Git metadata and dotted-space aliases may
+    # redirect/install into reserved locations or fail after partial writes.
+    low = control_dir_name.lower()
+    device_stem = low.split(".", 1)[0]
+    if (low in {".git", ".github", ".svn", ".hg", ".vscode", ".idea"}
+        or control_dir_name != control_dir_name.strip(" .")
+        or device_stem in {"con", "prn", "aux", "nul"}
+        or device_stem in {"com" + str(i) for i in range(1, 10)}
+        or device_stem in {"lpt" + str(i) for i in range(1, 10)}):
+        raise ValueError("RESERVED_CONTROL_DIRECTORY_NAME")
     if target.is_symlink():
         raise ValueError("target symlink is not an authorized install root")
     if not target.exists():

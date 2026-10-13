@@ -278,6 +278,22 @@ def main() -> int:
             raise AssertionError("force destroyed an unconfirmed CLIENT requirement")
         (baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md").write_bytes(saved)
 
+        # No output folder may be created if --force fails before install.
+        never_created = base / "force-must-not-create"
+        invalid_force = run(str(SCAFFOLD), "--target", str(never_created),
+                            "--profile", "SMALL", "--product-id", "TEST", "--force")
+        if invalid_force.returncode == 0 or never_created.exists():
+            raise AssertionError("failed --force created a partial project")
+        # Reject Windows device names and Git metadata on Linux CI too.
+        for forbidden in (".git", ".github", ".svn", ".vscode",
+                          "CON", "AUX", "NUL", "COM1", "LPT9", "controls."):
+            forbidden_root = base / ("reserved-" + forbidden.replace(".", "x"))
+            rejected = run(str(SCAFFOLD), "--target", str(forbidden_root),
+                           "--profile", "SMALL", "--product-id", "TEST",
+                           "--control-dir", forbidden)
+            if rejected.returncode == 0 or forbidden_root.exists():
+                raise AssertionError("reserved control directory was accepted: " + forbidden)
+
         # Adversarial installation path and overwrite tests.
         victim = base / "victim"
         victim.mkdir()
