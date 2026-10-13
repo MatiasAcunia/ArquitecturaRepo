@@ -137,6 +137,7 @@ TOKEN_HINT_RE = re.compile(
     r"(?i)(?:api[_-]?key|secret|access[_-]?token|bearer)\s*[:=]\s*['\"][A-Za-z0-9_\-]{12,}"
 )
 MD_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|MatiasAcunia)\b|TRO/RED")
 
 
 def fail(message: str, errors: list[str]) -> None:
@@ -216,6 +217,12 @@ def validate_structure_only(errors: list[str]) -> None:
         rel = path.relative_to(ROOT)
         if EMAIL_RE.search(text):
             fail(f"possible personal email in public starter: {rel}", errors)
+        # The public starter can demonstrate arbitrary project categories,
+        # never identify the maintainer's own active product workstreams.
+        if (path.suffix.lower() == ".md"
+            and rel.parts[0] in {"docs", "prompts", "protocols"}
+            and PUBLIC_PROJECT_MARKER_RE.search(text)):
+            fail(f"project-specific source name in public documentation: {rel}", errors)
         # Official immutable action pins are supply-chain controls, not
         # project/source identity. Exception is limited to these two CI YAML
         # surfaces and three official actions with semver comments.

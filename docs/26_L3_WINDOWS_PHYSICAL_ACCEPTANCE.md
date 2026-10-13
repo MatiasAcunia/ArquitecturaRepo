@@ -6,7 +6,7 @@ Status: handoff protocol, **not authorization to run against active projects**.
 
 L3 must read the exact v1.2 candidate HEAD, its docs/25 security ledger, state/V1_2_ACCEPTANCE_CRITERIA.json, core v1.1 tests and existing canonical machine configuration. The known Windows reference is Codex Daily Control **2.0.2-hardening-candidate**; examine the actual installed bytes and current native Codex Desktop version first, not the historical package name or a copied path. Use one existing canonical checkout, disposable isolated worktrees only when real concurrency demands them, and clean ephemeral artifacts afterward.
 
-Before any mutation: capture exact branch/HEAD and CI, preserve active workstream Goals, check free disk, Windows permissions, native SQLite/Goal identity, supported CLI/app-server, secrets policy and rollback. Do not touch productive ROBLOX, MUSIC, TRO/RED, CTR or OWNER automations without an explicit separate authorization.
+Before any mutation: capture exact branch/HEAD and CI, preserve active workstream Goals, check free disk, Windows permissions, native SQLite/Goal identity, supported CLI/app-server, secrets policy and rollback. Do not touch the user's productive repositories or existing scheduled automations without an explicit separate authorization.
 
 ## Pilot gates (each with real evidence)
 

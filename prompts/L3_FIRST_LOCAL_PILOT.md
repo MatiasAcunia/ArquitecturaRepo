@@ -12,7 +12,7 @@ Read the exact current v1.2 branch HEAD, successful GitHub CI, AGENTS.md, SECURI
 
 ## Safety
 
-Use one disposable local sandbox repo/DB and synthetic data, avoiding all active OWNER/ROBLOX/MUSIC/TRO/CTR repositories, Goals, Tasks, credentials, cloud services, ports and publication. Do not clone redundantly or create branches per bug. No paid APIs, real personal data, secrets export, destructive chat cleanup or cloud resource creation. Check disk and rollback before writing. A failing install must never delete unowned/live Product State.
+Use one disposable local sandbox repo/DB and synthetic data, avoiding all active other existing production repositories, Goals, Tasks, credentials, cloud services, ports and publication. Do not clone redundantly or create branches per bug. No paid APIs, real personal data, secrets export, destructive chat cleanup or cloud resource creation. Check disk and rollback before writing. A failing install must never delete unowned/live Product State.
 
 ## Longitudinal tasks
 

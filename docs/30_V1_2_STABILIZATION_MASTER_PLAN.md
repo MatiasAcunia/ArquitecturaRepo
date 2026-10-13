@@ -6,7 +6,7 @@ Status: strategic stabilization plan, NOT acceptance or release authorization. T
 
 Ship a trustworthy first-use public starter, not an endlessly expanding agent ecosystem. Core expectations: no accidental loss of existing project state; one canonical owner per truth/identity; correct Goal/Planner/I3 boundaries and fresh-context reconstruction; validated rollback; bounded privacy/cost; enough useful documentation that an unrelated adopter can start correctly; transparent differentiation between actual support, simulated tests, experimental adapters and physical human acceptance.
 
-Do not alter active productive OWNER/ROBLOX/MUSIC/TRO/CTR Goals, repos, private SQLite, media, cloud resources, licensing decisions or scheduled tasks. A sandbox can be deleted only after the evidence has been captured and the tester has identified its ownership. One v1.2 PR and coherent commits; no branches or campaigns per bug.
+Do not alter active productive other existing production Goals, repos, private SQLite, media, cloud resources, licensing decisions or scheduled tasks. A sandbox can be deleted only after the evidence has been captured and the tester has identified its ownership. One v1.2 PR and coherent commits; no branches or campaigns per bug.
 
 ## PASS1 — whole-product reconstruction and critical path
 
@@ -98,3 +98,16 @@ Raw L3 reports remain PRIVATE. A separately redacted public issue can contain re
 ## Public demo
 
 Publish a synthetic, approved example showing setup, a useful feature, one controlled failure and recovery, limitations and an opt-out. Show an actual product screenshot or tested output only after the relevant review, not a model-authored success claim. Include current stable VERSION, supported environments and any unverified optional adapters.
+
+## PASS3 — previously missed cross-boundary defects and unresolved publication issues
+
+This PASS3 is justified by materially new evidence about systemic path/state/installation boundaries, not ordinary in-charter bugs. Reuse existing owners and avoid creating another control plane.
+
+- **Crash-journal trust (code-level corrected):** verify entire untrusted recovery record, staging location and cleanup target before applying the first effect. This closes directory traversal and forged journal-path risks but does not authenticate an attacker who already has write access to all canonical files.
+- **Installer partial failure (code-level corrected):** stage complete control under one temporary sibling and publish only after generation. A preexisting managed or custom GitHub workflow must not be overwritten. Workflow and control reside in separate directories, so cross-directory atomicity is not claimed; a secondary failure must persist an explicit HOLD.
+- **Customized control path (code-level corrected):** a selected safe directory name must be bound to the managed workflow, and injection syntax must not be interpolated into shell instructions.
+- **Goal↔Plan currentness (code-level corrected):** a Plan revision must verify its live charter/authority files and optional canonical-store presence, not only the immutable Goal document's digest. A local PASS is not permission from the actual Codex host.
+- **Windows portability (hosted CI):** Linux tests are complemented by Windows-hosted filesystem/state smoke checks; actual local Windows/Codex Desktop, old shell versions and user ACLs remain for L3. No macOS acceptance claim.
+- **Public-source boundary (CURRENT tree under review):** sanitize public docs to avoid portfolio-specific product names, repo refs, CLIENT snippets and media identities. Git history is separate: removed development references may persist in historical PR commit objects. Before merging, independently audit all changed files and public historical exposure; use a policy-approved consolidated integration, never promise that a normal file deletion erases remote history. Any necessary history rewrite or data removal requires explicit approval and a distinct privacy procedure.
+
+The PR already covers a substantial surface area. From here, no optional feature expansion before CRUD and existing-project physical terminals. Scope-freeze only permits reproduced safety/correctness defects, documentation contradictions and test coverage for already-promised behavior. Adjudicate release scope from the actual L3/host evidence; future capability ideas belong in a post-1.2 roadmap.

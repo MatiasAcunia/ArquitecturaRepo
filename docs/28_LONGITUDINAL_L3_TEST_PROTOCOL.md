@@ -4,7 +4,7 @@ Status: future local, user-authorized acceptance exercise, NOT an already execut
 
 ## Scope and hard safety limits
 
-Use an isolated disposable folder and new synthetic repository and DB (SQLite or PostgreSQL only if pre-authorized local tooling exists). Never use production identities or copy Product State from a live project. Do not access credentials/secrets or live OWNER/ROBLOX/MUSIC/TRO/CTR Goals. Read exact v1.2 candidate HEAD and CI, installed Codex Daily Control **2.0.2** physical bytes and current host capabilities. Determine real Windows version, PowerShell, Git, Python, running background tasks, disk, ports and rollback before mutation.
+Use an isolated disposable folder and new synthetic repository and DB (SQLite or PostgreSQL only if pre-authorized local tooling exists). Never use production identities or copy Product State from a live project. Do not access credentials/secrets or live other existing production Goals. Read exact v1.2 candidate HEAD and CI, installed Codex Daily Control **2.0.2** physical bytes and current host capabilities. Determine real Windows version, PowerShell, Git, Python, running background tasks, disk, ports and rollback before mutation.
 
 Choose a small CRUD (products, stock/quantity, sales/orders, optional suppliers) with basic business constraints, no payment API, no public publication, no real personal data. I2 chooses the stack from host evidence and product requirements; do not impose one stack just to fit a prebuilt solution.
 
@@ -43,4 +43,4 @@ Future Linux/macOS, full parallel team, stress/memory/disk/cost endurance and la
 
 ## Second, independently scheduled transfer pilot
 
-After the CRUD L3 closes and its findings are reconciled, use [Transfer Pilot B: existing repository](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md). This is a separate read-only authority and isolated-adaptation audit, NOT a reroute of the running CRUD Goal or authorization to mutate production MUSIC. It measures real existing-project portability, identity fidelity and risk boundaries more than raw script counts.
+After the CRUD L3 closes and its findings are reconciled, use [Transfer Pilot B: existing repository](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md). This is a separate read-only authority and isolated-adaptation audit, NOT a reroute of the running CRUD Goal or authorization to mutate the established project. It measures real existing-project portability, identity fidelity and risk boundaries more than raw script counts.
