@@ -83,6 +83,18 @@
       "required": true,
       "proof": "Project-local JSON file inventory persists across I3 invocations; real producer capture or explicitly scoped reconciliation registers files, GC blocks unknown/canonical/Git/DB and stale identities; Windows physical crash/recovery and disk-readback evidence required for advertised automatic host coverage.",
       "status": "SOURCE_CANDIDATE_TEST_PENDING__PHYSICAL_HOST_HOLD"
+    },
+    {
+      "id": "L3_ARTIFACT_OWNERSHIP_AND_SLASH_WORKFLOW",
+      "required": true,
+      "proof": "L3 maintains persistent artifact JSON plus bounded Git source observation across real native sessions; /cleangarbage via actual supported skill/text/native entry performs reconcile, human-safe classification, dry-run, verified eligible deletion and physical disk readback. Native slash UI claimed only if actually observed.",
+      "status": "SOURCE_AND_HOSTED_CI_PENDING__PHYSICAL_L3_HOLD"
+    },
+    {
+      "id": "ENGINEERING_FIRST_NATIVE_WRITE_ENFORCEMENT",
+      "required": true,
+      "proof": "Demonstrate actual host operation boundary for Git/Goal/Plan/I4 YAML, bootstrap/currentness and writer lease; where native interception is absent label unsupported/advisory and obtain explicit supported-scope approval",
+      "status": "HOST_OPERATIONAL_EVIDENCE_HOLD"
     }
   ]
 }

@@ -26,6 +26,8 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 ## Stabilization and release planning
 
+- [Engineering-first route, L3 ownership and bounded real test budget](docs/35_ENGINEERING_FIRST_EXECUTION_MASTER_ROUTE.md). This is a proposed execution plan, not a released host guarantee.
+
 - L3-managed `/cleangarbage` workflow: [the cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). It accepts this as a natural-language instruction; a native slash-menu entry is not claimed until host verification.
 
 - [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
