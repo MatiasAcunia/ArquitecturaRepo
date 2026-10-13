@@ -63,18 +63,52 @@ def create_scaffold(
     with_runtime: bool,
     install_feedback_workflow: bool,
 ) -> Path:
+    # Never allow a caller-provided control-dir to escape or replace the
+    # project root. --force is legal only for a recognizable starter layer.
+    if (not isinstance(control_dir_name, str)
+        or not control_dir_name or control_dir_name in {".", ".."}
+        or "/" in control_dir_name or "\\" in control_dir_name
+        or ":" in control_dir_name or "\x00" in control_dir_name):
+        raise ValueError("control-dir must be one safe directory name within target")
+    if target.is_symlink():
+        raise ValueError("target symlink is not an authorized install root")
     if not target.exists():
         target.mkdir(parents=True, exist_ok=True)
     if not target.is_dir():
         raise ValueError(f"target is not a directory: {target}")
 
     control = target / control_dir_name
+    if control.is_symlink():
+        raise ValueError("refuse symlinked control directory (even with --force)")
     if control.exists():
         if not force:
             raise FileExistsError(
                 f"{control} already exists; refuse to overwrite without --force"
             )
+        manifest_path = control / "state" / "STARTER_MANIFEST.json"
+        profile_path = control / "PROFILE.json"
+        if (not control.is_dir() or manifest_path.is_symlink()
+            or profile_path.is_symlink() or not manifest_path.is_file()
+            or not profile_path.is_file()):
+            raise ValueError("--force refuses unrecognized/non-starter control directory")
+        try:
+            old_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            old_profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise ValueError("--force requires valid starter manifest/profile") from None
+        if (old_manifest.get("starter") != "agentic-sdlc-starter"
+            or old_profile.get("schema_version") != "starter-profile-selection-0.1"):
+            raise ValueError("--force refuses non-starter control state")
+        # A linked subtree could be followed by a later write. Reject before
+        # any deletion rather than treating --force as a generic rm -rf.
+        if any(node.is_symlink() for node in control.rglob("*")):
+            raise ValueError("--force refuses symlinks in the existing control layer")
         shutil.rmtree(control)
+    workflow_target = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+    if (workflow_target.is_symlink()
+        or (target / ".github").is_symlink()
+        or (target / ".github" / "workflows").is_symlink()):
+        raise ValueError("refuse symlinked managed workflow or workflow directory")
 
     profile = PROFILES[profile_name]
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
