@@ -57,3 +57,7 @@ jobs:
         run: python tools/selftest_hardening.py
       - name: Verify complete v1 release gate
         run: python tools/verify_v1_release.py
+      - name: Exercise v1.2 operational controls (synthetic, no network)
+        run: python tools/selftest_operational_v12.py
+      - name: Check v1.2 candidate evidence without claiming physical host acceptance
+        run: python tools/verify_v12_candidate.py
