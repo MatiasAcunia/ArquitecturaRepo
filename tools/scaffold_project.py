@@ -174,6 +174,10 @@ def create_scaffold(
             ROOT / "tools" / "campaignctl.py",
             control / "tools" / "campaignctl.py",
         )
+        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py"):
+            copy_file(ROOT / "tools" / tool, control / "tools" / tool)
+    if profile_name == "MULTI_PRODUCT":
+        copy_file(ROOT / "tools" / "owner_task_recovery.py", control / "tools" / "owner_task_recovery.py")
 
     include_identity = any(
         item in profile["recommended_current_contracts"]
