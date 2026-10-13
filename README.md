@@ -26,6 +26,8 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 ## Stabilization and release planning
 
+- [CLIENT capability-truth inventory and post-release integration design](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — proposals and falsifiers, not current execution or release authority.
+
 - [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
 - [L3 local evidence intake and independent review template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
 
