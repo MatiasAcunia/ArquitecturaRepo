@@ -48,7 +48,7 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh. Para desligar relatórios, defina e
 
 ### 12. O que foi testado e como relatar problemas?
 
-v1.1 é estável; v1.2 permanece candidata até passar testes físicos independentes. Abra um Issue com reprodução e logs sem segredos. O material original usa MIT.
+1.1.0 é estável; v1.2 permanece candidata até passar testes físicos independentes. Abra um Issue com reprodução e logs sem segredos. O material original usa MIT.
 
 ---
 
