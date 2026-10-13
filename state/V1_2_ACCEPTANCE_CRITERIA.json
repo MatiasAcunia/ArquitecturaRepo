@@ -1,0 +1,64 @@
+{
+  "schema_version": "agentic-v12-candidate-criteria-v1",
+  "target_release": "1.2.0",
+  "branch_status": "IMPLEMENTATION_IN_PROGRESS__NOT_RELEASED",
+  "baseline_stable_version": "1.1.0",
+  "codex_daily_control_reference": "2.0.2-hardening-candidate",
+  "principle": "No code/test/policy may replace a verified physical host, provider, external-delivery or product gate.",
+  "gates": [
+    {
+      "id": "V11_BACKWARD_COMPATIBILITY",
+      "required": true,
+      "proof": "full existing v1 release suite on exact candidate",
+      "status": "PENDING_CI"
+    },
+    {
+      "id": "GOAL_PLAN_INVOCATION",
+      "required": true,
+      "proof": "same Goal across actual host invocations with changed-charter HOLD and 120-minute checkpoint",
+      "status": "SYNTHETIC_CODE_ONLY"
+    },
+    {
+      "id": "EXTERNAL_EFFECT_RECOVERY",
+      "required": true,
+      "proof": "physical adapter exact receipt, restart and no duplicate remote effect",
+      "status": "SYNTHETIC_CODE_ONLY"
+    },
+    {
+      "id": "GEMINI_I4_IN_REAL_GOAL",
+      "required": true,
+      "proof": "two authorized non-private consults; delivery to same I3 and independent physical consumption readback",
+      "status": "NOT_YET_PROVEN"
+    },
+    {
+      "id": "CODEX_DAILY_CONTROL_2_0_2",
+      "required": true,
+      "proof": "native Windows install, quota resume, daypack/cloud readback and safe cleanup on approved disposable target",
+      "status": "PHYSICAL_EXTERNAL_SYSTEM_NOT_TESTED_BY_STARTER"
+    },
+    {
+      "id": "OPTIONAL_OWNER_FIVE_TASKS",
+      "required": true,
+      "proof": "scheduler adapter exactly five tasks; four-way recovery and explicit CLIENT suspend preserved",
+      "status": "POLICY_ONLY"
+    },
+    {
+      "id": "PROPORTIONAL_SCAFFOLD_AND_UPGRADE",
+      "required": true,
+      "proof": "six profiles, backward compatible migrations, no default expensive services",
+      "status": "PENDING_CI"
+    },
+    {
+      "id": "PRIVACY_AND_FEEDBACK_DELIVERY",
+      "required": true,
+      "proof": "monthly local on, strict privacy, user opt-out, if sharing advertised real collector receipt and permission",
+      "status": "LOCAL_ONLY"
+    },
+    {
+      "id": "INDEPENDENT_TRANSFER_AND_RELEASE",
+      "required": true,
+      "proof": "one independent unrelated adoption, exact-head CI and separate host/human gates",
+      "status": "NOT_YET_PROVEN"
+    }
+  ]
+}
