@@ -47,20 +47,31 @@ def test_goal(tmp: Path) -> None:
                   active_minutes=0, review_evidence_ref="synthetic-evidence")
     assert plan["goal_digest"] == digest(goal)
     assert assess(tmp)["status"] == "HOLD"
-    good = assess(tmp, host_currentness_verified=True, host_invocation_binding_verified=True)
-    assert good["status"] == "PASS"
+    good = assess(tmp)
+    assert good["local_integrity_passed"] is True
+    assert good["may_execute_material_goal"] is False
+    assert "HOST_INVOCATION_HOOK_NOT_PROVEN" in good["failure_codes"]
     must_fail(lambda: update(tmp, expected_revision=-1, plan={"steps": []},
                              active_minutes=0, review_evidence_ref="e"), TacticalPlanError)
     charter.write_text("changed charter")
-    bad = assess(tmp, host_currentness_verified=True, host_invocation_binding_verified=True)
+    bad = assess(tmp)
     assert "AUTHORITY_REF_STALE" in bad["failure_codes"]
     charter.write_text("authorized charter\n")
     (tmp / "state" / "canonical.sqlite").write_bytes(b"sqlite")
     goal["canonical_store"] = {"required": True, "ref": "state/canonical.sqlite",
                                "sha256": hashlib.sha256(b"sqlite").hexdigest()}
     (tmp / "state" / "GOAL_CONTRACT_CURRENT.json").write_text(json.dumps(goal))
-    assert "TACTICAL_PLAN_GOAL_DRIFT" in assess(tmp, host_currentness_verified=True,
-                                                host_invocation_binding_verified=True)["failure_codes"]
+    assert "TACTICAL_PLAN_GOAL_DRIFT" in assess(tmp)["failure_codes"]
+    # Traversal and symlinks never become authorized control refs.
+    goal["authority_refs"] = {"../outside": "a" * 64}
+    goal["charter_ref"] = "../outside"
+    goal["charter_sha256"] = "a" * 64
+    (tmp / "state" / "GOAL_CONTRACT_CURRENT.json").write_text(json.dumps(goal))
+    assert any("UNTRUSTED_GOAL" in c for c in assess(tmp)["failure_codes"])
+    goal["authority_refs"] = {"state/CHARTER.md": charter_sha}
+    goal["charter_ref"] = "state/CHARTER.md"
+    goal["charter_sha256"] = charter_sha
+    (tmp / "state" / "GOAL_CONTRACT_CURRENT.json").write_text(json.dumps(goal))
     # New canonical goal needs formal reconciliation; plan update must not silently self-rebind.
     must_fail(lambda: update(tmp, expected_revision=0, plan={"steps": []}, active_minutes=0,
                              review_evidence_ref="e"), TacticalPlanError)
