@@ -48,7 +48,7 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh; offline documentation follows the s
 
 ### 12. What is tested, and how do I report a problem?
 
-v1.1 is stable. v1.2 is a draft candidate until independent physical gates pass. File a GitHub Issue with reproducible steps and redacted logs. Original source and documentation use MIT; third-party rights remain separate.
+1.1.0 is stable. v1.2 is a draft candidate until independent physical gates pass. File a GitHub Issue with reproducible steps and redacted logs. Original source and documentation use MIT; third-party rights remain separate.
 
 ---
 
