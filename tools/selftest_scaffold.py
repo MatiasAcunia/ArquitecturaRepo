@@ -165,12 +165,21 @@ def main() -> int:
         small = base / "small" / ".agentic-sdlc"
         if (small / "protocols" / "MASTER_OWNER_OS.md").exists():
             raise AssertionError("SMALL profile must not install MASTER_OWNER_OS by default")
+        if (small / "templates" / "CODEX_DAILY_CONTROL_ADAPTER_CONFIG.json").exists():
+            raise AssertionError("SMALL cannot install an unrequested Codex adapter")
+        if (small / "tools" / "cognitive_i4.py").exists():
+            raise AssertionError("SMALL cannot install cognitive I4 tools")
+        if (small / "templates" / "OWNER_FIVE_TASK_PACK.json").exists():
+            raise AssertionError("SMALL cannot install OWNER pack")
         if (small / "state" / "EXECUTION_AUTHORITY_CURRENT.json").exists():
             raise AssertionError("SMALL profile must not create execution authority by default")
 
         multi = base / "multi_product" / ".agentic-sdlc"
         if not (multi / "protocols" / "MASTER_OWNER_OS.md").exists():
             raise AssertionError("MULTI_PRODUCT profile must include MASTER_OWNER_OS")
+        pack_path = multi / "templates" / "OWNER_FIVE_TASK_PACK.json"
+        if not pack_path.is_file() or json.loads(pack_path.read_text())["enabled"] is not False:
+            raise AssertionError("OWNER task pack must be present but disabled until authorized")
         if not (multi / "state" / "EXECUTION_AUTHORITY_CURRENT.json").exists():
             raise AssertionError("MULTI_PRODUCT profile must create fail-closed execution authority")
 
@@ -206,6 +215,15 @@ def main() -> int:
         )
         if runtime_profile.get("runtime_enabled") is not True:
             raise AssertionError("runtime-enabled scaffold did not record runtime_enabled=true")
+        for item in ("goal_guard.py", "goal_plan.py", "cognitive_i4.py",
+                     "cognitive_ledger.py", "external_effects.py", "fenced_mutator.py",
+                     "evidence_decision.py"):
+            if not (runtime_control / "tools" / item).is_file():
+                raise AssertionError("v1.2 optional runtime tool missing: " + item)
+        for item in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
+                     "CODEX_DAILY_CONTROL_ADAPTER_CONFIG.json"):
+            if not (runtime_control / "templates" / item).is_file():
+                raise AssertionError("v1.2 opt-in runtime template missing: " + item)
         if not (runtime_control / "tools" / "campaignctl.py").exists():
             raise AssertionError("runtime-enabled scaffold missing campaignctl.py")
         copied_validation = run(
