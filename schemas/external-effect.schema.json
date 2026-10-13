@@ -11,7 +11,7 @@
     "authorized_ref",
     "phase",
     "attempts",
-    "verified_receipt"
+    "receipt_attestation"
   ],
   "properties": {
     "schema_version": {
@@ -34,14 +34,14 @@
         "PREPARED",
         "REQUESTED_AMBIGUOUS",
         "HOLD_RECONCILIATION_REQUIRED",
-        "RECEIPT_VERIFIED"
+        "RECEIPT_ATTESTED_UNVERIFIED"
       ]
     },
     "attempts": {
       "type": "integer",
       "minimum": 0
     },
-    "verified_receipt": {
+    "receipt_attestation": {
       "type": [
         "object",
         "null"
