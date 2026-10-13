@@ -109,6 +109,21 @@ def create_scaffold(
         if (old_manifest.get("starter") != "agentic-sdlc-starter"
             or old_profile.get("schema_version") != "starter-profile-selection-0.1"):
             raise ValueError("--force refuses non-starter control state")
+        # Force is NOT an upgrade mechanism. Reject a live/verified/modified
+        # project before any deletion; updates require versioned migrations.
+        try:
+            existing_product = json.loads(
+                (control / "state" / "PRODUCT_STATE_CURRENT.json").read_text(encoding="utf-8"))
+            existing_bootstrap = json.loads(
+                (control / "state" / "CURRENT_BOOTSTRAP_STATE.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise ValueError("--force requires reconstructible initial Product State") from None
+        if (existing_product.get("status") != "HOLD"
+            or existing_product.get("active_campaign")
+            or existing_bootstrap.get("status") != "UNTRUSTED_CONTEXT"
+            or existing_bootstrap.get("currentness", {}).get("verified") is not False
+            or (control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json").exists()):
+            raise ValueError("--force refuses live/verified/pending-transaction state; use migrations")
         # A linked subtree could be followed by a later write. Reject before
         # any deletion rather than treating --force as a generic rm -rf.
         if any(node.is_symlink() for node in control.rglob("*")):
