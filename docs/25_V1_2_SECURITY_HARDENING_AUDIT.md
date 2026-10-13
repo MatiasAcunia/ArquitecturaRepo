@@ -48,3 +48,7 @@ No accidental Product State replacement, privilege escalation, external paid act
 ## Additional synthetic endurance gate
 
 `python tools/selftest_v12_longitudinal.py` exercises three separate interpreter processes, durable plan identity, a revision race, a changed charter, ambiguous external-effect replay refusal and metadata-only diagnostics. It does not simulate hours of actual L3 execution or prove an external provider readback.
+
+## Post-plan critical finding: crash-journal reference confinement
+
+A persisted transaction journal previously carried relative target and stage references directly into recovery. v1.2 now validates the *entire* journal (transaction ID format, phase, bounded operations, hashes, unique destinations, confinement, protected runtime paths, symlinks and stage references) before applying any operation. A malformed journal remains untouched for deliberate reconciliation; it cannot authorize writes or cleanup outside its control root. The adversarial synthetic suite checks traversal, absolute paths, Windows drive paths, duplicate operations, tampered stage references, protected lock/journal, unsafe metadata and a positive genuine recovery. This is an essential boundary, not an invitation to treat arbitrary local journal edits as authenticated evidence.

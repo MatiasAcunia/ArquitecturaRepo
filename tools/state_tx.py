@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -95,6 +96,82 @@ def relative_target(control: Path, path: Path) -> str:
         raise StateTransactionError(f"transaction target escapes control root: {path}")
 
 
+# A crash journal is persisted state, not authority to write arbitrary paths.
+# Validate the entire journal BEFORE applying even its first operation.
+_SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+_TRANSACTION_ID = re.compile(r"^[0-9a-f]{32}$")
+_MAX_JOURNAL_OPS = 1024
+
+
+def checked_journal_path(control: Path, value: str, *, purpose: str) -> Path:
+    if not isinstance(value, str) or not (0 < len(value) <= 4096):
+        raise StateTransactionError("UNSAFE_JOURNAL_PATH:" + purpose)
+    normalized = value.replace("\\", "/")
+    parts = normalized.split("/")
+    if (any(part in {"", ".", ".."} for part in parts)
+        or any(":" in part or "\x00" in part for part in parts)
+        or normalized.startswith(("/", "//"))):
+        raise StateTransactionError("UNSAFE_JOURNAL_PATH:" + purpose)
+    root = control.resolve()
+    target = root.joinpath(*parts)
+    try:
+        target.resolve().relative_to(root)
+    except (ValueError, OSError, RuntimeError):
+        raise StateTransactionError("JOURNAL_PATH_ESCAPES_CONTROL:" + purpose) from None
+    cursor = root
+    for part in parts:
+        cursor = cursor / part
+        if cursor.is_symlink():
+            raise StateTransactionError("JOURNAL_SYMLINK_REFUSED:" + purpose)
+    return target
+
+
+def verify_journal(control: Path, journal: dict[str, Any]) -> None:
+    if journal.get("schema_version") != "transition-journal-0.1":
+        raise StateTransactionError("UNSUPPORTED_TRANSACTION_JOURNAL")
+    txid = journal.get("transaction_id")
+    if not isinstance(txid, str) or not _TRANSACTION_ID.fullmatch(txid):
+        raise StateTransactionError("INVALID_TRANSACTION_ID")
+    if journal.get("status") not in {"PREPARED", "COMMITTING", "COMMITTED", "CONFLICT"}:
+        raise StateTransactionError("INVALID_TRANSACTION_PHASE")
+    operations = journal.get("operations")
+    if not isinstance(operations, list) or not (0 < len(operations) <= _MAX_JOURNAL_OPS):
+        raise StateTransactionError("INVALID_TRANSACTION_OPERATION_SET")
+    seen: set[str] = set()
+    for index, operation in enumerate(operations, start=1):
+        if not isinstance(operation, dict):
+            raise StateTransactionError("INVALID_TRANSACTION_OPERATION")
+        raw = operation.get("path")
+        target = checked_journal_path(control, raw, purpose="target")
+        relative = target.relative_to(control.resolve()).as_posix()
+        if (relative == "runtime/.campaignctl.lock"
+            or relative.startswith("runtime/transactions/")):
+            raise StateTransactionError("JOURNAL_PROTECTED_TARGET")
+        if relative in seen:
+            raise StateTransactionError("JOURNAL_DUPLICATE_TARGET")
+        seen.add(relative)
+        stage_raw = operation.get("stage_ref")
+        stage = checked_journal_path(control, stage_raw, purpose="staged")
+        expected_stage = (
+            f"runtime/transactions/{txid}/op_{index:04d}.json"
+        )
+        if stage.relative_to(control.resolve()).as_posix() != expected_stage:
+            raise StateTransactionError("JOURNAL_STAGE_REF_MISMATCH")
+        if type(operation.get("before_exists")) is not bool:
+            raise StateTransactionError("JOURNAL_BEFORE_EXISTS_INVALID")
+        prior = operation.get("before_sha256")
+        if operation["before_exists"]:
+            if not isinstance(prior, str) or not _SHA256_HEX.fullmatch(prior):
+                raise StateTransactionError("JOURNAL_PRIOR_HASH_INVALID")
+        elif prior is not None:
+            raise StateTransactionError("JOURNAL_ABSENT_PRIOR_HASH_INVALID")
+        after = operation.get("after_sha256")
+        if not isinstance(after, str) or not _SHA256_HEX.fullmatch(after):
+            raise StateTransactionError("JOURNAL_AFTER_HASH_INVALID")
+        if type(operation.get("applied")) is not bool:
+            raise StateTransactionError("JOURNAL_APPLIED_FLAG_INVALID")
+
+
 @contextmanager
 def state_lock(control: Path, timeout: float = 10.0) -> Iterator[None]:
     path = control / "runtime" / ".campaignctl.lock"
@@ -153,7 +230,10 @@ def state_lock(control: Path, timeout: float = 10.0) -> Iterator[None]:
 
 
 def cleanup(control: Path, journal: dict[str, Any]) -> None:
-    directory = stage_dir(control, journal["transaction_id"])
+    directory = checked_journal_path(
+        control, f"runtime/transactions/{journal['transaction_id']}",
+        purpose="cleanup_directory",
+    )
     if directory.exists():
         shutil.rmtree(directory)
         fsync_dir(directory.parent)
@@ -171,13 +251,15 @@ def conflict(control: Path, journal: dict[str, Any], reason: str) -> None:
 
 
 def recover(control: Path) -> str | None:
-    path = journal_path(control)
+    path = checked_journal_path(
+        control, "runtime/transactions/CURRENT_TRANSACTION.json",
+        purpose="current_journal",
+    )
     if not path.exists():
         return None
 
     journal = load_json(path)
-    if journal.get("schema_version") != "transition-journal-0.1":
-        raise StateTransactionError(f"unsupported transition journal: {path}")
+    verify_journal(control, journal)
     if journal.get("status") == "CONFLICT":
         raise StateTransactionError(
             "transaction conflict requires reconciliation: "
@@ -185,8 +267,8 @@ def recover(control: Path) -> str | None:
         )
 
     for operation in journal["operations"]:
-        target = control / operation["path"]
-        stage = control / operation["stage_ref"]
+        target = checked_journal_path(control, operation["path"], purpose="target")
+        stage = checked_journal_path(control, operation["stage_ref"], purpose="staged")
         current_hash = sha256_file(target)
 
         if current_hash == operation["after_sha256"]:
@@ -220,7 +302,8 @@ def recover(control: Path) -> str | None:
         atomic_json(path, journal)
 
     for operation in journal["operations"]:
-        if sha256_file(control / operation["path"]) != operation["after_sha256"]:
+        target = checked_journal_path(control, operation["path"], purpose="poststate")
+        if sha256_file(target) != operation["after_sha256"]:
             reason = f"{operation['path']}: after-state verification failed"
             conflict(control, journal, reason)
             raise StateTransactionError(reason)
@@ -242,8 +325,8 @@ def write_state_set(
         raise StateTransactionError(
             "pending transition exists; recover it before another multi-file mutation"
         )
-    if not writes:
-        raise StateTransactionError("transaction requires at least one write")
+    if not writes or len(writes) > _MAX_JOURNAL_OPS:
+        raise StateTransactionError("transaction operation set must be 1..1024 writes")
 
     transaction_id = uuid.uuid4().hex
     directory = stage_dir(control, transaction_id)
@@ -255,6 +338,10 @@ def write_state_set(
     try:
         for index, (target, data) in enumerate(writes, start=1):
             relative = relative_target(control, target)
+            checked = checked_journal_path(control, relative, purpose="write_target")
+            normal = checked.relative_to(control.resolve()).as_posix()
+            if normal == "runtime/.campaignctl.lock" or normal.startswith("runtime/transactions/"):
+                raise StateTransactionError("transaction cannot overwrite own journal or lock")
             if relative in seen:
                 raise StateTransactionError(f"duplicate transaction target: {relative}")
             seen.add(relative)
