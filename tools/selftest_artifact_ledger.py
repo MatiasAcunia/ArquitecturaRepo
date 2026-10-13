@@ -80,7 +80,15 @@ def main() -> int:
         assert data["files"][root + "/sample.bin"]["safe_delete"]
         assert run(project, "gc")["ready_count"] == 1 and sample.exists()
         assert run(project, "cleangarbage")["ready_count"] == 1 and sample.exists()
-        assert run(project, "gc", "--execute")["deleted_count"] == 1
+        removal = run(project, "gc", "--execute")
+        assert removal["deleted_count"] == 1
+        assert removal["reclaimed_bytes"] == len(b"sample")
+        assert type(removal["disk_free_before_bytes"]) is int
+        assert type(removal["disk_free_after_bytes"]) is int
+        assert removal["disk_free_delta_bytes"] == (
+            removal["disk_free_after_bytes"] - removal["disk_free_before_bytes"]
+        )
+        assert removal["reclaimed_bytes_basis"] == "logical_deleted_file_sizes"
         assert not sample.exists()
         assert run(project, "gc", "--execute")["deleted_count"] == 0
         assert json.loads(ledger.read_text())["files"][root + "/sample.bin"]["status"] == "DELETED"

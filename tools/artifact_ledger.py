@@ -12,6 +12,7 @@ import json
 import os
 import re
 import subprocess
+import shutil
 import sys
 import tempfile
 import uuid
@@ -497,6 +498,10 @@ def operate(a):
             save(path, data)
             return {"status": "CLASSIFIED", "path": name}
         if a.action in {"gc", "cleangarbage"}:
+            # File size is a logical estimate; real disk-free delta may
+            # differ due to sparse files, filesystem compression, metadata
+            # overhead and concurrent processes.
+            free_before = shutil.disk_usage(project).free
             result = gc_plan(project, data)
             unregistered = set(result["unregistered_roots"])
             for row in result["rows"]:
@@ -519,6 +524,12 @@ def operate(a):
             result["deleted_count"] = sum(r["decision"] == "DELETED" for r in result["rows"])
             result["reclaimed_bytes"] = sum(
                 r["bytes"] for r in result["rows"] if r["decision"] == "DELETED")
+            free_after = shutil.disk_usage(project).free
+            result["disk_free_before_bytes"] = free_before
+            result["disk_free_after_bytes"] = free_after
+            result["disk_free_delta_bytes"] = free_after - free_before
+            result["reclaimed_bytes_basis"] = "logical_deleted_file_sizes"
+            result["disk_delta_limitations"] = "Includes unrelated concurrent filesystem activity"
             return result
     raise LedgerHold("UNKNOWN_ACTION")
 
