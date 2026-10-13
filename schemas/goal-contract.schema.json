@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:goal-contract:1.2",
+  "title": "Immutable authorized Goal binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "goal_id",
+    "campaign_id",
+    "charter_ref",
+    "charter_sha256",
+    "authority_refs",
+    "definition_of_done",
+    "hard_gates",
+    "forbidden_effects",
+    "write_envelope"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-goal-contract-v1"
+    },
+    "goal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "charter_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "charter_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "authority_refs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "definition_of_done": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hard_gates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_effects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "write_envelope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "canonical_store": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "ref"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}
