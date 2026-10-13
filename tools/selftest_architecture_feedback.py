@@ -62,6 +62,8 @@ def main() -> int:
         config = json.loads(config_path.read_text(encoding="utf-8"))
         if config.get("enabled") is not True:
             raise AssertionError("feedback must default enabled")
+        if config.get("cadence") != "MONTHLY":
+            raise AssertionError("feedback must default to monthly, not weekly")
         if config.get("external_submission_enabled") is not False:
             raise AssertionError("external submission must default disabled")
         if config.get("privacy_mode") != "STRICT_METADATA_ONLY":
@@ -149,7 +151,7 @@ def main() -> int:
 
     print("ARCHITECTURE FEEDBACK PRIVACY SELF-TEST PASSED")
     print("- scheduled feedback is installed by default")
-    print("- local report generation defaults enabled")
+    print("- local report generation defaults enabled, monthly")
     print("- external submission defaults disabled")
     print("- strict allowlisted metadata report validates")
     print("- product identifiers, requirements, paths, emails and SHA-like values do not leak")
