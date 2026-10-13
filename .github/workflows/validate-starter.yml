@@ -82,6 +82,8 @@ jobs:
         run: python tools/selftest_v12_stabilization.py
       - name: Reject unbound SQLite WAL currentness and stale snapshots
         run: python tools/selftest_v12_sqlite_wal.py
+      - name: Verify read-only attachment of existing canonical owner references
+        run: python tools/selftest_v12_attachment.py
       - name: Refuse tampered crash journals and verify bounded recovery
         run: python tools/selftest_v12_journal_security.py
       - name: Falsify partial installs and user-owned workflow collisions

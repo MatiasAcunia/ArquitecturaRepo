@@ -216,6 +216,7 @@ def _populate_staging_project(
     copy_file(ROOT / "tools" / "branch_guard.py", control / "tools" / "branch_guard.py")
     copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
     copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
+    copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
     preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
     preferences.update(execution_mode=execution_mode, collaboration=collaboration,

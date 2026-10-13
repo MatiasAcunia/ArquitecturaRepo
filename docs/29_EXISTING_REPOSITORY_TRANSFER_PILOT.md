@@ -42,3 +42,7 @@ One sanitized, evidence-backed transfer audit gives PASS / FAIL / HOLD / NOT_APP
 Do not count a project's own failing application script as a starter defect without causal reproduction at the adapter boundary. Do not imply the test proves all project categories, operating systems, model providers or paid integrations.
 
 Release gate: initial CRUD + this transfer pilot + clean reinstall and rollback + exact-head CI + independent adversarial acceptance, then publish only proven features. Preserve the stable branch until those gates pass.
+
+## Preflight-only existing governance attachment
+
+Use [read-only reference preflight](32_EXISTING_GOVERNED_ATTACHMENT.md) before normal adoption. A successful owner-reference check is **not** an operational attachment and does not pass B1–B9; the exact L3 transfer failure and DB/host currentness must be reconciled before any authoritative migration.
