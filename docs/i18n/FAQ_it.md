@@ -48,7 +48,7 @@ Usa --language auto|en|es|pt|fr|de|it|ja|zh. Per disattivare: enabled=false o --
 
 ### 12. Che cosa è testato e come segnalo un errore?
 
-v1.1 è stabile; v1.2 resta candidata fino a test fisici indipendenti. Apri una Issue con passaggi riproducibili e log senza segreti. Il materiale originale usa MIT.
+1.1.0 è stabile; v1.2 resta candidata fino a test fisici indipendenti. Apri una Issue con passaggi riproducibili e log senza segreti. Il materiale originale usa MIT.
 
 ---
 
