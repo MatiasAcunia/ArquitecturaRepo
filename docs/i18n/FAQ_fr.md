@@ -48,7 +48,7 @@ Utilisez --language auto|en|es|pt|fr|de|it|ja|zh. Pour désactiver : enabled=fal
 
 ### 12. Quels tests et comment signaler une erreur ?
 
-v1.1 est stable ; v1.2 reste candidate avant validation physique indépendante. Ouvrez une Issue avec étapes reproductibles et journaux expurgés. Le contenu original est sous MIT.
+1.1.0 est stable ; v1.2 reste candidate avant validation physique indépendante. Ouvrez une Issue avec étapes reproductibles et journaux expurgés. Le contenu original est sous MIT.
 
 ---
 
