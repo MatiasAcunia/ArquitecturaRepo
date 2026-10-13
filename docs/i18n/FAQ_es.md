@@ -48,7 +48,7 @@ Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el i
 
 ### 12. ¿Qué está probado y cómo reporto errores?
 
-v1.1 es estable; v1.2 sigue siendo una candidata hasta pasar pruebas físicas independientes. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
+1.1.0 es estable; v1.2 sigue siendo una candidata hasta pasar pruebas físicas independientes. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
 
 ---
 
