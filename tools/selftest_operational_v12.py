@@ -94,7 +94,8 @@ def test_effect(tmp: Path) -> None:
     receipt = {"request_sha256": sha(request), "readback_verified": True,
                "external_receipt_sha256": "a" * 64}
     c = transition(tmp, "E1", "RECEIPT", proof=receipt)
-    assert c["phase"] == "RECEIPT_VERIFIED"
+    assert c["phase"] == "RECEIPT_ATTESTED_UNVERIFIED"
+    assert "verified_receipt" not in c
     must_fail(lambda: transition(tmp, "E1", "ATTEMPT"), ExternalEffectHold)
 
 
