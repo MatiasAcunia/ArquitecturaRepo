@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Crash-safe logical external-effect ledger; never performs an external effect.
 
-An actual provider adapter must supply independent readback. An ambiguous
+This ledger only records an asserted readback; it cannot validate provider truth.
+An actual authorized provider adapter must supply independent readback. An ambiguous
 request is NOT a license to retry. Uses the existing state_tx owner.
 """
 from __future__ import annotations
@@ -61,7 +62,7 @@ def transition(root: Path, effect_id: str, event: str, *,
                 "authorized_ref": authorized_ref,
                 "phase": "PREPARED",
                 "attempts": 0,
-                "verified_receipt": None,
+                "receipt_attestation": None,
             }
         elif old is None:
             raise ExternalEffectHold("EFFECT_NOT_PREPARED")
@@ -72,8 +73,8 @@ def transition(root: Path, effect_id: str, event: str, *,
             # Crash after this write is ambiguous until independently reconciled.
             new = {**old, "phase": "REQUESTED_AMBIGUOUS", "attempts": 1}
         elif event == "HOLD":
-            if old["phase"] == "RECEIPT_VERIFIED":
-                raise ExternalEffectHold("VERIFIED_EFFECT_CANNOT_BE_REOPENED")
+            if old["phase"] == "RECEIPT_ATTESTED_UNVERIFIED":
+                raise ExternalEffectHold("RECEIPT_ALREADY_ATTESTED")
             new = {**old, "phase": "HOLD_RECONCILIATION_REQUIRED"}
         elif event == "RECEIPT":
             if old["phase"] not in {"REQUESTED_AMBIGUOUS", "HOLD_RECONCILIATION_REQUIRED"}:
@@ -84,10 +85,10 @@ def transition(root: Path, effect_id: str, event: str, *,
                 not isinstance(proof.get("external_receipt_sha256"), str) or
                 not re.fullmatch(r"[a-f0-9]{64}", proof["external_receipt_sha256"])):
                 raise ExternalEffectHold("INDEPENDENT_EXACT_READBACK_REQUIRED")
-            # The caller must perform physical readback; this module records the
-            # assertion, not provider truth. Release requires adapter evidence.
-            new = {**old, "phase": "RECEIPT_VERIFIED",
-                   "verified_receipt": {k: proof[k] for k in
+            # Caller claims readback; this is NOT independent validation. A real
+            # adapter and immutable provider receipt remain a separate hard gate.
+            new = {**old, "phase": "RECEIPT_ATTESTED_UNVERIFIED",
+                   "receipt_attestation": {k: proof[k] for k in
                      ("request_sha256", "external_receipt_sha256", "readback_verified")}}
         else:
             raise ExternalEffectHold("UNSUPPORTED_EFFECT_TRANSITION")
