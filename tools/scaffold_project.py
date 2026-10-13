@@ -77,6 +77,12 @@ def create_scaffold(
     if not target.is_dir():
         raise ValueError(f"target is not a directory: {target}")
 
+    workflow_target = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+    if (workflow_target.is_symlink()
+        or (target / ".github").is_symlink()
+        or (target / ".github" / "workflows").is_symlink()):
+        raise ValueError("refuse symlinked managed workflow or workflow directory")
+
     control = target / control_dir_name
     if control.is_symlink():
         raise ValueError("refuse symlinked control directory (even with --force)")
@@ -104,12 +110,6 @@ def create_scaffold(
         if any(node.is_symlink() for node in control.rglob("*")):
             raise ValueError("--force refuses symlinks in the existing control layer")
         shutil.rmtree(control)
-    workflow_target = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
-    if (workflow_target.is_symlink()
-        or (target / ".github").is_symlink()
-        or (target / ".github" / "workflows").is_symlink()):
-        raise ValueError("refuse symlinked managed workflow or workflow directory")
-
     profile = PROFILES[profile_name]
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     version = MANIFEST["version"]
@@ -984,7 +984,7 @@ def main() -> int:
 
     try:
         control = create_scaffold(
-            target=Path(args.target).resolve(),
+            target=Path(args.target).absolute(),
             control_dir_name=args.control_dir,
             profile_name=args.profile,
             product_id=args.product_id,
