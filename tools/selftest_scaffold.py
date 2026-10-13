@@ -286,6 +286,21 @@ def main() -> int:
             if linked.returncode == 0:
                 raise AssertionError("scaffold must refuse symlinked project roots")
 
+        live_project = base / "small"
+        live_control = live_project / ".agentic-sdlc"
+        current_product = live_control / "state" / "PRODUCT_STATE_CURRENT.json"
+        original = current_product.read_text(encoding="utf-8")
+        modified_product = json.loads(original)
+        modified_product["status"] = "ACTIVE"
+        current_product.write_text(json.dumps(modified_product), encoding="utf-8")
+        unsafe_live = run(str(SCAFFOLD), "--target", str(live_project),
+                          "--profile", "SMALL", "--product-id", "TEST", "--force")
+        if unsafe_live.returncode == 0:
+            raise AssertionError("--force removed live Product State")
+        if json.loads(current_product.read_text(encoding="utf-8"))["status"] != "ACTIVE":
+            raise AssertionError("blocked --force nevertheless mutated the Product State")
+        current_product.write_text(original, encoding="utf-8")
+
         linked_control_project = base / "linked-control"
         linked_control_project.mkdir()
         (linked_control_project / ".agentic-sdlc").symlink_to(
