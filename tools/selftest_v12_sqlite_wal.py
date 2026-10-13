@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from contextlib import closing
 import json
 import sqlite3
 import tempfile
@@ -89,8 +90,9 @@ def main() -> int:
         # A normal non-WAL live SQLite DB also needs an application-level
         # consistent witness; a bare file hash is not a safe universal gate.
         legacy=control/"state"/"legacy.sqlite"
-        with sqlite3.connect(legacy) as plain:
+        with closing(sqlite3.connect(legacy)) as plain:
             plain.execute("CREATE TABLE records(id INTEGER PRIMARY KEY)")
+            plain.commit()
         from sqlite_currentness import inspect_store
         assert "SQLITE_CONSISTENT_SNAPSHOT_REQUIRED" in inspect_store(
             legacy,{"required":True,"ref":"state/legacy.sqlite","sha256":sha(legacy)}
