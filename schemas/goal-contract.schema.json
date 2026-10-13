@@ -84,6 +84,11 @@
         "sha256": {
           "type": "string",
           "pattern": "^[a-f0-9]{64}$"
+        },
+        "sqlite_snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Hash of read-only SQLite backup including WAL; not a host execution permit."
         }
       }
     }

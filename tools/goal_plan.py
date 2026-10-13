@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from goal_guard import goal_fingerprint, read, confined, file_sha, GoalGuardError
+from sqlite_currentness import inspect_store
 from state_tx import state_lock, write_json_set
 
 
@@ -41,6 +42,9 @@ def update(control: Path, *, expected_revision: int, plan: dict,
                     raise TacticalPlanError("PLAN_CANONICAL_STORE_MISSING")
                 if "sha256" in source and file_sha(store) != source["sha256"]:
                     raise TacticalPlanError("PLAN_CANONICAL_STORE_CHANGED")
+                failures = inspect_store(store, source)
+                if failures:
+                    raise TacticalPlanError("PLAN_CANONICAL_STORE_HOLD:" + ",".join(failures))
         except GoalGuardError as exc:
             raise TacticalPlanError("PLAN_GOAL_INTEGRITY_HOLD:" + str(exc)) from None
         current_path = control / "runtime" / "TACTICAL_PLAN_CURRENT.json"

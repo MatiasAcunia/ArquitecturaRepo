@@ -14,6 +14,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from sqlite_currentness import inspect_store
+
 
 SCHEMA = "agentic-goal-contract-v1"
 PLAN_SCHEMA = "agentic-tactical-plan-v1"
@@ -132,8 +134,12 @@ def assess(control: Path) -> dict[str, Any]:
             store_ref = confined(control, store["ref"])
             if not store_ref.is_file() or store_ref.stat().st_size == 0:
                 failures.append("CANONICAL_STORE_MISSING")
-            elif "sha256" in store and file_sha(store_ref) != store["sha256"]:
-                failures.append("CANONICAL_STORE_IDENTITY_STALE")
+            else:
+                if "sha256" in store and file_sha(store_ref) != store["sha256"]:
+                    failures.append("CANONICAL_STORE_IDENTITY_STALE")
+                # A bare database-file hash can remain unchanged while
+                # committed transactions exist only in SQLite WAL.
+                failures.extend(inspect_store(store_ref, store))
         if not plan_path.is_file():
             failures.append("TACTICAL_PLAN_MISSING")
         else:

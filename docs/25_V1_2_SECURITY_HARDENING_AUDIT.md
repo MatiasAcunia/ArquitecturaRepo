@@ -68,3 +68,10 @@ A custom `--control-dir` previously installed successfully but left the monthly 
 ## Goal integrity applies at Plan revision too
 
 The diagnostic Goal guard already identified stale charter/authority files, but the tactical Plan writer formerly only compared the stored Goal document fingerprint. A changed charter could therefore be followed by a new local Plan revision until the separate guard ran again. The writer now checks each exact authority reference and any required canonical store before committing a Plan update, and refuses stale/missing references without incrementing the revision. This local invariant does not establish a real pre-dispatch Codex host hook or remote currentness; those remain physical HOLD gates.
+
+## L3 follow-up: SQLite WAL currentness
+
+L3 reported that a bare SHA-256 of the SQLite main database file can miss committed transactions in an active WAL. The optional canonical-store Goal contract now accepts `sqlite_snapshot_sha256`, derived from the SQLite online-backup API on a read-only connection. It is a digest of an ephemeral, transactionally consistent snapshot (including WAL), not of the `-shm` file or merely the main `.sqlite` file. A nonempty WAL with no pinned snapshot produces `SQLITE_WAL_CURRENTNESS_UNBOUND`, and a changed snapshot produces `SQLITE_SNAPSHOT_STALE`; Goal diagnostics and tactical Plan revisions both HOLD. All tests use a tiny disposable database and no external provider or production asset.
+
+These guards cannot authenticate the origin of a user-supplied digest or attest an actual Codex Desktop invocation. A busy/oversized/protected SQLite store, an absent canonical database, uncertain WAL read permission or missing independent authority remains HOLD. Run the audit on an explicitly authorized source copy for protected products. The origin DB must never be replaced by a fabricated fixture to obtain a PASS.
+
