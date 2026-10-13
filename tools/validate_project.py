@@ -34,6 +34,7 @@ SCHEMA_BY_VERSION = {
     "architecture-feedback-report-0.1": "architecture-feedback-report.schema.json",
     "v1-release-criteria-0.1": "v1-release-criteria.schema.json",
     "workspace-lifecycle-0.1": "workspace-lifecycle.schema.json",
+    "artifact-ledger-v1": "artifact-ledger.schema.json",
 }
 
 GATE_TO_EVIDENCE_KEY = {

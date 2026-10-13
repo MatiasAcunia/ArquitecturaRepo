@@ -217,7 +217,18 @@ def _populate_staging_project(
     copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
     copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
     copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
+    copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
+    # Persistent local operational index, not a second Product State or DB.
+    # No deletion owner is inferred until a new scratch root is registered.
+    write_json(control / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json", {
+        "schema_version": "artifact-ledger-v1",
+        "revision": 0,
+        "created_at": now,
+        "updated_at": now,
+        "roots": {},
+        "files": {},
+    })
     preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
     preferences.update(execution_mode=execution_mode, collaboration=collaboration,
                        work_scope=work_scope, project_type=project_type)
@@ -774,6 +785,11 @@ I4 workers do not create canonical commits by default. I3/controller owns ordina
 With a trusted local baseline, refresh remote state delta-first; do not default to git pull, reclone or reread of the entire repository.
 
 System-created local workspaces should be lifecycle-marked and cleaned only through explicit safe-delete authority.
+All generated samples, temporary files and test outputs must use a
+new system-owned scratch root and tools/artifact_ledger.py capture/reconcile
+where the CLI controls their producer. Persist its JSON file across sessions.
+Unregistered, modified and protected files are never auto garbage.
+Unwrapped host writes are not yet intercepted and require separate audit.
 """
     write_text(control / "AGENTS.md", agents)
 
@@ -992,6 +1008,19 @@ python {control_dir_name}/tools/validate_project.py --root .
 - this selection is NOT current Product State or authority, and cannot grant background work.
 - canonical CLIENT intent remains in state/CLIENT_REQUIREMENTS_CURRENT.md,
   state/PRODUCT_STATE_CURRENT.json and governance/PROJECT_OVERLAY.md.
+
+## File lifecycle and safe GC
+
+The persistent local runtime/ARTIFACT_LIFECYCLE_CURRENT.json records owned
+scratch outputs with owner, campaign, category, hash, retention and delete
+permission. It is NOT a global DB or a second Product State.
+Use python {control_dir_name}/tools/artifact_ledger.py --project .
+--control-dir {control_dir_name} init-root --root
+.agentic-sdlc-scratch/campaign --owner I3 --campaign CAMPAIGN to claim a fresh
+output root, then route generators via capture. Reconcile after interruption.
+The gc command is read-only by default; gc --execute only removes exact,
+expired, ignored, owned rebuildables/temporaries, never unknown/DB/source.
+Unwrapped IDE/host writes still need real host integration and Git review.
 
 ## Architecture feedback
 

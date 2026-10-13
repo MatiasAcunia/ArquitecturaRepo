@@ -77,6 +77,12 @@
       "required": true,
       "proof": "Semantically reconcile any uncommitted L3 source patches against latest remote HEAD; audit applied diff and run full CI on identical final candidate; do not equate prior remote CI with local source tree",
       "status": "L3_LOCAL_CANDIDATE_UNCOMMITTED"
+    },
+    {
+      "id": "ARTIFACT_FILE_LIFECYCLE_AND_GC",
+      "required": true,
+      "proof": "Project-local JSON file inventory persists across I3 invocations; real producer capture or explicitly scoped reconciliation registers files, GC blocks unknown/canonical/Git/DB and stale identities; Windows physical crash/recovery and disk-readback evidence required for advertised automatic host coverage.",
+      "status": "SOURCE_CANDIDATE_TEST_PENDING__PHYSICAL_HOST_HOLD"
     }
   ]
 }

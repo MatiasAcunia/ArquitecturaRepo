@@ -94,6 +94,7 @@ def main() -> int:
                 "repo_delta.py",
                 "commit_guard.py",
                 "workspace_gc.py",
+                "artifact_ledger.py",
                 "baseline_guard.py",
                 "project_status.py",
                 "architecture_feedback.py",
@@ -107,11 +108,17 @@ def main() -> int:
                 "state/DELIVERY_PLAN_CURRENT.json",
                 "governance/AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md",
                 "feedback/ARCHITECTURE_FEEDBACK_CONFIG.json",
+                "runtime/ARTIFACT_LIFECYCLE_CURRENT.json",
             ):
                 if not (control / baseline_surface).exists():
                     raise AssertionError(
                         f"{profile}: baseline surface missing: {baseline_surface}"
                     )
+            inventory = json.loads(
+                (control / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json").read_text(encoding="utf-8")
+            )
+            if inventory["schema_version"] != "artifact-ledger-v1" or inventory["files"] or inventory["roots"]:
+                raise AssertionError(f"{profile}: fresh lifecycle inventory must be empty and unowned")
             baseline_guard = run(
                 str(control / "tools" / "baseline_guard.py"),
                 "--control-root",

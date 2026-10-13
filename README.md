@@ -26,6 +26,8 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 ## Stabilization and release planning
 
+- [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
+
 - [CLIENT capability-truth inventory and post-release integration design](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — proposals and falsifiers, not current execution or release authority.
 
 - [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
