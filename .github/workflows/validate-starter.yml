@@ -118,3 +118,7 @@ jobs:
         run: python tools/selftest_v12_setup.py
       - name: Verify cross-process plan and external-effect restart
         run: python tools/selftest_v12_longitudinal.py
+      - name: Verify SQLite WAL logical currentness under Windows file locks
+        run: python tools/selftest_v12_sqlite_wal.py
+      - name: Verify existing governed source attachment is read-only
+        run: python tools/selftest_v12_attachment.py

@@ -19,6 +19,11 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
 
+## Governed existing projects / SQLite WAL (v1.2 candidate)
+
+- [Read-only existing-governance attachment preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md) checks pinned source owners without installing a second Product State or I3; **it does not authorize material attachment**.
+- SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. Real DB currentness and native host gates still require physical verification.
+
 ## Stabilization and release planning
 
 - [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
