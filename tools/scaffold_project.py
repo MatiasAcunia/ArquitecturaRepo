@@ -89,7 +89,8 @@ def create_scaffold(
     low = control_dir_name.lower()
     device_stem = low.split(".", 1)[0]
     if (low in {".git", ".github", ".svn", ".hg", ".vscode", ".idea"}
-        or control_dir_name != control_dir_name.strip(" .")
+        or control_dir_name != control_dir_name.rstrip(" .")
+        or control_dir_name.startswith(" ")
         or device_stem in {"con", "prn", "aux", "nul"}
         or device_stem in {"com" + str(i) for i in range(1, 10)}
         or device_stem in {"lpt" + str(i) for i in range(1, 10)}):
