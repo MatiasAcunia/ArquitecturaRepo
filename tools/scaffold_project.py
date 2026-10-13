@@ -957,6 +957,9 @@ Do not claim installation success until the fresh-context probe has been exercis
 """
     if selected_lang != "en":
         localized = (control / "docs" / "i18n" / f"README_{selected_lang}.md").read_text(encoding="utf-8")
+        localized = localized.replace(f"(FAQ_{selected_lang}.md)",
+                                      f"(docs/i18n/FAQ_{selected_lang}.md)")
+        localized = localized.replace("(../../README.md)", "(README.md)")
         readme = localized + "\n---\n\n" + readme
     write_text(control / "README.md", readme)
 
