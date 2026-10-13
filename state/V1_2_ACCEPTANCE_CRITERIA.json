@@ -58,7 +58,25 @@
       "id": "INDEPENDENT_TRANSFER_AND_RELEASE",
       "required": true,
       "proof": "one independent unrelated adoption, exact-head CI and separate host/human gates",
-      "status": "NOT_YET_PROVEN"
+      "status": "L3_REPORTED_TRANSFER_HOLD__FULL_REPORT_NOT_READBACK"
+    },
+    {
+      "id": "EXISTING_GOVERNED_ATTACHMENT",
+      "required": true,
+      "proof": "L3 must attach to a governed existing project without duplicating CURRENT owners, authority, or active I3; read-only map preflight is insufficient; exact private report and source-bound independent transfer evidence",
+      "status": "LOCAL_READ_ONLY_PREFLIGHT_ONLY"
+    },
+    {
+      "id": "SQLITE_WAL_CURRENTNESS",
+      "required": true,
+      "proof": "Canonical DB currentness includes committed WAL via a transactionally consistent pinned snapshot; test stale WAL and restore on authorized disposable DB plus independent reviewer",
+      "status": "CODE_CI_PENDING__PHYSICAL_L3_HOLD"
+    },
+    {
+      "id": "LOCAL_CANDIDATE_EXACT_CI",
+      "required": true,
+      "proof": "Semantically reconcile any uncommitted L3 source patches against latest remote HEAD; audit applied diff and run full CI on identical final candidate; do not equate prior remote CI with local source tree",
+      "status": "L3_LOCAL_CANDIDATE_UNCOMMITTED"
     }
   ]
 }
