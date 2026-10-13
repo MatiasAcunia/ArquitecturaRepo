@@ -25,11 +25,15 @@ def recovery_actions(tasks: list[dict[str, Any]], *,
     ids = [x.get("id") for x in tasks]
     if any(not isinstance(x, str) or not x for x in ids) or len(set(ids)) != 5:
         raise OwnerTaskError("EXACTLY_FIVE_UNIQUE_TASK_IDS_REQUIRED")
-    explicit = client_disabled or set()
+    client_authority_verified = client_disabled is not None
+    explicit = set(client_disabled or set())
     actions = []
     held = []
     for row in tasks:
         if row["role"] == subject_role or row.get("is_enabled") is True:
+            continue
+        if not client_authority_verified:
+            held.append({"role": row["role"], "reason": "CLIENT_SUSPENSION_AUTHORITY_UNVERIFIED"})
             continue
         if row["id"] in explicit or row.get("suspension_source") in ("CLIENT", "PLATFORM", "SECURITY"):
             held.append({"role": row["role"], "reason": "EXPLICIT_OR_PLATFORM_SUSPENSION"})
@@ -42,7 +46,8 @@ def recovery_actions(tasks: list[dict[str, Any]], *,
             "scope_roles": list(ROLES), "subject_role": subject_role,
             "actions": actions, "held": held,
             "requires_scheduler_readback": bool(actions),
-            "actual_recovery_verified": False}
+            "actual_recovery_verified": False,
+            "client_suspension_authority_verified": client_authority_verified}
 
 
 if __name__ == "__main__":
