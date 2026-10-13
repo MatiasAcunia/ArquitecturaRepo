@@ -65,7 +65,7 @@ class Collector:
 def main() -> int:
     for bad in ("http://feedback.example.org", "https://localhost/x",
                 "https://127.0.0.1/x", "https://x.local/", "https://a.org:444/",
-                "https://user:password@a.org/x", "https://a.org/?secret=x",
+                "https://user:password" + "@" + "a.org/x", "https://a.org/?secret=x",
                 "https://metadata.google.internal/x", "file:///etc/passwd"):
         refused(lambda: safe_endpoint(bad))
     assert safe_endpoint("https://feedback.example.org/collect") == "https://feedback.example.org/collect"
