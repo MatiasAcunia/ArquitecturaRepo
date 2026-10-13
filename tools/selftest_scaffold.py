@@ -79,6 +79,12 @@ def main() -> int:
                 raise AssertionError(f"{profile}: missing selected optional protocol")
             if profile_state.get("runtime_enabled") is not False:
                 raise AssertionError(f"{profile}: runtime must remain opt-in")
+            skill = control / "skills" / "cleangarbage" / "SKILL.md"
+            if not skill.is_file() or "/cleangarbage" not in skill.read_text(encoding="utf-8"):
+                raise AssertionError(f"{profile}: L3 cleanup skill missing")
+            agents_content = (control / "AGENTS.md").read_text(encoding="utf-8")
+            if "/cleangarbage" not in agents_content or "primary owner" not in agents_content:
+                raise AssertionError(f"{profile}: L3 cleanup responsibility missing")
             if not (control / "tools" / "validate_project.py").exists():
                 raise AssertionError(f"{profile}: copied validator missing")
             if not (control / "requirements-validation.txt").exists():

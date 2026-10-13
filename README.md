@@ -26,6 +26,8 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 ## Stabilization and release planning
 
+- L3-managed `/cleangarbage` workflow: [the cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). It accepts this as a natural-language instruction; a native slash-menu entry is not claimed until host verification.
+
 - [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
 
 - [CLIENT capability-truth inventory and post-release integration design](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — proposals and falsifiers, not current execution or release authority.

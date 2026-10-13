@@ -218,6 +218,7 @@ def _populate_staging_project(
     copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
     copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
     copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
+    copy_file(ROOT / ".agents" / "skills" / "cleangarbage" / "SKILL.md", control / "skills" / "cleangarbage" / "SKILL.md")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
     copy_file(ROOT / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md", control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md")
     # Persistent local operational index, not a second Product State or DB.
@@ -796,6 +797,14 @@ new system-owned scratch root and tools/artifact_ledger.py capture/reconcile
 where the CLI controls their producer. Persist its JSON file across sessions.
 Unregistered, modified and protected files are never auto garbage.
 Unwrapped host writes are not yet intercepted and require separate audit.
+L3/I3 is the primary owner of the persistent JSON file inventory. For all
+material source changes, retain Git HEAD/status evidence; for generated
+samples, use artifact_ledger.py capture and reconciliation before/after runs.
+On /cleangarbage, load skills/cleangarbage/SKILL.md: check Git and JSON,
+reconcile registered roots, review file classifications, dry-run, reclaim
+only previously authorized exact-safe disposable files, read back disk space.
+Do not promise native slash-menu registration until tested on this Codex host.
+
 """
     write_text(control / "AGENTS.md", agents)
 
