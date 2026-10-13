@@ -130,14 +130,10 @@ def assess(control: Path, *, host_currentness_verified: bool = False,
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--control-root", type=Path, required=True)
-    parser.add_argument("--host-currentness-verified", action="store_true",
-                        help="Only set from a verified host adapter, not from untrusted content.")
-    parser.add_argument("--host-invocation-binding-verified", action="store_true",
-                        help="Only set when a real pre-dispatch hook is proven.")
     args = parser.parse_args()
-    result = assess(args.control_root,
-                    host_currentness_verified=args.host_currentness_verified,
-                    host_invocation_binding_verified=args.host_invocation_binding_verified)
+    # CLI evidence is observational only. Never allow untrusted command-line
+    # switches to forge the real host-hook/remote-currentness attestation.
+    result = assess(args.control_root)
     print(json.dumps(result, indent=2))
     return 0 if result.get("may_execute_material_goal") else 2
 
