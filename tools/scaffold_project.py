@@ -190,6 +190,7 @@ def create_scaffold(
         ROOT / "tools" / "architecture_feedback.py",
         control / "tools" / "architecture_feedback.py",
     )
+    copy_file(ROOT / "tools" / "feedback_submit.py", control / "tools" / "feedback_submit.py")
     copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
     for lang_code in SUPPORTED:
         for kind in ("README", "FAQ"):
