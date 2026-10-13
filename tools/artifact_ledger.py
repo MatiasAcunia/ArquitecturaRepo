@@ -477,7 +477,7 @@ def main():
         print(json.dumps(result, indent=2, sort_keys=True))
         return result.get("exit_code") or 0
     except (LedgerHold, OSError, ValueError, subprocess.SubprocessError) as e:
-        reason = str(e) if isinstance(e, LedgerHold) else "UNVERIFIED_FILESYSTEM_OPERATION"
+        reason = (str(e) if isinstance(e, LedgerHold) else "OS_OR_RUNTIME_" + type(e).__name__ + (("_" + str(e.errno)) if isinstance(e, OSError) and e.errno is not None else ""))
         print(json.dumps({"status": "HOLD", "failure_codes": [reason]}, indent=2))
         return 2
 
