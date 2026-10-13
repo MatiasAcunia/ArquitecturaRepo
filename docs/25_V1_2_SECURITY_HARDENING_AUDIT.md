@@ -1,0 +1,46 @@
+# v1.2 Security & Robustness Audit — candidate, not a release
+
+Date: 2026-10-13. Owner: starter repository. Scope: the v1.2 development PR and inherited v1.1 mechanics. This is a threat model + code/CI hardening ledger, **not** an independent penetration test, Windows deployment certificate, provider audit or general-purpose proof of safety.
+
+## Audit goals
+
+No accidental Product State replacement, privilege escalation, external paid action, data exfiltration, stale writer acceptance, fabricated receipt, duplicate external effect, incorrect Goal continuation, in-band reviewer acceptance, irreversible cleanup or upgrade incompatibility. Controls must be proportional to profile; the smallest profile must not quietly install resident supervisors or enabled LLM calls.
+
+## Findings and present dispositions
+
+| Severity | Finding / falsifier | Candidate disposition | Acceptance boundary |
+|---|---|---|---|
+| HIGH | Scaffold --control-dir could escape project root; --force could delete an unexpected folder | Restrict to a safe child, reject symlinks and unrecognized pre-existing control layer, with adversarial preservation tests | A *live* control directory is not upgraded by --force; use explicit migration, confirm no destructive state path |
+| HIGH | Local Goal diagnostic accepted caller-supplied host-verified flags and could appear to grant execution authority | Removed forgeable CLI/argument path; the library now always returns may_execute_material_goal=false absent a separately verified host adapter | Real Codex Goal hook and remote currentness proof remain BLOCKED |
+| HIGH | External effect record called a caller-asserted provider receipt VERIFIED | Changed to RECEIPT_ATTESTED_UNVERIFIED; idempotency and ambiguous timeout still HOLD | Actual provider readback and source identity must be demonstrated |
+| HIGH | Generated/constructed feedback metadata might leak through arbitrary status strings or keys | Allowlist exporter fields, validate outgoing schema and enum keys, reject unrecognized value/key, no raw collector response logging | External collector receipt/real user consent remains independent |
+| HIGH | Outbound feedback could treat HTTP success as delivery, echo arbitrary response or accept redirects | Two-key explicit opt-in + HTTPS-only host + bounded JSON schema + exact report SHA receipt, no content echo | Authenticated/authorized collector identity and real reception remain unproven |
+| MEDIUM | Mutable third-party GitHub Action tags could change content | Pin checkout/setup-python/upload-artifact to exact reviewed upstream commits and disable persisted checkout credentials | Recheck upstream SHA, update dependencies with review |
+| MEDIUM | Gemini transport might be activated by a mere API key or unsafe model name | Require explicit AGENTIC_SDLC_GEMINI_ENABLED=true; restrict model name, request timeout and response size; no private data by default | Account/quota/data policy/real Goal consumption remain unproven |
+| MEDIUM | Context resets/long tactical plans can drift from authorized Goal | Goal->charter exact digest + versioned I3 plan + revision conflict + active-progress review due; fresh Goal changes HOLD | Current host invocation and active-time accounting must be physical |
+| MEDIUM | Stale mutator runs and self-review could falsely certify own output | Optional epoch-fenced local critical section, exact frozen candidate/source hash and reviewer separation | Never substitute for system physical gates or host-level permissions |
+| MEDIUM | Optional five-task OWNER config could override deliberate pauses | Pure recovery policy includes explicit CLIENT/platform/safety suspension holds and no extra supervisor | Scheduling/reads/writes are not implemented by this policy |
+| LOW | Language UI could claim GitHub README geo-locale auto-routing | Static explicit 8-language links; local OS/--language detection; fallback to English; offline docs | Translated *intro/FAQ* coverage, not translation of every technical protocol |
+
+## Defense-in-depth suites
+
+- Existing v1.1: schema/ownership/currentness/adoption, six profiles, transaction journal/crash recovery, independent review and shared state primitive.
+- v1.2 operational: impossible synthetic Goal host PASS, changed-source/charter hold, source traversal rejection, tactical revision conflict, external-effect duplicate dispatch block, stale I4 advice, bounded Gemini opt-in, actor fencing, exact reviewer/source binding.
+- v1.2 scaffolding: path traversal, nonstarter --force refusal, symlink rejection, no unrequested SMALL I4/OWNER deployment.
+- v1.2 i18n: explicit and OS-locale resolution, unsupported override errors, fallback, offline docs existence, consistent FAQ questions across eight languages.
+- v1.2 feedback: disabled-by-default external transport, safe HTTPS endpoint, wrong/missing digest refusal, unexpected status, schema-invalid payload, free-text metadata keys and status-value exfil tests.
+- All candidate gates are run on the exact commit by GitHub Actions. Run/test screenshots, successful earlier SHA, or the user-facing PASS string do **not** count as evidence for a later SHA.
+
+## Open / blocked items — do not promote
+
+1. Codex Desktop **2.0.2** native Goal Resume, context re-anchor and daily close transport must be tested on the user's authorized disposable Windows pilot, including active-writer HOLD, quota truth, cloud readback and rollback. Do not touch active workstream Goals.
+2. Gemini in a *real* continuing I3 Goal: verified export authority, quota, two distinct-evidence consultations, delivery, model consumption and falsifying test; read-only output cannot self-certify.
+3. The OWNER five-task pack needs actual provider scheduler installation, mutual recovery for exactly five IDs, explicit suspensions preserved and readbacks; fake task IDs are not acceptance.
+4. No default remote telemetry. Real collector receipt, HTTPS identity, opt-in installation UX, privacy guarantee and disable tests are needed before claiming central feedback.
+5. Security posture of real adopter applications: auth, backup, licensing, data retention, deployment exposure, code-specific tests and human/subjective gates are always project-owned.
+6. Current code still depends on Python/PyPI/GitHub runner supply chain; CI and SHA pins reduce but cannot eliminate that risk. No unrestricted auto-upgrade.
+7. The starter has not undergone an independent external code audit. Threat-model pass and synthetic tests are not equivalent to a penetration test.
+
+## Release verdict
+
+**DO NOT RELEASE 1.2.0** until all required physical gate IDs in state/V1_2_ACCEPTANCE_CRITERIA.json are individually accepted from exact immutable candidates. Keep the PR as draft; stable main remains 1.1.x. Do not let test-gate success replace host or product proof.
