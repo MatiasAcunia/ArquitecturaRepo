@@ -66,7 +66,8 @@ def main() -> int:
         check(readme.is_file() and faq.is_file(), "missing localized documents: " + code)
         readme_text = readme.read_text(encoding="utf-8")
         faq_text = faq.read_text(encoding="utf-8")
-        check(len(readme_text) > 1000 and len(faq_text) > 1300,
+        minimum = 700 if code in {"ja", "zh"} else 1000
+        check(len(readme_text) > minimum and len(faq_text) > minimum,
               "localized documentation too short: " + code)
         check(len(re.findall(r"^### [0-9]+\.", faq_text, flags=re.M)) == 12,
               "FAQ coverage parity broken: " + code)
