@@ -201,6 +201,23 @@ def test_consultation_ledger(tmp: Path) -> None:
     assert result["phase"] == "ADOPTED_PENDING_GATE"
 
 
+
+def test_new_schemas(root: Path) -> None:
+    from jsonschema import Draft202012Validator
+    schema_root = Path(__file__).resolve().parents[1] / "schemas"
+    pairs = (
+        (schema_root / "goal-contract.schema.json", root / "goal/state/GOAL_CONTRACT_CURRENT.json"),
+        (schema_root / "tactical-plan.schema.json", root / "goal/runtime/TACTICAL_PLAN_CURRENT.json"),
+        (schema_root / "external-effect.schema.json", root / "effect/runtime/external_effects/E1.json"),
+        (schema_root / "cognitive-consultation.schema.json", root / "consultation/runtime/cognitive_i4/C001.json"),
+    )
+    for schema_path, sample_path in pairs:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        instance = json.loads(sample_path.read_text(encoding="utf-8"))
+        Draft202012Validator(schema).validate(instance)
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="operational-v12-") as tmp:
         root = Path(tmp)
@@ -208,6 +225,7 @@ def main() -> int:
         test_effect(root / "effect")
         test_fencing_and_decision(root / "fencing")
         test_consultation_ledger(root / "consultation")
+        test_new_schemas(root)
         test_owner_pack()
         test_cognitive()
     print("OPERATIONAL V1.2 SYNTHETIC SELF-TEST PASSED")
