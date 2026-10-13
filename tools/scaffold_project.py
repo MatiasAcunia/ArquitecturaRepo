@@ -176,8 +176,14 @@ def create_scaffold(
         )
         for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py"):
             copy_file(ROOT / "tools" / tool, control / "tools" / tool)
+    if with_runtime:
+        for filename in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
+                         "CODEX_DAILY_CONTROL_ADAPTER_CONFIG.json"):
+            copy_file(ROOT / "templates" / filename, control / "templates" / filename)
     if profile_name == "MULTI_PRODUCT":
         copy_file(ROOT / "tools" / "owner_task_recovery.py", control / "tools" / "owner_task_recovery.py")
+        copy_file(ROOT / "templates" / "OWNER_FIVE_TASK_PACK.json",
+                  control / "templates" / "OWNER_FIVE_TASK_PACK.json")
 
     include_identity = any(
         item in profile["recommended_current_contracts"]
