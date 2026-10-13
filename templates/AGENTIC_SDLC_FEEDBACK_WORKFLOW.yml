@@ -3,7 +3,6 @@ name: Agentic SDLC architecture feedback
 
 on:
   schedule:
-    - cron: "23 4 * * 0"
     - cron: "41 4 1 * *"
   workflow_dispatch:
 
