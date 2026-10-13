@@ -64,3 +64,7 @@ In addition to the full Ubuntu v1.1/v1.2 suite, pull requests run a small Window
 ## Configurable control directory and managed workflow coupling
 
 A custom `--control-dir` previously installed successfully but left the monthly GitHub feedback workflow checking only the hardcoded default directory. The installer now derives that managed workflow's actual root from the *same* validated control directory argument, rejects unsafe shell-metacharacters and reserved names, and tests non-default roots. Existing user workflows remain preserved, not silently rewritten. No scheduled job is interpreted as an independently verified external receiver.
+
+## Goal integrity applies at Plan revision too
+
+The diagnostic Goal guard already identified stale charter/authority files, but the tactical Plan writer formerly only compared the stored Goal document fingerprint. A changed charter could therefore be followed by a new local Plan revision until the separate guard ran again. The writer now checks each exact authority reference and any required canonical store before committing a Plan update, and refuses stale/missing references without incrementing the revision. This local invariant does not establish a real pre-dispatch Codex host hook or remote currentness; those remain physical HOLD gates.

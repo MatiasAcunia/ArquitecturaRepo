@@ -141,6 +141,13 @@ def main() -> int:
                        "--control-root", str(control))
         assert stale.returncode == 2
         assert "AUTHORITY_REF_STALE" in json.loads(stale.stdout)["failure_codes"]
+        stale_plan = invoke(
+            str(control / "tools" / "goal_plan.py"), "--control-root", str(control),
+            "--expected-revision", "1", "--plan-file", str(plan_file),
+            "--active-minutes", "41", "--review-evidence-ref", "synthetic/stale-plan",
+        )
+        assert stale_plan.returncode == 2, stale_plan.stdout + stale_plan.stderr
+        assert "PLAN_AUTHORITY_REF_STALE_OR_MISSING" in stale_plan.stderr
         assert read(control / "runtime" / "TACTICAL_PLAN_CURRENT.json")["revision"] == 1
 
         # Reporter must be small, own project, no private event payload.

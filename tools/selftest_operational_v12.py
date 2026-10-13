@@ -56,6 +56,12 @@ def test_goal(tmp: Path) -> None:
     charter.write_text("changed charter")
     bad = assess(tmp)
     assert "AUTHORITY_REF_STALE" in bad["failure_codes"]
+    must_fail(lambda: update(
+        tmp, expected_revision=0,
+        plan={"steps": [{"id": "UNAUTHORIZED_STALE", "status": "READY"}]},
+        active_minutes=1, review_evidence_ref="synthetic-stale",
+    ), TacticalPlanError)
+    assert json.loads((tmp / "runtime" / "TACTICAL_PLAN_CURRENT.json").read_text())["revision"] == 0
     charter.write_text("authorized charter\n")
     (tmp / "state" / "canonical.sqlite").write_bytes(b"sqlite")
     goal["canonical_store"] = {"required": True, "ref": "state/canonical.sqlite",

@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from goal_guard import goal_fingerprint, read
+from goal_guard import goal_fingerprint, read, confined, file_sha, GoalGuardError
 from state_tx import state_lock, write_json_set
 
 
@@ -26,6 +26,23 @@ def update(control: Path, *, expected_revision: int, plan: dict,
     with state_lock(control):
         goal = read(control / "state" / "GOAL_CONTRACT_CURRENT.json")
         fingerprint = goal_fingerprint(goal)
+        # The Plan is not an invocation authorization. Even this local
+        # revision must not be persisted against a stale charter, an invalid
+        # Goal authority reference, or a missing required canonical store.
+        try:
+            for relative, expected_sha in goal["authority_refs"].items():
+                reference = confined(control, relative)
+                if not reference.is_file() or file_sha(reference) != expected_sha:
+                    raise TacticalPlanError("PLAN_AUTHORITY_REF_STALE_OR_MISSING")
+            if "canonical_store" in goal:
+                source = goal["canonical_store"]
+                store = confined(control, source["ref"])
+                if not store.is_file() or store.stat().st_size == 0:
+                    raise TacticalPlanError("PLAN_CANONICAL_STORE_MISSING")
+                if "sha256" in source and file_sha(store) != source["sha256"]:
+                    raise TacticalPlanError("PLAN_CANONICAL_STORE_CHANGED")
+        except GoalGuardError as exc:
+            raise TacticalPlanError("PLAN_GOAL_INTEGRITY_HOLD:" + str(exc)) from None
         current_path = control / "runtime" / "TACTICAL_PLAN_CURRENT.json"
         old = read(current_path) if current_path.is_file() else None
         old_revision = old["revision"] if old else -1
