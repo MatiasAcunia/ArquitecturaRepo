@@ -43,6 +43,12 @@ def main() -> int:
         git(project, "commit", "-m", "initial")
         ledger = project / ".agentic-sdlc" / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json"
         ledger.parent.mkdir(parents=True)
+        (ledger.parent / ".gitignore").write_text(
+            "ARTIFACT_LIFECYCLE_CURRENT.json\nARTIFACT_LIFECYCLE_CURRENT.json.lock\n",
+            encoding="utf-8",
+        )
+        git(project, "add", ".agentic-sdlc/runtime/.gitignore")
+        git(project, "commit", "-m", "fixture ignores local operational ledger")
         ledger.write_text(json.dumps(initial()), encoding="utf-8")
         observed = run(project, "observe-git")
         assert observed["status"] == "SOURCE_GIT_OBSERVED"
