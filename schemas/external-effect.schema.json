@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:external-effect:1.2",
+  "title": "External effect record with ambiguous outcomes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "effect_id",
+    "request_sha256",
+    "authorized_ref",
+    "phase",
+    "attempts",
+    "verified_receipt"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-external-effect-v1"
+    },
+    "effect_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "authorized_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "phase": {
+      "enum": [
+        "PREPARED",
+        "REQUESTED_AMBIGUOUS",
+        "HOLD_RECONCILIATION_REQUIRED",
+        "RECEIPT_VERIFIED"
+      ]
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "verified_receipt": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  }
+}
