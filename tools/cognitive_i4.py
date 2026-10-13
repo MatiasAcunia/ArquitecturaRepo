@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
@@ -44,8 +45,13 @@ def consult_public_or_synthetic(*, model: str, question: str,
         raise CognitiveHold("PRIVATE_DATA_EXPORT_NOT_AUTHORIZED")
     if not isinstance(question, str) or not (10 <= len(question) <= 4000):
         raise CognitiveHold("BOUNDED_QUESTION_REQUIRED")
-    if not isinstance(model, str) or not model or "/" in model:
+    if not isinstance(model, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{1,79}", model):
         raise CognitiveHold("INVALID_MODEL")
+    # Explicit local opt-in is separate from mere presence of a provider key.
+    if os.environ.get("AGENTIC_SDLC_GEMINI_ENABLED") != "true":
+        raise CognitiveHold("GEMINI_TRANSPORT_NOT_OPTED_IN")
+    if not (0 < timeout <= 30):
+        raise CognitiveHold("GEMINI_TIMEOUT_OUT_OF_BOUNDS")
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         raise CognitiveHold("GEMINI_API_KEY_NOT_CONFIGURED")
@@ -65,6 +71,8 @@ def consult_public_or_synthetic(*, model: str, question: str,
             data = json.loads(response.read(200000).decode("utf-8"))
     except (HTTPError, URLError, TimeoutError) as error:
         raise CognitiveHold("PROVIDER_UNAVAILABLE_OR_QUOTA:" + type(error).__name__) from None
+    if not isinstance(data, dict):
+        raise CognitiveHold("PROVIDER_RESPONSE_MALFORMED")
     candidates = data.get("candidates", [])
     if not candidates:
         raise CognitiveHold("PROVIDER_EMPTY_RESPONSE")
@@ -75,6 +83,8 @@ def consult_public_or_synthetic(*, model: str, question: str,
             raise ValueError()
     except (ValueError, KeyError, IndexError, TypeError):
         raise CognitiveHold("PROVIDER_RESPONSE_SCHEMA_INVALID") from None
+    if len(raw.encode("utf-8")) > 40000:
+        raise CognitiveHold("PROVIDER_PROPOSAL_TOO_LARGE")
     # Provider proposal remains NON_EXECUTABLE and UNCONSUMED.
     return {"schema_version": "cognitive-i4-proposal-v1", "status": "DELIVERY_PENDING",
             "source_classification": export_classification, "model": model,
