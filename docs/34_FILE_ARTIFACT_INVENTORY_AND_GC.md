@@ -116,3 +116,5 @@ The generated control runtime includes a local .gitignore for the per-file ledge
 ## L3 responsibility and /cleangarbage
 
 L3 maintains the JSON continuously; this is not a blind scheduled collector. A literal /cleangarbage message instructs L3 to follow the [cleangarbage skill](../.agents/skills/cleangarbage/SKILL.md): rebuild current Git/source evidence, reconcile every registered root, classify actual output, run GC dry-run, delete only protected-policy-authorized exact-safe files and read back reclaimed bytes. The skill is packaged in generated control as skills/cleangarbage/SKILL.md, and AGENTS.md specifies the invocation. Native Codex slash-menu registration is host-dependent and unproven; use explicit skill/text invocation if unavailable. The source tree outside the managed scratch roots remains governed by canonical Git/normal I3 review, not by this GC.
+
+The CLI also exposes `cleangarbage` as a semantic alias of `gc`. It is dry-run unless `--execute` is explicitly supplied by an authorized L3 after reconciliation and candidate review. This Python subcommand is real and tested; it is not a native Codex slash-menu command.

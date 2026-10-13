@@ -79,6 +79,7 @@ def main() -> int:
         data = json.loads(ledger.read_text(encoding="utf-8"))
         assert data["files"][root + "/sample.bin"]["safe_delete"]
         assert run(project, "gc")["ready_count"] == 1 and sample.exists()
+        assert run(project, "cleangarbage")["ready_count"] == 1 and sample.exists()
         assert run(project, "gc", "--execute")["deleted_count"] == 1
         assert not sample.exists()
         assert run(project, "gc", "--execute")["deleted_count"] == 0

@@ -404,7 +404,7 @@ def operate(a):
         data = load(path)
         return {"status": "PERSISTED", "revision": data["revision"],
                 "files": len(data["files"]), "roots": len(data["roots"])}
-    if a.action == "gc" and not a.execute:
+    if a.action in {"gc", "cleangarbage"} and not a.execute:
         return gc_plan(project, load(path))
     with locked(path):
         data = load(path)
@@ -496,7 +496,7 @@ def operate(a):
                          if a.ttl_hours is not None else None)
             save(path, data)
             return {"status": "CLASSIFIED", "path": name}
-        if a.action == "gc":
+        if a.action in {"gc", "cleangarbage"}:
             result = gc_plan(project, data)
             unregistered = set(result["unregistered_roots"])
             for row in result["rows"]:
@@ -552,6 +552,8 @@ def main():
     cls.add_argument("--ttl-hours", type=float)
     g = sub.add_parser("gc")
     g.add_argument("--execute", action="store_true")
+    clean = sub.add_parser("cleangarbage", help="L3-owned cleanup workflow: dry-run default")
+    clean.add_argument("--execute", action="store_true")
     a = p.parse_args()
     try:
         result = operate(a)
