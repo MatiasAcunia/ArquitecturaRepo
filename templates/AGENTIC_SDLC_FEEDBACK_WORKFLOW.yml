@@ -68,29 +68,22 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Optional external submission
+      - name: Optional external submission with verified hash receipt
         if: >-
           steps.generate.outputs.emitted == 'true' &&
           steps.generate.outputs.external_submission_enabled == 'true' &&
           vars.AGENTIC_SDLC_FEEDBACK_SUBMIT == 'true' &&
           vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT != ''
         env:
-          FEEDBACK_ENDPOINT: ${{ vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT }}
+          AGENTIC_SDLC_FEEDBACK_SUBMIT: ${{ vars.AGENTIC_SDLC_FEEDBACK_SUBMIT }}
+          AGENTIC_SDLC_FEEDBACK_ENDPOINT: ${{ vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT }}
         shell: bash
         run: |
-          response_file="$RUNNER_TEMP/agentic-feedback/collector-response.txt"
-          curl --fail-with-body --silent --show-error             --request POST             --header "Content-Type: application/json"             --data-binary @"$RUNNER_TEMP/agentic-feedback/report.json"             "$FEEDBACK_ENDPOINT" > "$response_file"
-          {
-            echo "### Agentic SDLC feedback submission"
-            echo
-            echo "External submission was explicitly enabled by both the control config and repository variables."
-            echo
-            echo "Collector response:"
-            echo '~~~'
-            head -c 2000 "$response_file"
-            echo
-            echo '~~~'
-          } >> "$GITHUB_STEP_SUMMARY"
+          CONTROL_ROOT="${{ steps.resolve.outputs.control_root }}"
+          python "$CONTROL_ROOT/tools/feedback_submit.py" \
+            --report "$RUNNER_TEMP/agentic-feedback/report.json" \
+            --config "$CONTROL_ROOT/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json" \
+            --schema "$CONTROL_ROOT/schemas/architecture-feedback-report.schema.json"
 
       - name: Privacy notice
         if: steps.generate.outputs.emitted == 'true'
