@@ -2,6 +2,8 @@
 
 The starter can generate recurring architecture-usage feedback without reading or exporting project content.
 
+The minimal monthly report is ON by default so the project owner can inspect structural adoption friction, error categories, recovery frequency and setup issues. This can help improve the starter architecture and organize engineering-process data. The report is stored in the adopter's own GitHub Actions artifacts; it is not silently delivered to the starter maintainer.
+
 ## Default behavior
 
 New scaffolds install a managed GitHub Actions workflow at:
@@ -15,12 +17,12 @@ and a project-local config at:
 Defaults:
 
 - feedback generation: enabled;
-- cadence: weekly;
+- cadence: monthly (automatically scheduled, where GitHub Actions schedules are active);
 - GitHub Actions artifact: enabled;
 - external submission: disabled;
 - privacy mode: `STRICT_METADATA_ONLY`.
 
-The workflow also has a monthly schedule. The exporter only emits on the schedule that matches the configured cadence. Manual runs always work.
+The managed workflow schedules one monthly run by default. The exporter emits only when the configured cadence matches its trigger; manual dispatch remains available. Users who prefer weekly feedback may configure their own schedule and cadence explicitly.
 
 ## What the report can contain
 
