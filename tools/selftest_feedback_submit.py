@@ -110,6 +110,21 @@ def main() -> int:
         rejected_transport = Collector()
         refused(lambda: submit(**request, opener=rejected_transport))
         assert rejected_transport.calls == 0, "Out-of-schema data leaked to HTTP collector"
+        # Valid JSON Schema is insufficient when a free-text dictionary key
+        # could smuggle private data through aggregated work-status counts.
+        safe = json.loads(transport.body.decode("utf-8"))
+        safe["runtime"]["work_status_counts"]["PRIVATE_SOURCE_KEY_DO_NOT_SEND"] = 1
+        report.write_text(json.dumps(safe), encoding="utf-8")
+        collision = Collector()
+        refused(lambda: submit(**request, opener=collision))
+        assert collision.calls == 0, "Free-text status key exfiltrated through metadata"
+        safe["runtime"]["work_status_counts"].pop("PRIVATE_SOURCE_KEY_DO_NOT_SEND")
+        safe["profile"] = "PRIVATE_PROJECT_ID"
+        report.write_text(json.dumps(safe), encoding="utf-8")
+        collision2 = Collector()
+        refused(lambda: submit(**request, opener=collision2))
+        assert collision2.calls == 0, "Free-text profile exfiltrated"
+
         report.write_bytes(b"{}")
         refused(lambda: submit(**request, opener=Collector()))
         report.write_bytes(b"0" * 33000)
