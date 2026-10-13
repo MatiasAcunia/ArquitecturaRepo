@@ -148,12 +148,16 @@ def test_fencing_and_decision(tmp: Path) -> None:
     path.write_text(json.dumps(authority))
     with fenced_local_write(tmp, actor_id="I3", run_id="RUN9", mutator_epoch=9):
         assert path.is_file()
-    must_fail(lambda: next(iter(fenced_local_write(tmp, actor_id="I3",
-              run_id="RUN8", mutator_epoch=8))), StaleMutatorHold)
+    def stale_run() -> None:
+        with fenced_local_write(tmp, actor_id="I3", run_id="RUN8", mutator_epoch=8):
+            raise AssertionError("Stale run was improperly authorized")
+    must_fail(stale_run, StaleMutatorHold)
     authority["current_mutator"] = None
     path.write_text(json.dumps(authority))
-    must_fail(lambda: next(iter(fenced_local_write(tmp, actor_id="I3",
-              run_id="RUN9", mutator_epoch=9))), StaleMutatorHold)
+    def revoked() -> None:
+        with fenced_local_write(tmp, actor_id="I3", run_id="RUN9", mutator_epoch=9):
+            raise AssertionError("Revoked authority was improperly authorized")
+    must_fail(revoked, StaleMutatorHold)
     candidate = bind_candidate(source_hashes={"source": "a" * 64},
                                payload={"decision": "example"}, author_actor="I3")
     must_fail(lambda: review(candidate, reviewer_actor="I3",
