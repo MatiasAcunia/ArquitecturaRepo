@@ -353,7 +353,7 @@ def inspect_git(project):
                   "--porcelain=v1", "-z", "--untracked-files=all")
     if current.returncode or len(current.stdout) > 2_000_000:
         raise LedgerHold("GIT_STATUS_UNVERIFIABLE_OR_OVERSIZE")
-    records = current.stdout.split(b"\\x00")
+    records = current.stdout.split(b"\x00")
     if records and records[-1] == b"":
         records.pop()
     if len(records) > 5000:
@@ -366,7 +366,7 @@ def inspect_git(project):
         filename = os.fsdecode(raw[3:])
         # Git porcelain -z keeps spaces and accents in file names verbatim.
         # Values are local-only evidence; never concatenate them into shell.
-        if not filename or filename.startswith(("/", "\\")) or "\\x00" in filename:
+        if not filename or filename.startswith(("/", "\\")) or "\x00" in filename:
             raise LedgerHold("GIT_STATUS_PATH_INVALID")
         changed.append({"status": status, "path": filename})
     return {"observed_at": stamp(now()), "head": revision, "changed": changed}
