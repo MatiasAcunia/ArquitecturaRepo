@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from i18n import SUPPORTED, choose_language
+
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "state" / "STARTER_MANIFEST.json").read_text(encoding="utf-8"))
 PROFILES = json.loads((ROOT / "profiles" / "profiles.json").read_text(encoding="utf-8"))["profiles"]
@@ -62,7 +64,9 @@ def create_scaffold(
     force: bool,
     with_runtime: bool,
     install_feedback_workflow: bool,
+    language: str = "auto",
 ) -> Path:
+    selected_lang, selection_source = choose_language(language)
     # Never allow a caller-provided control-dir to escape or replace the
     # project root. --force is legal only for a recognizable starter layer.
     if (not isinstance(control_dir_name, str)
@@ -186,6 +190,19 @@ def create_scaffold(
         ROOT / "tools" / "architecture_feedback.py",
         control / "tools" / "architecture_feedback.py",
     )
+    copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
+    for lang_code in SUPPORTED:
+        for kind in ("README", "FAQ"):
+            name = f"{kind}_{lang_code}.md"
+            copy_file(ROOT / "docs" / "i18n" / name,
+                      control / "docs" / "i18n" / name)
+    write_json(control / "docs" / "LANGUAGE_SELECTION.json", {
+        "schema_version": "starter-language-selection-v1",
+        "language": selected_lang,
+        "source": selection_source,
+        "supported": list(SUPPORTED),
+        "local_documentation_only": True,
+    })
     copy_file(
         ROOT / "templates" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
         control / "feedback" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
@@ -938,6 +955,9 @@ The managed workflow status for this installation is: {feedback_workflow_status}
 
 Do not claim installation success until the fresh-context probe has been exercised and the installation report is updated with physical evidence.
 """
+    if selected_lang != "en":
+        localized = (control / "docs" / "i18n" / f"README_{selected_lang}.md").read_text(encoding="utf-8")
+        readme = localized + "\n---\n\n" + readme
     write_text(control / "README.md", readme)
 
     return control
@@ -976,6 +996,11 @@ def main() -> int:
         help="Copy the optional campaign runtime/controller into the generated control layer.",
     )
     parser.add_argument(
+        "--language", default="auto",
+        choices=["auto", *sorted(SUPPORTED)],
+        help="Documentation language; auto detects system language. No remote locale tracking.",
+    )
+    parser.add_argument(
         "--no-feedback-workflow",
         action="store_true",
         help="Do not install the managed scheduled architecture-feedback GitHub Actions workflow.",
@@ -992,6 +1017,7 @@ def main() -> int:
             force=args.force,
             with_runtime=args.with_runtime,
             install_feedback_workflow=not args.no_feedback_workflow,
+            language=args.language,
         )
     except Exception as exc:
         print(f"SCAFFOLD FAILED: {exc}", file=sys.stderr)
