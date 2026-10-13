@@ -216,7 +216,20 @@ def validate_structure_only(errors: list[str]) -> None:
         rel = path.relative_to(ROOT)
         if EMAIL_RE.search(text):
             fail(f"possible personal email in public starter: {rel}", errors)
-        if SHA40_RE.search(text):
+        # Official immutable action pins are supply-chain controls, not
+        # project/source identity. Exception is limited to these two CI YAML
+        # surfaces and three official actions with semver comments.
+        checked = text
+        if rel.as_posix() in {
+            ".github/workflows/validate-starter.yml",
+            "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
+        }:
+            checked = re.sub(
+                r"(?m)^\\s*- uses: actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\\.[0-9]+\\.[0-9]+\\s*$",
+                "",
+                checked,
+            )
+        if SHA40_RE.search(checked):
             fail(f"40-char commit-like identifier in structure-only starter: {rel}", errors)
         if PRIVATE_KEY_RE.search(text):
             fail(f"private-key material detected: {rel}", errors)
