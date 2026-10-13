@@ -36,7 +36,7 @@ No accidental Product State replacement, privilege escalation, external paid act
 1. Codex Desktop **2.0.2** native Goal Resume, context re-anchor and daily close transport must be tested on the user's authorized disposable Windows pilot, including active-writer HOLD, quota truth, cloud readback and rollback. Do not touch active workstream Goals.
 2. Gemini in a *real* continuing I3 Goal: verified export authority, quota, two distinct-evidence consultations, delivery, model consumption and falsifying test; read-only output cannot self-certify.
 3. The OWNER five-task pack needs actual provider scheduler installation, mutual recovery for exactly five IDs, explicit suspensions preserved and readbacks; fake task IDs are not acceptance.
-4. No default remote telemetry. Real collector receipt, HTTPS identity, opt-in installation UX, privacy guarantee and disable tests are needed before claiming central feedback.
+4. Opt-out remote telemetry is default-intent only; without a configured approved collector there is NO actual remote delivery. A real receipt, recipient identity, visible first-run disclosure, privacy guarantee and disable tests are needed before claiming central feedback.
 5. Security posture of real adopter applications: auth, backup, licensing, data retention, deployment exposure, code-specific tests and human/subjective gates are always project-owned.
 6. Current code still depends on Python/PyPI/GitHub runner supply chain; CI and SHA pins reduce but cannot eliminate that risk. No unrestricted auto-upgrade.
 7. The starter has not undergone an independent external code audit. Threat-model pass and synthetic tests are not equivalent to a penetration test.

@@ -92,7 +92,7 @@ Recurring architecture feedback is process-improvement telemetry, not product au
 
 A new scaffold may enable local strict-metadata report generation by default, but the CLIENT must be told that it exists and how to disable it.
 
-External submission is different: it requires explicit CLIENT opt-in.
+External submission is a different trust boundary. Stable v1.1 requires explicit opt-in; v1.2 supports a disclosed, easily disabled opt-out preference only for strictly minimized reports with an approved collector actually present. Private, attributable or free-text data require explicit authorization. Missing collector means LOCAL_ONLY.
 
 Do not treat silence as permission to transmit outside the repository's normal GitHub Actions artifact storage.
 

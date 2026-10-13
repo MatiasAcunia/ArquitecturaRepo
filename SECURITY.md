@@ -17,7 +17,7 @@ For non-sensitive defects, open a GitHub Issue with a synthetic reproducible fix
 - Gemini I4 is disabled by default and must have explicit export permission, key, provider/data-use and quota verification.
 - OWNER five-task scheduling requires a real scheduler adapter and the user's installation authorization.
 - Codex Desktop, Windows and Codex Daily Control 2.0.2 are separate physical integration gates.
-- Monthly strict metadata-only feedback is ON by default in **the adopter's own** GitHub Actions; external sending is OFF unless separately authorized. See [privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+- Monthly strictly allowlisted feedback in **the adopter's own** GitHub Actions is ON by default. Opt-out external delivery is prepared only for a verified HTTPS collector, which is NOT bundled or currently configured. Users can disable local or outbound delivery before first scheduled run. See [privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 - Never run untrusted repository code with elevated privileges or grant unnecessary tokens to jobs.
 
 ## Verification before any 1.2 release

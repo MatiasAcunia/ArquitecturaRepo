@@ -215,6 +215,7 @@ def create_scaffold(
     copy_file(ROOT / "tools" / "project_setup.py", control / "tools" / "project_setup.py")
     copy_file(ROOT / "tools" / "branch_guard.py", control / "tools" / "branch_guard.py")
     copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
+    copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
     preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
     preferences.update(execution_mode=execution_mode, collaboration=collaboration,
                        work_scope=work_scope, project_type=project_type)
@@ -969,7 +970,7 @@ python {control_dir_name}/tools/validate_project.py --root .
 
 - execution: {execution_mode}; coordination: {collaboration}; work scope: {work_scope};
 - product category: {project_type};
-- configuration: configuration/OPERATING_PREFERENCES.json;
+- configuration: configuration/OPERATING_PREFERENCES.json; see docs/27_PROJECT_MODES_AND_STACK_SELECTION.md;
 - asynchronous and team operation require physical host, scheduler and authority gates;
 - this selection is NOT current Product State or authority, and cannot grant background work.
 - canonical CLIENT intent remains in state/CLIENT_REQUIREMENTS_CURRENT.md,

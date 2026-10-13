@@ -114,7 +114,7 @@ python tools/scaffold_project.py \
 
 Generated control layers carry their own schemas, validator and validation dependency declaration.
 
-New scaffolds also install a **monthly**, minimal architecture-feedback workflow by default. It generates only strict metadata and stores the report as a GitHub Actions artifact; external submission is disabled by default.
+New scaffolds generate a **monthly**, strictly allowlisted metadata report in their own GitHub Actions artifacts, enabled by default. The outbound preference is opt-out **if a verified collector URL is configured**; this candidate has no collector and cannot claim external delivery.
 
 Disable scheduling at install time with:
 
@@ -274,15 +274,15 @@ New scaffolds include `tools/architecture_feedback.py` and a managed scheduled w
 
 Default behavior:
 
-- weekly strict-metadata report;
+- monthly strict-metadata report;
 - GitHub Actions artifact retained for 30 days;
 - read-only repository permission;
-- no external submission;
+- external transmission only after configuring an approved collector; no collector is bundled;
 - no project/repository names, product ids, requirements text, code, paths, SHAs, free text, users, emails or credentials.
 
 The report contains only allowlisted enums, booleans and counters useful for improving the architecture: validation/currentness state, profile, owner/capability counts, baseline readiness, network exposure category, milestone/overdue counts and generic runtime retry/failure/HOLD/recovery counters.
 
-External submission requires both `external_submission_enabled=true` in the control config and explicit repository variables for submission + endpoint. The starter does not request a personal access token.
+Default external-feedback preference is opt-out once a valid HTTPS collector endpoint is configured. Users can disable outbound delivery with external_submission_enabled=false or repository variable AGENTIC_SDLC_FEEDBACK_SUBMIT=false. Without a collector URL, nothing leaves the adopter's normal GitHub Actions artifact storage. The starter requests no personal access token.
 
 See `docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md`.
 

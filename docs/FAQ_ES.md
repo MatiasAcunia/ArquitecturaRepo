@@ -74,7 +74,7 @@ La licencia permite adaptar el código, pero **eso no certifica seguridad ni pre
 
 ### 15. ¿El starter envía información de mi proyecto a alguien?
 
-La arquitectura no presupone que debas compartir el contenido del proyecto. En scaffolds nuevos, un workflow programado puede producir en **GitHub Actions** un reporte de metadatos estrictamente limitados y conservarlo como artifact; la **transmisión a un endpoint externo está deshabilitada por defecto**. La generación programada también se puede desactivar. No equivale a que el uso de modelos o servicios externos sea privado por definición: revisá los proveedores que elijas. Ver [configuración, contenido y opt-out](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+La arquitectura no presupone que debas compartir el contenido del proyecto. En scaffolds nuevos, un workflow programado puede producir en **GitHub Actions** un reporte de metadatos estrictamente limitados y conservarlo como artifact; **el envío externo necesita un receptor HTTPS aprobado, todavía no configurado**; con receptor comprobado, v1.2 usará una preferencia opt-out, con aviso visible y desactivación antes del primer envío. La generación programada también se puede desactivar. No equivale a que el uso de modelos o servicios externos sea privado por definición: revisá los proveedores que elijas. Ver [configuración, contenido y opt-out](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
 ## Documentación y colaboración
 
