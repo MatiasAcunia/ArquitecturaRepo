@@ -103,7 +103,10 @@ def test_owner_pack() -> None:
     rows = [{"role": role, "id": "T" + str(i), "is_enabled": False}
             for i, role in enumerate(ROLES)]
     rows[2]["suspension_source"] = "CLIENT"
-    actions = recovery_actions(rows, subject_role="Architecture")
+    unknown = recovery_actions(rows, subject_role="Architecture")
+    assert unknown["actions"] == []
+    assert unknown["client_suspension_authority_verified"] is False
+    actions = recovery_actions(rows, subject_role="Architecture", client_disabled=set())
     assert {item["id"] for item in actions["actions"]} == {"T0", "T3", "T4"}
     assert actions["actual_recovery_verified"] is False
     must_fail(lambda: recovery_actions(rows[:-1], subject_role="Architecture"), ValueError)
