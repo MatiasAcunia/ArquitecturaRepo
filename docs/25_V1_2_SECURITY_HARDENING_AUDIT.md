@@ -10,7 +10,7 @@ No accidental Product State replacement, privilege escalation, external paid act
 
 | Severity | Finding / falsifier | Candidate disposition | Acceptance boundary |
 |---|---|---|---|
-| HIGH | Scaffold --control-dir could escape project root; --force could delete an unexpected folder | Restrict to a safe child, reject symlinks and unrecognized pre-existing control layer, with adversarial preservation tests | A *live* control directory is not upgraded by --force; use explicit migration, confirm no destructive state path |
+| HIGH | Reinstallation could erase unsaved CLIENT theory while still in DRAFT | v1.2 refuses --force regardless of apparently dormant state; tests unchanged byte preservation | Use explicit versioned migrations or a fresh sandbox, never silent overwrite |
 | HIGH | Local Goal diagnostic accepted caller-supplied host-verified flags and could appear to grant execution authority | Removed forgeable CLI/argument path; the library now always returns may_execute_material_goal=false absent a separately verified host adapter | Real Codex Goal hook and remote currentness proof remain BLOCKED |
 | HIGH | External effect record called a caller-asserted provider receipt VERIFIED | Changed to RECEIPT_ATTESTED_UNVERIFIED; idempotency and ambiguous timeout still HOLD | Actual provider readback and source identity must be demonstrated |
 | HIGH | Generated/constructed feedback metadata might leak through arbitrary status strings or keys | Allowlist exporter fields, validate outgoing schema and enum keys, reject unrecognized value/key, no raw collector response logging | External collector receipt/real user consent remains independent |

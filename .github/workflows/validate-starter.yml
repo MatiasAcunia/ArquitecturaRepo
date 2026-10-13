@@ -78,5 +78,7 @@ jobs:
         run: python tools/selftest_v12_release_falsifiers.py
       - name: Falsify malformed CLIENT theory and stale baseline
         run: python tools/selftest_v12_theory_hardening.py
+      - name: Verify release plan and private L3 terminal intake
+        run: python tools/selftest_v12_stabilization.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py

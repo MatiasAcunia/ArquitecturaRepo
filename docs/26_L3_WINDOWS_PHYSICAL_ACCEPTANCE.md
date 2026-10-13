@@ -10,7 +10,7 @@ Before any mutation: capture exact branch/HEAD and CI, preserve active workstrea
 
 ## Pilot gates (each with real evidence)
 
-1. **Install and rollback**: clean Windows 10/PowerShell 5.1 fixture, synthetic project, parser/probe, check a failed upgrade restores prior state and doesn't follow symlinks or delete non-starter data.
+1. **Install and rollback**: clean Windows 10/PowerShell 5.1 fixture, synthetic project, parser/probe, verify a refused --force preserves unconfirmed CLIENT theory, and an explicitly authorized migration (if present) is separately tested; no generic overwrite.
 2. **Goals**: one disposable Goal with canonical charter and plan; initial and subsequent invocation reentry with live digest, exact remote and authority; reject changed/stale/missing theory, negative currentness and short-context reentry.
 3. **Tactical plan**: I3 uses its real planning tool when available, performs in-envelope DAG changes, journals checkpoints and notices an active-progress review due without terminating the campaign.
 4. **I4 Gemini**: public/synthetic minimal data only, verified nonbillable quota and provider policy, two distinct-evidence consultations delivered to the same Goal I3 and explicitly accepted/rejected with tests; failure/quota/timeout and injection falsifiers.

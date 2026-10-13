@@ -19,6 +19,13 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
 
+## Stabilization and release planning
+
+- [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
+- [L3 local evidence intake and independent review template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
+
+Version 1.2 forbids destructive scaffold `--force`; use a new isolated target or explicit reviewed migrations. Editable gate JSON and passing CI do not authorize product release.
+
 ## v1.2 operational candidate (not a released version)
 
 The isolated 1.2 development branch adds fail-closed Goal/invocation and tactical-plan controls, ambiguous external-effect receipts, bounded Gemini I4 consultation plumbing and optional five-task OWNER mutual-recovery policy. A physical Codex Goal host adapter, scheduler readback, collector delivery and independent release gates are still **NOT YET PROVEN**. Stable releases remain on 1.1 until those gates pass.
