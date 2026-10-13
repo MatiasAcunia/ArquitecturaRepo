@@ -9,6 +9,7 @@ The digest is local evidence and never grants host/CLIENT execution authority.
 from __future__ import annotations
 
 import hashlib
+from contextlib import closing
 import re
 import sqlite3
 import tempfile
@@ -56,11 +57,11 @@ def snapshot_sha256(path: Path) -> str:
     try:
         with tempfile.TemporaryDirectory(prefix="agentic-sqlite-snapshot-") as temp:
             output = Path(temp) / "currentness.sqlite"
-            with sqlite3.connect(path.resolve().as_uri() + "?mode=ro",
-                                 uri=True, timeout=2.0) as source:
+            with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro",
+                                         uri=True, timeout=2.0)) as source:
                 source.execute("PRAGMA query_only=ON")
                 source.execute("PRAGMA busy_timeout=2000")
-                with sqlite3.connect(output, timeout=2.0) as destination:
+                with closing(sqlite3.connect(output, timeout=2.0)) as destination:
                     attempts = [0]
                     def bounded_progress(status: int, remaining: int, total: int) -> None:
                         attempts[0] += 1
