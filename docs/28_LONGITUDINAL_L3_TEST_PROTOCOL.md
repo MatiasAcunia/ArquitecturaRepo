@@ -40,3 +40,7 @@ Checkpoint at every material handoff/interruption; daily close produces one cons
 For each gate classify PASS / FAIL / HOLD / NOT_APPLICABLE with exact evidence. Missing or simulated integrations must remain HOLD. Submit one sanitized L3 report with findings grouped by systemic root cause, impact, reproduction and proposed minimal next implementation. Do not create a new branch for each bug; fix within the same candidate and rerun the relevant gates. Only then decide whether 1.2.0 or a further release candidate is legal.
 
 Future Linux/macOS, full parallel team, stress/memory/disk/cost endurance and larger project types are separate compatibility exercises, not reasons to claim Windows pilot success globally.
+
+## Second, independently scheduled transfer pilot
+
+After the CRUD L3 closes and its findings are reconciled, use [Transfer Pilot B: MUSIC](29_MUSIC_EXISTING_REPOSITORY_TRANSFER_PILOT.md). This is a separate read-only authority and isolated-adaptation audit, NOT a reroute of the running CRUD Goal or authorization to mutate production MUSIC. It measures real existing-project portability, identity fidelity and risk boundaries more than raw script counts.
