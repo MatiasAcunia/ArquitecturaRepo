@@ -75,3 +75,4 @@ L3 reported that a bare SHA-256 of the SQLite main database file can miss commit
 
 These guards cannot authenticate the origin of a user-supplied digest or attest an actual Codex Desktop invocation. A busy/oversized/protected SQLite store, an absent canonical database, uncertain WAL read permission or missing independent authority remains HOLD. Run the audit on an explicitly authorized source copy for protected products. The origin DB must never be replaced by a fabricated fixture to obtain a PASS.
 
+For a genuine SQLite source, an application-consistent snapshot is required even in rollback-journal/non-WAL mode. Main-file hashing alone is never an accepted full currentness witness; a synthetic non-WAL test guards this rule too.

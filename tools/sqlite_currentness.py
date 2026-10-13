@@ -91,7 +91,12 @@ def inspect_store(path: Path, record: dict[str, Any]) -> list[str]:
         has_snapshot = expected is not None
         valid_db = is_sqlite_database(path)
         wal_exists = wal_nonempty(path)
-        if wal_exists and not has_snapshot:
+        if not has_snapshot and valid_db:
+            failures.append(
+                "SQLITE_WAL_CURRENTNESS_UNBOUND" if wal_exists
+                else "SQLITE_CONSISTENT_SNAPSHOT_REQUIRED"
+            )
+        elif wal_exists and not has_snapshot:
             failures.append("SQLITE_WAL_CURRENTNESS_UNBOUND")
         if has_snapshot:
             if not isinstance(expected, str) or not SHA256.fullmatch(expected):

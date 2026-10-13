@@ -86,6 +86,15 @@ def main() -> int:
         plan=json.loads((control/"runtime"/"TACTICAL_PLAN_CURRENT.json").read_text())
         assert plan["revision"]==0
 
+        # A normal non-WAL live SQLite DB also needs an application-level
+        # consistent witness; a bare file hash is not a safe universal gate.
+        legacy=control/"state"/"legacy.sqlite"
+        with sqlite3.connect(legacy) as plain:
+            plain.execute("CREATE TABLE records(id INTEGER PRIMARY KEY)")
+        from sqlite_currentness import inspect_store
+        assert "SQLITE_CONSISTENT_SNAPSHOT_REQUIRED" in inspect_store(
+            legacy,{"required":True,"ref":"state/legacy.sqlite","sha256":sha(legacy)}
+        )
         # No sidecar-less immutable read fallback: a corrupt DB must HOLD.
         connection.close()
         db.write_bytes(b"not an SQLite source")
