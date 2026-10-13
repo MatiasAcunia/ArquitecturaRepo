@@ -172,12 +172,42 @@ def test_fencing_and_decision(tmp: Path) -> None:
     assert critique["product_acceptance"] == "NOT_CLAIMED"
 
 
+
+def test_consultation_ledger(tmp: Path) -> None:
+    from cognitive_ledger import register, advance, ConsultationHold
+    kw = {"consultation_id": "C001", "campaign_id": "CAMPAIGN",
+          "source_digest": "a" * 64, "question_digest": "b" * 64,
+          "model": "synthetic", "export_classification": "PUBLIC_OR_SYNTHETIC"}
+    row = register(tmp, **kw)
+    assert register(tmp, **kw) == row
+    must_fail(lambda: register(tmp, **{**kw, "source_digest": "c" * 64}), ConsultationHold)
+    must_fail(lambda: advance(tmp, "C001", "REQUEST", current_source_digest="a" * 64),
+              ConsultationHold)
+    assert advance(tmp, "C001", "CLAIM", current_source_digest="a" * 64)["phase"] == "CLAIMED"
+    assert advance(tmp, "C001", "REQUEST", current_source_digest="a" * 64)["network_attempt_count"] == 1
+    must_fail(lambda: advance(tmp, "C001", "REQUEST", current_source_digest="a" * 64),
+              ConsultationHold)
+    must_fail(lambda: advance(tmp, "C001", "RESPONSE", current_source_digest="c" * 64,
+                              response_sha256="d" * 64), ConsultationHold)
+    advance(tmp, "C001", "RESPONSE", current_source_digest="a" * 64, response_sha256="d" * 64)
+    advance(tmp, "C001", "DELIVER", current_source_digest="a" * 64,
+            evidence_ref="host/receipt.json")
+    must_fail(lambda: advance(tmp, "C001", "ADOPT", current_source_digest="a" * 64,
+                              evidence_ref="test"), ConsultationHold)
+    advance(tmp, "C001", "CONSUME", current_source_digest="a" * 64,
+            evidence_ref="host/later-i3-event.json")
+    result = advance(tmp, "C001", "ADOPT", current_source_digest="a" * 64,
+                     evidence_ref="tests/causal-proof.json")
+    assert result["phase"] == "ADOPTED_PENDING_GATE"
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="operational-v12-") as tmp:
         root = Path(tmp)
         test_goal(root / "goal")
         test_effect(root / "effect")
         test_fencing_and_decision(root / "fencing")
+        test_consultation_ledger(root / "consultation")
         test_owner_pack()
         test_cognitive()
     print("OPERATIONAL V1.2 SYNTHETIC SELF-TEST PASSED")
