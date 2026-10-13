@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -128,6 +129,30 @@ def classify(path: Path, marker: dict[str, Any], now: datetime) -> dict[str, Any
         result["decision"] = "BLOCK"
         result["reason"] = "SYMLINK_ROOT"
         return result
+    registered_identity = marker.get("registered_identity")
+    if not isinstance(registered_identity, dict) or set(registered_identity) != {"device", "inode"}:
+        result["decision"] = "BLOCK"
+        result["reason"] = "LEGACY_MARKER_HAS_NO_PHYSICAL_OWNERSHIP_PROOF"
+        return result
+    try:
+        identity = path.stat()
+    except OSError:
+        result["decision"] = "BLOCK"
+        result["reason"] = "WORKSPACE_IDENTITY_UNREADABLE"
+        return result
+    if (identity.st_dev != registered_identity["device"]
+        or identity.st_ino != registered_identity["inode"]):
+        result["decision"] = "BLOCK"
+        result["reason"] = "REGISTERED_WORKSPACE_IDENTITY_CHANGED"
+        return result
+    if (path / ".git").is_dir():
+        result["decision"] = "BLOCK"
+        result["reason"] = "CANONICAL_GIT_CHECKOUT_NEVER_AUTO_DELETED"
+        return result
+    if linked_worktree(path):
+        result["decision"] = "BLOCK"
+        result["reason"] = "GIT_LINKED_WORKTREE_REQUIRES_GIT_AWARE_OWNER_CLEANUP"
+        return result
     if (path / ".keep").exists() or (path / ".agentic-sdlc-active").exists():
         result["decision"] = "BLOCK"
         result["reason"] = "ACTIVE_OR_KEEP_SENTINEL"
@@ -193,12 +218,20 @@ def remove_candidate(path: Path, row: dict[str, Any]) -> None:
 
 
 def register(args: argparse.Namespace) -> int:
-    path = Path(args.path).resolve()
-    path.mkdir(parents=True, exist_ok=True)
+    supplied = Path(args.path).absolute()
+    if args.force:
+        raise GCError("UNSAFE_REGISTER_FORCE_REFUSED")
+    if supplied.is_symlink() or supplied.exists():
+        raise GCError("REGISTRATION_REQUIRES_NEW_SYSTEM_OWNED_WORKSPACE")
+    if supplied.parent.is_symlink() or not supplied.parent.is_dir():
+        raise GCError("WORKSPACE_PARENT_MUST_EXIST_AND_NOT_BE_SYMLINK")
+    path = supplied
+    # Reject implicit path traversal or a symlinked parent component.
+    if ".." in path.parts or any(part.is_symlink() for part in list(path.parents)):
+        raise GCError("WORKSPACE_PARENT_PATH_UNTRUSTED")
+    path.mkdir(parents=False, exist_ok=False)
     marker_path = path / MARKER
-    if marker_path.exists() and not args.force:
-        raise GCError(f"marker already exists: {marker_path}")
-
+    identity = path.stat()
     now = utc_now()
     expires = now + timedelta(hours=float(args.ttl_hours))
     payload = {
@@ -213,6 +246,10 @@ def register(args: argparse.Namespace) -> int:
         "source_repo": args.source_repo,
         "source_ref": args.source_ref,
         "reason": args.reason,
+        "registered_identity": {
+            "device": identity.st_dev,
+            "inode": identity.st_ino,
+        },
     }
     marker_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, indent=2) if args.json else f"WORKSPACE REGISTERED: {path}")
@@ -265,8 +302,17 @@ def collect(args: argparse.Namespace) -> int:
                 raise GCError(f"candidate escaped GC root: {path}") from exc
             if path.parent != root:
                 raise GCError(f"candidate is not an immediate child of GC root: {path}")
-            before = int(row.get("bytes") or 0)
-            remove_candidate(path, row)
+            # Dry-run plans are not deletion authority. The root, marker,
+            # device/inode, lease, Git status and expiry must still match
+            # immediately before deletion.
+            marker = load_marker(path)
+            rechecked = classify(path, marker, now)
+            if rechecked["decision"] != "DELETE_READY":
+                row["decision"] = "BLOCK"
+                row["reason"] = "PREDELETE_REVALIDATION:" + str(rechecked["reason"])
+                continue
+            before = int(rechecked.get("bytes") or 0)
+            remove_candidate(path, rechecked)
             deleted.append(str(path))
             reclaimed += before
             row["decision"] = "DELETED"
