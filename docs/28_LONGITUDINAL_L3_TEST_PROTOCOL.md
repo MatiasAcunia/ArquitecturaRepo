@@ -43,4 +43,4 @@ Future Linux/macOS, full parallel team, stress/memory/disk/cost endurance and la
 
 ## Second, independently scheduled transfer pilot
 
-After the CRUD L3 closes and its findings are reconciled, use [Transfer Pilot B: MUSIC](29_MUSIC_EXISTING_REPOSITORY_TRANSFER_PILOT.md). This is a separate read-only authority and isolated-adaptation audit, NOT a reroute of the running CRUD Goal or authorization to mutate production MUSIC. It measures real existing-project portability, identity fidelity and risk boundaries more than raw script counts.
+After the CRUD L3 closes and its findings are reconciled, use [Transfer Pilot B: existing repository](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md). This is a separate read-only authority and isolated-adaptation audit, NOT a reroute of the running CRUD Goal or authorization to mutate production MUSIC. It measures real existing-project portability, identity fidelity and risk boundaries more than raw script counts.
