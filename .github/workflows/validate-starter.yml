@@ -62,5 +62,9 @@ jobs:
         run: python tools/verify_v1_release.py
       - name: Exercise v1.2 operational controls (synthetic, no network)
         run: python tools/selftest_operational_v12.py
+      - name: Verify localized installer, FAQ and eight offline languages
+        run: python tools/selftest_i18n.py
+      - name: Exercise privacy-gated collector and hash-receipt rejection tests
+        run: python tools/selftest_feedback_submit.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py
