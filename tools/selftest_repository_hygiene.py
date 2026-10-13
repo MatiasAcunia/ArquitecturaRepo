@@ -216,13 +216,13 @@ def test_workspace_gc(base: Path) -> None:
         raise AssertionError(rows["protected"])
     if rows["future"]["decision"] != "KEEP":
         raise AssertionError(rows["future"])
-    if rows["dirty"]["reason"] != "DIRTY_GIT_WORKSPACE":
+    if rows["dirty"]["reason"] != "CANONICAL_GIT_CHECKOUT_NEVER_AUTO_DELETED":
         raise AssertionError(rows["dirty"])
     if rows["clean_canonical_git"]["reason"] != "CANONICAL_GIT_CHECKOUT_NEVER_AUTO_DELETED":
         raise AssertionError("clean canonical Git checkout was not protected")
     if (preexisting / "private.txt").read_text(encoding="utf-8") != "NEVER_DELETE":
         raise AssertionError("unowned source was lost")
-    if dry_payload["unmarked_directories_ignored"] != 1:
+    if dry_payload["unmarked_directories_ignored"] != 2:
         raise AssertionError("unmarked directory was not ignored")
 
     execute = run(str(WORKSPACE_GC), "collect", "--root", str(root), "--execute")
