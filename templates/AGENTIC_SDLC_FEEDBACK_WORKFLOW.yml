@@ -37,8 +37,6 @@ jobs:
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "trigger=MANUAL" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "23 4 * * 0" ]; then
-            echo "trigger=WEEKLY" >> "$GITHUB_OUTPUT"
           else
             echo "trigger=MONTHLY" >> "$GITHUB_OUTPUT"
           fi
