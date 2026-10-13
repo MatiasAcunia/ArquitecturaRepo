@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import tempfile
 import shutil
 import sys
@@ -84,7 +85,8 @@ def _populate_staging_project(
     if (not isinstance(control_dir_name, str)
         or not control_dir_name or control_dir_name in {".", ".."}
         or "/" in control_dir_name or "\\" in control_dir_name
-        or ":" in control_dir_name or "\x00" in control_dir_name):
+        or ":" in control_dir_name or "\x00" in control_dir_name
+        or not re.fullmatch(r"[A-Za-z0-9._-]{1,64}", control_dir_name)):
         raise ValueError("control-dir must be one safe directory name within target")
     # Windows device names, Git metadata and dotted-space aliases may
     # redirect/install into reserved locations or fail after partial writes.
@@ -848,6 +850,21 @@ This is process-improvement evidence, not product authority.
         else:
             copy_file(template_path, feedback_workflow_path)
             feedback_workflow_status = "INSTALLED"
+
+    if feedback_workflow_status == "INSTALLED" and control_dir_name != ".agentic-sdlc":
+        # The managed workflow must address the actual installed control root.
+        # The installer restricts names to shell-safe single directory tokens.
+        workflow = feedback_workflow_path.read_text(encoding="utf-8")
+        old = 'if [ -d ".agentic-sdlc" ]; then'
+        old_output = 'echo "control_root=.agentic-sdlc" >> "$GITHUB_OUTPUT"'
+        if old not in workflow or old_output not in workflow:
+            raise ValueError("WORKFLOW_TEMPLATE_CONTROL_ROOT_CONTRACT_CHANGED")
+        workflow = workflow.replace(old, f'if [ -d "{control_dir_name}" ]; then')
+        workflow = workflow.replace(
+            old_output,
+            f'echo "control_root={control_dir_name}" >> "$GITHUB_OUTPUT"',
+        )
+        feedback_workflow_path.write_text(workflow, encoding="utf-8")
 
     runtime_report_line = (
         "- optional campaign runtime/controller;"

@@ -60,3 +60,7 @@ Scaffold generation now stages the project-local control directory in a private 
 ## Windows-hosted CI portability smoke
 
 In addition to the full Ubuntu v1.1/v1.2 suite, pull requests run a small Windows-hosted job for all profile scaffolds, interrupted installation staging, symlink/journal path confinement, cross-process Goal and effect continuity, and project mode defaults. Hosted Windows success is **not** equivalent to real native Codex Desktop 2.0.2, Windows 10 user permissions, installed toolchain, account quota, cloud/DB/media access, or human UI review. The L3 machine-specific gate remains mandatory. This job uses hosted CI resources; it does not install anything on the user's own machine or execute paid model/provider calls.
+
+## Configurable control directory and managed workflow coupling
+
+A custom `--control-dir` previously installed successfully but left the monthly GitHub feedback workflow checking only the hardcoded default directory. The installer now derives that managed workflow's actual root from the *same* validated control directory argument, rejects unsafe shell-metacharacters and reserved names, and tests non-default roots. Existing user workflows remain preserved, not silently rewritten. No scheduled job is interpreted as an independently verified external receiver.

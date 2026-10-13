@@ -9,9 +9,9 @@ from pathlib import Path
 import scaffold_project as scaffolder
 
 
-def install(target: Path, *, feedback: bool = True) -> Path:
+def install(target: Path, *, feedback: bool = True, control_name: str = ".agentic-sdlc") -> Path:
     return scaffolder.create_scaffold(
-        target=target, control_dir_name=".agentic-sdlc", profile_name="SMALL",
+        target=target, control_dir_name=control_name, profile_name="SMALL",
         product_id="SYNTHETIC", objective="Synthetic test only", force=False,
         with_runtime=False, install_feedback_workflow=feedback,
     )
@@ -92,6 +92,31 @@ def main() -> int:
             assert "PRESERVED_EXISTING_WORKFLOW" in (
                 control / name).read_text(encoding="utf-8")
         assert not list(colliding.glob(".agentic-sdlc-stage-*"))
+        custom = root / "custom-control-root"
+        control_custom = install(custom, control_name="sdlc_custom")
+        assert control_custom.name == "sdlc_custom"
+        custom_workflow = (
+            custom / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+        ).read_text(encoding="utf-8")
+        assert 'if [ -d "sdlc_custom" ]; then' in custom_workflow
+        assert 'echo "control_root=sdlc_custom" >> "$GITHUB_OUTPUT"' in custom_workflow
+        assert 'if [ -d ".agentic-sdlc" ]; then' not in custom_workflow
+        for bad_name in (
+            "x$(echo BAD)", "x;exit", "x\"newline", "x space",
+            "x/dir", "dot..suffix ", "control`whoami`",
+        ):
+            bad_target = root / ("rejected-" + str(len(bad_name)) +
+                                  "-" + str(ord(bad_name[0])))
+            if bad_target.exists():
+                bad_target = root / ("other-" + str(len(list(root.iterdir()))))
+            try:
+                install(bad_target, control_name=bad_name)
+            except (ValueError, OSError):
+                pass
+            else:
+                raise AssertionError("UNSAFE_CONTROL_NAME_ACCEPTED:"+bad_name)
+            assert not bad_target.exists(), "invalid setup left a partial project"
+
 
     print("INSTALL STAGING SELF-TEST PASSED: interrupted install, fresh success and preexisting workflow preservation")
     return 0
