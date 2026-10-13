@@ -70,5 +70,7 @@ jobs:
         run: python tools/selftest_security_v12.py
       - name: Verify project modes, discovery and canonical theory preflight
         run: python tools/selftest_v12_setup.py
+      - name: Exercise three offline process boundaries and no-replay recovery
+        run: python tools/selftest_v12_longitudinal.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py

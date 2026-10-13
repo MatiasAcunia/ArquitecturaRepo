@@ -14,7 +14,7 @@ No accidental Product State replacement, privilege escalation, external paid act
 | HIGH | Local Goal diagnostic accepted caller-supplied host-verified flags and could appear to grant execution authority | Removed forgeable CLI/argument path; the library now always returns may_execute_material_goal=false absent a separately verified host adapter | Real Codex Goal hook and remote currentness proof remain BLOCKED |
 | HIGH | External effect record called a caller-asserted provider receipt VERIFIED | Changed to RECEIPT_ATTESTED_UNVERIFIED; idempotency and ambiguous timeout still HOLD | Actual provider readback and source identity must be demonstrated |
 | HIGH | Generated/constructed feedback metadata might leak through arbitrary status strings or keys | Allowlist exporter fields, validate outgoing schema and enum keys, reject unrecognized value/key, no raw collector response logging | External collector receipt/real user consent remains independent |
-| HIGH | Outbound feedback could treat HTTP success as delivery, echo arbitrary response or accept redirects | Two-key explicit opt-in + HTTPS-only host + bounded JSON schema + exact report SHA receipt, no content echo | Authenticated/authorized collector identity and real reception remain unproven |
+| HIGH | Outbound feedback could treat HTTP success as delivery, echo arbitrary response or accept redirects | Opt-out intent only when a verified named HTTPS collector is configured; until then LOCAL_ONLY. Bounded schema, strict fixed categories, and exact report SHA receipt, no content echo | Authenticated/authorized collector identity and real reception remain unproven |
 | MEDIUM | Mutable third-party GitHub Action tags could change content | Pin checkout/setup-python/upload-artifact to exact reviewed upstream commits and disable persisted checkout credentials | Recheck upstream SHA, update dependencies with review |
 | MEDIUM | Gemini transport might be activated by a mere API key or unsafe model name | Require explicit AGENTIC_SDLC_GEMINI_ENABLED=true; restrict model name, request timeout and response size; no private data by default | Account/quota/data policy/real Goal consumption remain unproven |
 | MEDIUM | Context resets/long tactical plans can drift from authorized Goal | Goal->charter exact digest + versioned I3 plan + revision conflict + active-progress review due; fresh Goal changes HOLD | Current host invocation and active-time accounting must be physical |
@@ -44,3 +44,7 @@ No accidental Product State replacement, privilege escalation, external paid act
 ## Release verdict
 
 **DO NOT RELEASE 1.2.0** until all required physical gate IDs in state/V1_2_ACCEPTANCE_CRITERIA.json are individually accepted from exact immutable candidates. Keep the PR as draft; stable main remains 1.1.x. Do not let test-gate success replace host or product proof.
+
+## Additional synthetic endurance gate
+
+`python tools/selftest_v12_longitudinal.py` exercises three separate interpreter processes, durable plan identity, a revision race, a changed charter, ambiguous external-effect replay refusal and metadata-only diagnostics. It does not simulate hours of actual L3 execution or prove an external provider readback.

@@ -213,6 +213,7 @@ def create_scaffold(
     copy_file(ROOT / "tools" / "feedback_submit.py", control / "tools" / "feedback_submit.py")
     copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
     copy_file(ROOT / "tools" / "project_setup.py", control / "tools" / "project_setup.py")
+    copy_file(ROOT / "tools" / "branch_guard.py", control / "tools" / "branch_guard.py")
     copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
     preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
     preferences.update(execution_mode=execution_mode, collaboration=collaboration,

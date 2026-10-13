@@ -57,3 +57,5 @@ Observe and classify with fixed categories. On a material defect, stop affected 
 ## 7. Repository theory and Git hygiene
 
 CLIENT intent and meaning go into existing canonical requirements, Product State and domain overlay, with L0 interaction lineage for material changes. Restructure sections and archive obsolete theory as desired, but never discard evidence or leave duplicated current policies. I2 reconciles material contradictions before dispatch. I3 owns implementation, retries and candidate integration. Commit and branch mania are prohibited; create a branch only for justified isolation, hotfix or release, never for each task or agent invocation.
+
+The optional `tools/branch_guard.py` is a pure decision aid: it can classify a branch reason and its affected surfaces, but it never moves Git refs or gives itself I3 merge authority. Actual isolated branch creation requires live exact HEAD, conflict and cleanup review.
