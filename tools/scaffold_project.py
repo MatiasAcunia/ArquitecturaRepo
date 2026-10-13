@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from i18n import SUPPORTED, choose_language
+from project_setup import WORK_SCOPE, EXECUTION, COLLABORATION, PROJECT_TYPES, defaults
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "state" / "STARTER_MANIFEST.json").read_text(encoding="utf-8"))
@@ -65,6 +66,10 @@ def create_scaffold(
     with_runtime: bool,
     install_feedback_workflow: bool,
     language: str = "auto",
+    execution_mode: str = "SYNCHRONOUS",
+    collaboration: str = "SOLO",
+    work_scope: str = "SOFTWARE",
+    project_type: str = "OTHER",
 ) -> Path:
     selected_lang, selection_source = choose_language(language)
     # Never allow a caller-provided control-dir to escape or replace the
@@ -207,6 +212,12 @@ def create_scaffold(
     )
     copy_file(ROOT / "tools" / "feedback_submit.py", control / "tools" / "feedback_submit.py")
     copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
+    copy_file(ROOT / "tools" / "project_setup.py", control / "tools" / "project_setup.py")
+    copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
+    preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
+    preferences.update(execution_mode=execution_mode, collaboration=collaboration,
+                       work_scope=work_scope, project_type=project_type)
+    write_json(control / "configuration" / "OPERATING_PREFERENCES.json", preferences)
     for lang_code in SUPPORTED:
         for kind in ("README", "FAQ"):
             name = f"{kind}_{lang_code}.md"
@@ -953,6 +964,16 @@ Validate this control layer with its copied validator:
 python {control_dir_name}/tools/validate_project.py --root .
 ```
 
+## Operating dimensions
+
+- execution: {execution_mode}; coordination: {collaboration}; work scope: {work_scope};
+- product category: {project_type};
+- configuration: configuration/OPERATING_PREFERENCES.json;
+- asynchronous and team operation require physical host, scheduler and authority gates;
+- this selection is NOT current Product State or authority, and cannot grant background work.
+- canonical CLIENT intent remains in state/CLIENT_REQUIREMENTS_CURRENT.md,
+  state/PRODUCT_STATE_CURRENT.json and governance/PROJECT_OVERLAY.md.
+
 ## Architecture feedback
 
 A strict metadata-only feedback exporter is enabled in `feedback/ARCHITECTURE_FEEDBACK_CONFIG.json`.
@@ -1019,6 +1040,14 @@ def main() -> int:
         choices=["auto", *sorted(SUPPORTED)],
         help="Documentation language; auto detects system language. No remote locale tracking.",
     )
+    parser.add_argument("--execution-mode", choices=EXECUTION,
+                        default="SYNCHRONOUS")
+    parser.add_argument("--collaboration", choices=COLLABORATION,
+                        default="SOLO")
+    parser.add_argument("--work-scope", choices=WORK_SCOPE,
+                        default="SOFTWARE")
+    parser.add_argument("--project-type", choices=PROJECT_TYPES,
+                        default="OTHER")
     parser.add_argument(
         "--no-feedback-workflow",
         action="store_true",
@@ -1037,6 +1066,10 @@ def main() -> int:
             with_runtime=args.with_runtime,
             install_feedback_workflow=not args.no_feedback_workflow,
             language=args.language,
+            execution_mode=args.execution_mode,
+            collaboration=args.collaboration,
+            work_scope=args.work_scope,
+            project_type=args.project_type,
         )
     except Exception as exc:
         print(f"SCAFFOLD FAILED: {exc}", file=sys.stderr)

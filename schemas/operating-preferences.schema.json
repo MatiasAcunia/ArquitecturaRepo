@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:operating-preferences:1.2",
+  "title": "Optional operational dimensions, never authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile",
+    "work_scope",
+    "execution_mode",
+    "collaboration",
+    "project_type",
+    "risk",
+    "platform",
+    "runtime_installed",
+    "model_provider_policy",
+    "plugins",
+    "host_continuity",
+    "team_authority",
+    "external_actions",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-operating-preferences-v1"
+    },
+    "profile": {
+      "enum": [
+        "SMALL",
+        "STATEFUL",
+        "ARTIFACT_HEAVY",
+        "MULTI_WORKSTREAM",
+        "MULTI_PRODUCT",
+        "HIGH_CONSEQUENCE"
+      ]
+    },
+    "work_scope": {
+      "enum": [
+        "SOFTWARE",
+        "NON_CODE_AI",
+        "MIXED"
+      ]
+    },
+    "execution_mode": {
+      "enum": [
+        "SYNCHRONOUS",
+        "ASYNCHRONOUS",
+        "HYBRID"
+      ]
+    },
+    "collaboration": {
+      "enum": [
+        "SOLO",
+        "TEAM"
+      ]
+    },
+    "project_type": {
+      "enum": [
+        "CRUD",
+        "API",
+        "WEB_APP",
+        "MOBILE",
+        "DESKTOP",
+        "CLI",
+        "DATA_PIPELINE",
+        "AI_ML",
+        "AUTOMATION",
+        "GAME",
+        "MEDIA_PIPELINE",
+        "INFRASTRUCTURE",
+        "RESEARCH",
+        "OTHER"
+      ]
+    },
+    "risk": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]
+    },
+    "platform": {
+      "enum": [
+        "WINDOWS",
+        "LINUX",
+        "MACOS",
+        "OTHER"
+      ]
+    },
+    "runtime_installed": {
+      "type": "boolean"
+    },
+    "model_provider_policy": {
+      "enum": [
+        "OPENAI_PREFERRED_NOT_REQUIRED",
+        "VENDOR_NEUTRAL"
+      ]
+    },
+    "plugins": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "purpose",
+          "access"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "access": {
+            "enum": [
+              "READ_ONLY",
+              "WRITE_REQUIRES_GATE"
+            ]
+          }
+        }
+      }
+    },
+    "host_continuity": {
+      "const": "NOT_PROVEN"
+    },
+    "team_authority": {
+      "const": "NOT_PROVEN"
+    },
+    "external_actions": {
+      "const": "NOT_AUTHORIZED"
+    },
+    "status": {
+      "const": "CONFIGURATION_ONLY"
+    }
+  }
+}

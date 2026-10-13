@@ -68,5 +68,7 @@ jobs:
         run: python tools/selftest_feedback_submit.py
       - name: Verify v1.2 security and exact release gates stay fail closed
         run: python tools/selftest_security_v12.py
+      - name: Verify project modes, discovery and canonical theory preflight
+        run: python tools/selftest_v12_setup.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py
