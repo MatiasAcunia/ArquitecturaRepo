@@ -130,8 +130,16 @@ def test_cognitive() -> None:
             "parts": [{"text": json.dumps({"recommendation": "test hypothesis"})}]}}]}).encode()
 
     prior = os.environ.get("GEMINI_API_KEY")
+    prior_enabled = os.environ.get("AGENTIC_SDLC_GEMINI_ENABLED")
     try:
         os.environ["GEMINI_API_KEY"] = "synthetic-test-only"
+        must_fail(lambda: consult_public_or_synthetic(
+            model="test-model", question="Review this public synthetic plan.",
+            export_classification="PUBLIC_OR_SYNTHETIC"), CognitiveHold)
+        os.environ["AGENTIC_SDLC_GEMINI_ENABLED"] = "true"
+        must_fail(lambda: consult_public_or_synthetic(
+            model="../evil", question="Review this public synthetic plan.",
+            export_classification="PUBLIC_OR_SYNTHETIC"), CognitiveHold)
         out = consult_public_or_synthetic(model="test-model", question="Review this public synthetic plan.",
                                          export_classification="PUBLIC_OR_SYNTHETIC",
                                          transport=lambda request, timeout: Response())
@@ -142,6 +150,10 @@ def test_cognitive() -> None:
             os.environ.pop("GEMINI_API_KEY", None)
         else:
             os.environ["GEMINI_API_KEY"] = prior
+        if prior_enabled is None:
+            os.environ.pop("AGENTIC_SDLC_GEMINI_ENABLED", None)
+        else:
+            os.environ["AGENTIC_SDLC_GEMINI_ENABLED"] = prior_enabled
 
 
 
