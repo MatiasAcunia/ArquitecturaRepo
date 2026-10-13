@@ -132,11 +132,48 @@ def test_cognitive() -> None:
             os.environ["GEMINI_API_KEY"] = prior
 
 
+
+def test_fencing_and_decision(tmp: Path) -> None:
+    from fenced_mutator import fenced_local_write, StaleMutatorHold
+    from evidence_decision import bind_candidate, review, EvidenceHold
+
+    (tmp / "state").mkdir(parents=True, exist_ok=True)
+    authority = {
+        "schema_version": "execution-authority-0.1",
+        "authority_status": "ACTIVE",
+        "mutator_epoch": 9,
+        "current_mutator": {"actor_id": "I3", "run_id": "RUN9", "epoch": 9},
+    }
+    path = tmp / "state" / "EXECUTION_AUTHORITY_CURRENT.json"
+    path.write_text(json.dumps(authority))
+    with fenced_local_write(tmp, actor_id="I3", run_id="RUN9", mutator_epoch=9):
+        assert path.is_file()
+    must_fail(lambda: next(iter(fenced_local_write(tmp, actor_id="I3",
+              run_id="RUN8", mutator_epoch=8))), StaleMutatorHold)
+    authority["current_mutator"] = None
+    path.write_text(json.dumps(authority))
+    must_fail(lambda: next(iter(fenced_local_write(tmp, actor_id="I3",
+              run_id="RUN9", mutator_epoch=9))), StaleMutatorHold)
+    candidate = bind_candidate(source_hashes={"source": "a" * 64},
+                               payload={"decision": "example"}, author_actor="I3")
+    must_fail(lambda: review(candidate, reviewer_actor="I3",
+              original_sources={"source": "a" * 64}, review_result="HOLD",
+              falsifier_refs=[]), EvidenceHold)
+    must_fail(lambda: review(candidate, reviewer_actor="I4",
+              original_sources={"source": "b" * 64}, review_result="HOLD",
+              falsifier_refs=[]), EvidenceHold)
+    critique = review(candidate, reviewer_actor="I4",
+                      original_sources={"source": "a" * 64},
+                      review_result="SUPPORTED_FOR_FURTHER_GATE", falsifier_refs=["test-1"])
+    assert critique["product_acceptance"] == "NOT_CLAIMED"
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="operational-v12-") as tmp:
         root = Path(tmp)
         test_goal(root / "goal")
         test_effect(root / "effect")
+        test_fencing_and_decision(root / "fencing")
         test_owner_pack()
         test_cognitive()
     print("OPERATIONAL V1.2 SYNTHETIC SELF-TEST PASSED")
