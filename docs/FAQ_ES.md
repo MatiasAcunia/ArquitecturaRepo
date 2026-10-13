@@ -98,6 +98,14 @@ También sirven experiencias de adopción: qué te aportó, qué te complicó y 
 
 Sí: el código y la documentación originales se publican bajo [licencia MIT](../LICENSE), con las condiciones indicadas allí. El material de terceros no queda automáticamente cubierto por esa licencia.
 
+### 19. ¿Qué modos y proyectos admite v1.2?
+
+Podés describir proyectos CRUD, API, web, móviles, datos, automatización, videojuegos, infraestructura y tareas de IA no dedicadas a programación. La configuración es por dimensiones: síncrono/asíncrono/híbrido, solo/equipo y software/no-código/mixto. No habilita ejecución autónoma por sí sola; se exige host, autoridad, permisos, recovery y evidencia física. Consultá [modos y tecnología](27_PROJECT_MODES_AND_STACK_SELECTION.md).
+
+### 20. ¿El feedback se envía automáticamente al mantenedor y cómo lo desactivo?
+
+El informe mínimo mensual local está activado y queda en los artifacts de GitHub Actions del proyecto. La preferencia de envío al mantenedor es opt-out **cuando haya un receptor HTTPS aprobado**. Esta candidata todavía no tiene uno: no hay entrega central real que podamos afirmar. No incluye código, conversaciones, nombres, rutas, secretos ni texto libre. Para desactivar todo, poné `enabled=false`; para cortar sólo el envío, `external_submission_enabled=false`, o borrá el workflow. Más detalles en la [guía de privacidad](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+
 ---
 
 **Ruta corta:** [README / Quick Start](../README.md#quick-start) → [prompt de instalación](../prompts/INSTALL_THIS_SDLC.md) → descubrimiento de solo lectura → adopción proporcional → validación + [fresh-context probe](07_FRESH_CONTEXT_TEST.md).

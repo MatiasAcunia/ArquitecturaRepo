@@ -50,6 +50,10 @@ Utilisez --language auto|en|es|pt|fr|de|it|ja|zh. Pour désactiver : enabled=fal
 
 1.1.0 est stable ; v1.2 reste candidate avant validation physique indépendante. Ouvrez une Issue avec étapes reproductibles et journaux expurgés. Le contenu original est sous MIT.
 
+### 13. Puis-je combiner l'asynchrone, les équipes et l'IA sans programmation ?
+
+Oui, comme dimensions de configuration. Leur exécution exige un hôte réel, des permissions, une reprise et une vérification indépendante. SMALL reste simple. I2 conserve théorie et choix techniques dans le dépôt canonique; la multiplication des commits/branches est interdite. L'envoi externe minimal reste impossible sans collecteur vérifié et désactivable.
+
 ---
 
 [FR guide](README_fr.md)

@@ -50,6 +50,10 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh. Para desligar relatórios, defina e
 
 1.1.0 é estável; v1.2 permanece candidata até passar testes físicos independentes. Abra um Issue com reprodução e logs sem segredos. O material original usa MIT.
 
+### 13. Posso combinar modos assíncronos, híbridos, equipes e IA sem programação?
+
+Sim, são dimensões de configuração. A execução exige host, autoridade, recuperação e direitos comprovados; SMALL continua simples. I2 mantém requisitos e stack no repositório canônico; commit/branch mania são proibidos. O feedback externo mínimo terá opção de desligar quando existir coletor verificado, ainda ausente.
+
 ---
 
 [PT guide](README_pt.md)

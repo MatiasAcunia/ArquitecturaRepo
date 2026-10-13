@@ -50,6 +50,10 @@ Usa --language auto|en|es|pt|fr|de|it|ja|zh. Per disattivare: enabled=false o --
 
 1.1.0 è stabile; v1.2 resta candidata fino a test fisici indipendenti. Apri una Issue con passaggi riproducibili e log senza segreti. Il materiale originale usa MIT.
 
+### 13. Posso combinare modalità asincrone, team e IA non dedicata alla programmazione?
+
+Sì, come dimensioni configurabili. L'esecuzione richiede host, autorizzazioni, recupero e verifiche reali. SMALL resta leggero. I2 conserva requisiti e scelte tecniche nel repository canonico; commit e branch inutili sono vietati. Il feedback esterno minimo sarà disattivabile ma non può partire senza un destinatario verificato.
+
 ---
 
 [IT guide](README_it.md)

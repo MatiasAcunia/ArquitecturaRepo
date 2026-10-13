@@ -69,7 +69,7 @@ def main() -> int:
         minimum = 700 if code in {"ja", "zh"} else 1000
         check(len(readme_text) > minimum and len(faq_text) > minimum,
               "localized documentation too short: " + code)
-        check(len(re.findall(r"^### [0-9]+\.", faq_text, flags=re.M)) == 12,
+        check(len(re.findall(r"^### [0-9]+\.", faq_text, flags=re.M)) == 13,
               "FAQ coverage parity broken: " + code)
         check("enabled=false" in readme_text + faq_text, "feedback opt-out missing: " + code)
         check("--language" in readme_text + faq_text, "language option missing: " + code)
@@ -110,7 +110,7 @@ def main() -> int:
         check(selected_docs["language"] == "fr" and Path(selected_docs["faq"]).is_file(),
               "switching docs offline did not work")
 
-    print("I18N SELF-TEST PASSED — 8 locales, 12 FAQ topics each, auto, override, fallback, offline install")
+    print("I18N SELF-TEST PASSED — 8 locales, 13 FAQ topics each, auto, override, fallback, offline install")
     return 0
 
 

@@ -50,6 +50,10 @@ Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el i
 
 1.1.0 es estable; v1.2 sigue siendo una candidata hasta pasar pruebas físicas independientes. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
 
+### 13. ¿Puedo combinar modos asíncrono, mixto, equipos y tareas de IA sin programación?
+
+Sí, se combinan como dimensiones, sin crear agentes de más. Para ejecutar hacen falta scheduler/host real, ownership, recuperación y permisos comprobados; SMALL sigue simple. I2 guarda tu teoría y stack en el repositorio canónico. No se permiten commit ni branch mania. El feedback externo mínimo se prepara como opt-out cuando haya receptor verificado; hoy no existe receptor.
+
 ---
 
 [ES guide](README_es.md)

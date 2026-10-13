@@ -50,6 +50,10 @@ Verwenden Sie --language auto|en|es|pt|fr|de|it|ja|zh. Zum Abschalten enabled=fa
 
 1.1.0 ist stabil, v1.2 bleibt ein Kandidat bis zu unabhängigen Praxistests. Erstellen Sie ein Issue mit Reproduktionsschritten und bereinigten Logs. Originalmaterial steht unter MIT.
 
+### 13. Lassen sich asynchroner Betrieb, Teamarbeit und KI ohne Programmierung kombinieren?
+
+Ja, als Konfigurationsdimensionen. Tatsächliche Ausführung benötigt einen geprüften Host, Berechtigungen, Wiederherstellung und entsprechende Freigaben. SMALL bleibt einfach. I2 führt Anforderungen und Stack im kanonischen Repository; unnötige Commits und Branches sind verboten. Externes anonymes Feedback bleibt ohne verifizierten Empfänger unmöglich und abschaltbar.
+
 ---
 
 [DE guide](README_de.md)

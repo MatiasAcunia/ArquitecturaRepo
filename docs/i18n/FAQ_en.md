@@ -50,6 +50,10 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh; offline documentation follows the s
 
 1.1.0 is stable. v1.2 is a draft candidate until independent physical gates pass. File a GitHub Issue with reproducible steps and redacted logs. Original source and documentation use MIT; third-party rights remain separate.
 
+### 13. Can asynchronous, team and non-code AI modes be combined?
+
+Yes, as configuration dimensions. Only a real authorized host and proven leases, ownership, recovery, rights and human acceptance allow execution. Default SMALL remains synchronous/solo. I2 stores your requirements and stack in the existing repo; commit and branch mania are prohibited. Outbound anonymous feedback is preference-on only after an approved receiver exists, and can be disabled.
+
 ---
 
 [EN guide](README_en.md)
