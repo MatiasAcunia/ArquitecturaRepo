@@ -10,6 +10,14 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
 
+## v1.2 operational candidate (not a released version)
+
+The isolated 1.2 development branch adds fail-closed Goal/invocation and tactical-plan controls, ambiguous external-effect receipts, bounded Gemini I4 consultation plumbing and optional five-task OWNER mutual-recovery policy. A physical Codex Goal host adapter, scheduler readback, collector delivery and independent release gates are still **NOT YET PROVEN**. Stable releases remain on 1.1 until those gates pass.
+
+- [Operational implementation and exact limits](docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md)
+- [Resumen y privacidad en español](docs/24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md)
+- [Machine-readable 1.2 acceptance blockers](state/V1_2_ACCEPTANCE_CRITERIA.json)
+
 ## What you get
 
 The starter defines four internal engineering roles:
@@ -88,7 +96,7 @@ python tools/scaffold_project.py \
 
 Generated control layers carry their own schemas, validator and validation dependency declaration.
 
-New scaffolds also install a weekly architecture-feedback workflow by default. It generates only strict metadata and stores the report as a GitHub Actions artifact; external submission is disabled by default.
+New scaffolds also install a **monthly**, minimal architecture-feedback workflow by default. It generates only strict metadata and stores the report as a GitHub Actions artifact; external submission is disabled by default.
 
 Disable scheduling at install time with:
 
