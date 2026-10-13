@@ -62,7 +62,7 @@ The logical roles are Delivery, Architecture, Quality, Integrator and Master. Do
 
 **Exactly what it contains:** starter version/profile, whether the optional runtime is installed, booleans/status enumerations about validation, bootstrap/currentness, baseline, campaign state, counts of owners/capabilities/milestones/work units, recovery/retries/holds, and the operating-review rating. It excludes code, product identifiers, repo names, requirements, messages, usernames, paths, SHAs, credentials, file contents and unbounded free text. It is not acceptance evidence or product state.
 
-**External transmission:** OFF until an explicit known receiving endpoint and one-time repository opt-in are configured and verified. No claim that the maintainer automatically receives private-project reports merely because an artifact exists. A verified collector, anonymous receipt, consent/disable UX and leakage falsifiers remain required for an external feedback product claim. No silent upload.
+**External transmission:** default preference ON when a named verified receiving endpoint exists; currently no endpoint is configured, so actual external sending remains NOT_PROVEN and users can opt out. No claim that the maintainer automatically receives private-project reports merely because an artifact exists. A verified collector, anonymous receipt, consent/disable UX and leakage falsifiers remain required for an external feedback product claim. No silent upload.
 
 **Disable:** set feedback/ARCHITECTURE_FEEDBACK_CONFIG.json enabled=false, or remove the managed .github/workflows/agentic-sdlc-feedback.yml, or scaffold with --no-feedback-workflow. There is no penalty or functionality loss. The user may inspect reports and change cadence.
 

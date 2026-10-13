@@ -3,6 +3,6 @@
   "enabled": true,
   "cadence": "MONTHLY",
   "artifact_enabled": true,
-  "external_submission_enabled": false,
+  "external_submission_enabled": true,
   "privacy_mode": "STRICT_METADATA_ONLY"
 }

@@ -70,10 +70,10 @@ jobs:
         if: >-
           steps.generate.outputs.emitted == 'true' &&
           steps.generate.outputs.external_submission_enabled == 'true' &&
-          vars.AGENTIC_SDLC_FEEDBACK_SUBMIT == 'true' &&
+          vars.AGENTIC_SDLC_FEEDBACK_SUBMIT != 'false' &&
           vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT != ''
         env:
-          AGENTIC_SDLC_FEEDBACK_SUBMIT: ${{ vars.AGENTIC_SDLC_FEEDBACK_SUBMIT }}
+          AGENTIC_SDLC_FEEDBACK_SUBMIT: ${{ vars.AGENTIC_SDLC_FEEDBACK_SUBMIT != 'false' && 'true' || 'false' }}
           AGENTIC_SDLC_FEEDBACK_ENDPOINT: ${{ vars.AGENTIC_SDLC_FEEDBACK_ENDPOINT }}
         shell: bash
         run: |
@@ -90,7 +90,7 @@ jobs:
           {
             echo "### Privacy"
             echo
-            echo "The uploaded report is strict metadata only: no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials."
+            echo "Default monthly report: strict categories only, stored in this repository Actions. If an external endpoint is configured, outbound is ON unless you set feedback external_submission_enabled=false or repository variable AGENTIC_SDLC_FEEDBACK_SUBMIT=false. Missing collector means no outbound delivery."
             echo
             echo "Disable by setting feedback/ARCHITECTURE_FEEDBACK_CONFIG.json enabled=false, or delete this managed workflow."
           } >> "$GITHUB_STEP_SUMMARY"

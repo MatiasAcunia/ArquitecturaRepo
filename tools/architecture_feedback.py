@@ -122,6 +122,39 @@ def count_runtime_events(runtime: dict[str, Any]) -> dict[str, int]:
     }
 
 
+
+DIAGNOSTIC_EVENT_CATEGORIES = {
+    "AGENT_LOOP_DETECTED": "erratic_agent_observations",
+    "AGENT_FABRICATED_GATE": "erratic_agent_observations",
+    "CONFIG_INVALID": "misconfiguration_observations",
+    "ENVIRONMENT_MISMATCH": "misconfiguration_observations",
+    "STALE_AUTHORITY": "stale_authority_observations",
+    "UNBOUNDED_RETRY": "unbounded_retry_observations",
+    "EXTERNAL_EFFECT_AMBIGUOUS": "ambiguous_external_effect_observations",
+    "RESOURCE_CONTENTION": "resource_contention_observations",
+}
+DIAGNOSTIC_FIELDS = (
+    "erratic_agent_observations", "misconfiguration_observations",
+    "stale_authority_observations", "unbounded_retry_observations",
+    "ambiguous_external_effect_observations", "resource_contention_observations",
+)
+
+
+def bounded_diagnostics(runtime: dict[str, Any]) -> dict[str, Any]:
+    """Count recognized exact event names only; never transmit event strings."""
+    counts = {name: 0 for name in DIAGNOSTIC_FIELDS}
+    entries = runtime.get("event_log", [])
+    if not isinstance(entries, list):
+        return {"source": "ENUM_EVENT_COUNTS_ONLY", **counts}
+    for entry in entries[:5000]:
+        if not isinstance(entry, dict):
+            continue
+        action = entry.get("action")
+        field = DIAGNOSTIC_EVENT_CATEGORIES.get(action) if isinstance(action, str) else None
+        if field:
+            counts[field] = min(counts[field] + 1, 10000)
+    return {"source": "ENUM_EVENT_COUNTS_ONLY", **counts}
+
 def build_report(control: Path, trigger: str) -> dict[str, Any]:
     profile = load_json(control / "PROFILE.json")
     product = load_json(control / "state" / "PRODUCT_STATE_CURRENT.json")
@@ -205,6 +238,7 @@ def build_report(control: Path, trigger: str) -> dict[str, Any]:
             "work_status_counts": dict(sorted(work_status_counts.items())),
             **event_counts,
         },
+        "diagnostics": bounded_diagnostics(runtime),
         "process": {
             "operating_review_rating": parse_review_rating(
                 control / "governance" / "AGENTIC_SDLC_OPERATING_REVIEW_CURRENT.md"

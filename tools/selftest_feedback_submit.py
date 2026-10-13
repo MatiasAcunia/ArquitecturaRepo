@@ -92,13 +92,20 @@ def main() -> int:
         request = dict(report_path=report, config_path=config, schema_path=schema,
                        endpoint="https://feedback.example.org/collect", repo_opt_in="true")
         transport = Collector()
-        refused(lambda: submit(**request, opener=transport))
-        assert transport.calls == 0, "Default config unexpectedly initiated external POST"
+        # Even default opt-out transmission intent cannot send without a
+        # configured endpoint, and explicit user disable always wins.
+        refused(lambda: submit(**{**request, "endpoint": ""}, opener=transport))
+        assert transport.calls == 0, "Missing collector endpoint initiated external POST"
         data = json.loads(config.read_text(encoding="utf-8"))
+        assert data["external_submission_enabled"] is True
+        refused(lambda: submit(**{**request, "repo_opt_in": "false"}, opener=transport))
+        assert transport.calls == 0, "Explicit recipient disable initiated external POST"
+        data["external_submission_enabled"] = False
+        config.write_text(json.dumps(data), encoding="utf-8")
+        refused(lambda: submit(**request, opener=transport))
+        assert transport.calls == 0, "Config opt-out initiated external POST"
         data["external_submission_enabled"] = True
         config.write_text(json.dumps(data), encoding="utf-8")
-        refused(lambda: submit(**{**request, "repo_opt_in": "false"}, opener=transport))
-        assert transport.calls == 0, "Missing repo-level consent initiated external POST"
         accepted = submit(**request, opener=transport)
         assert accepted["status"] == "HTTPS_RECEIPT_HASH_MATCH"
         assert transport.calls == 1 and transport.body == report.read_bytes()
@@ -125,6 +132,17 @@ def main() -> int:
         refused(lambda: submit(**request, opener=collision2))
         assert collision2.calls == 0, "Free-text profile exfiltrated"
 
+        safe["profile"] = json.loads(transport.body.decode("utf-8"))["profile"]
+        safe["diagnostics"] = {"source": "ENUM_EVENT_COUNTS_ONLY",
+                              "erratic_agent_observations": 0, "misconfiguration_observations": 0,
+                              "stale_authority_observations": 0, "unbounded_retry_observations": 0,
+                              "ambiguous_external_effect_observations": 0,
+                              "resource_contention_observations": 0,
+                              "PRIVATE_INFORMATION": 1}
+        report.write_text(json.dumps(safe), encoding="utf-8")
+        collision3 = Collector()
+        refused(lambda: submit(**request, opener=collision3))
+        assert collision3.calls == 0, "Unallowlisted diagnosis leaked"
         report.write_bytes(b"{}")
         refused(lambda: submit(**request, opener=Collector()))
         report.write_bytes(b"0" * 33000)

@@ -10,7 +10,7 @@ En proyectos nuevos se genera **una vez al mes** un informe de metadatos y se co
 
 Incluye versión y perfil, estados de validación, datos agregados de uso del mecanismo, cantidades de errores, reintentos, recuperaciones y bloqueos. No recopila código, contenido del proyecto, conversaciones, nombres de repositorios, rutas, identificadores persistentes, SHA ni credenciales.
 
-**No se envía automáticamente al creador del starter** por el mero hecho de generarlo: ese envío necesita un receptor real y configuración/autorización informada. Nunca se inventa que llegó.
+**El envío externo queda preparado como opt-out, pero no existe receptor configurado en esta candidata.** Por lo tanto, ahora no llega automáticamente al creador. Si se configura un receptor HTTPS verificable, la preferencia predeterminada será enviar un resumen mínimo, anunciado al instalar, con desactivación inmediata mediante external_submission_enabled=false. No se envían datos privados. Nunca se inventa que llegó.
 
 Para desactivarlo: cambiar enabled a false en .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, borrar .github/workflows/agentic-sdlc-feedback.yml o generar el proyecto con --no-feedback-workflow. No afecta al funcionamiento del proyecto.
 

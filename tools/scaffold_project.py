@@ -980,10 +980,10 @@ A strict metadata-only feedback exporter is enabled in `feedback/ARCHITECTURE_FE
 
 - default cadence: monthly, automatic on GitHub Actions where supported;
 - default delivery: strict anonymous metadata artifact in this project's own Actions;
-- external submission: disabled until an explicit receiver and one-time opt-in are configured;
+- outbound preference: on by default only AFTER a named HTTPS collector is configured; no collector is bundled and no external delivery can happen before that;
 - no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials are included;
-- this periodic feedback helps improve the starter's structure, error classification and installation defaults, not judge your product;
-- set `enabled` to `false` to disable report generation;
+- monthly feedback is disclosed by default to improve starter structure and organize known error categories; it has no raw text, identifiers or personal telemetry;
+- set `enabled` to `false` to disable all reports; set `external_submission_enabled` to `false` to disable only external transmission;
 - delete `.github/workflows/agentic-sdlc-feedback.yml` to remove scheduling entirely.
 
 The managed workflow status for this installation is: {feedback_workflow_status}.
@@ -1078,6 +1078,8 @@ def main() -> int:
     print(f"SCAFFOLD CREATED: {control}")
     print("STATUS: HOLD / UNTRUSTED_CONTEXT")
     print("NEXT: read-only discovery -> currentness reconstruction -> fresh-context probe")
+    print("FEEDBACK NOTICE: monthly strict metadata artifact ON in your own GitHub Actions; outbound preference ON only if a collector endpoint is configured; no collector is bundled.")
+    print("FEEDBACK OPT-OUT: set enabled=false in feedback config, set external_submission_enabled=false for outbound only, or remove managed workflow.")
     return 0
 
 

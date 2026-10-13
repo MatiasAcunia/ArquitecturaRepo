@@ -6,7 +6,7 @@
 
 [FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
 
-GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **nothing is sent to this repository's maintainer by default**. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **no data can reach a maintainer until a verified collector endpoint is configured**; after that, minimal outbound reporting defaults ON with a conspicuous opt-out. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
 
 A forkable starter for building a durable multi-agent software-development system around a real project.

@@ -64,8 +64,8 @@ def main() -> int:
             raise AssertionError("feedback must default enabled")
         if config.get("cadence") != "MONTHLY":
             raise AssertionError("feedback must default to monthly, not weekly")
-        if config.get("external_submission_enabled") is not False:
-            raise AssertionError("external submission must default disabled")
+        if config.get("external_submission_enabled") is not True:
+            raise AssertionError("v1.2 must declare opt-out outbound preference; no endpoint means no transport")
         if config.get("privacy_mode") != "STRICT_METADATA_ONLY":
             raise AssertionError("feedback privacy mode is not strict metadata only")
 
@@ -167,7 +167,7 @@ def main() -> int:
     print("ARCHITECTURE FEEDBACK PRIVACY SELF-TEST PASSED")
     print("- scheduled feedback is installed by default")
     print("- local report generation defaults enabled, monthly")
-    print("- external submission defaults disabled")
+    print("- outbound preference defaults ON but no real remote sends until verified collector exists; easily disabled")
     print("- strict allowlisted metadata report validates")
     print("- product identifiers, requirements, paths, emails and SHA-like values do not leak")
     print("- cadence mismatch skips emission")

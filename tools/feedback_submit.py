@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Explicit opt-in feedback sender with minimal, verifiable receipt.
 
-Never sends an arbitrary path or project content. Network use requires TWO
-independent opt-ins, a strict allowlisted schema and a safe HTTPS destination.
+Never sends an arbitrary path or project content. Network use requires local mode enabled and an explicit repo-level
+non-disabled transfer setting plus a preconfigured approved endpoint, a strict allowlisted schema and a safe HTTPS destination.
 No network call occurs during import/tests without a provided fake transport.
 """
 from __future__ import annotations
@@ -90,6 +90,15 @@ def validate_privacy_categories(report: dict) -> None:
         for name, count in statuses.items()
     ):
         raise FeedbackHold("FREE_TEXT_METADATA_KEY_OR_COUNT_REFUSED")
+    diagnostics = report.get("diagnostics")
+    if diagnostics is not None:
+        from architecture_feedback import DIAGNOSTIC_FIELDS
+        if (not isinstance(diagnostics, dict)
+            or set(diagnostics) != set(DIAGNOSTIC_FIELDS) | {"source"}
+            or diagnostics.get("source") != "ENUM_EVENT_COUNTS_ONLY"
+            or any(type(diagnostics[k]) is not int or not (0 <= diagnostics[k] <= 10000)
+                   for k in DIAGNOSTIC_FIELDS)):
+            raise FeedbackHold("UNTRUSTED_DIAGNOSTIC_FIELD_OR_COUNT")
     process = report.get("process", {})
     if process.get("operating_review_rating") not in ALLOWED_REVIEW_RATINGS:
         raise FeedbackHold("FREE_TEXT_REVIEW_RATING_REFUSED")
