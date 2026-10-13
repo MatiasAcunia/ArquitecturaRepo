@@ -251,6 +251,51 @@ def main() -> int:
         if rerun.returncode == 0:
             raise AssertionError("scaffold must refuse overwrite without --force")
 
+        # Adversarial installation path and overwrite tests.
+        victim = base / "victim"
+        victim.mkdir()
+        sentinel = victim / "DO_NOT_DELETE"
+        sentinel.write_text("protected", encoding="utf-8")
+        for malicious in ("../victim", "..", ".", "/tmp/somewhere", "C:\\other", "nested/subtree"):
+            unsafe = run(str(SCAFFOLD), "--target", str(base / "sandbox"),
+                         "--control-dir", malicious, "--profile", "SMALL",
+                         "--product-id", "TEST")
+            if unsafe.returncode == 0:
+                raise AssertionError("unsafe --control-dir accepted: " + malicious)
+            if sentinel.read_text(encoding="utf-8") != "protected":
+                raise AssertionError("unsafe install modified an unrelated directory")
+
+        rogue_project = base / "rogue"
+        rogue_control = rogue_project / ".agentic-sdlc"
+        rogue_control.mkdir(parents=True)
+        rogue_marker = rogue_control / "PERSONAL_NOT_STARTER"
+        rogue_marker.write_text("keep", encoding="utf-8")
+        illegal_force = run(str(SCAFFOLD), "--target", str(rogue_project),
+                            "--profile", "SMALL", "--product-id", "TEST", "--force")
+        if illegal_force.returncode == 0 or rogue_marker.read_text(encoding="utf-8") != "keep":
+            raise AssertionError("--force must not delete unrecognized control directories")
+
+        symlink_project = base / "linked-project"
+        try:
+            symlink_project.symlink_to(victim, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            pass
+        else:
+            linked = run(str(SCAFFOLD), "--target", str(symlink_project),
+                         "--profile", "SMALL", "--product-id", "TEST", "--force")
+            if linked.returncode == 0:
+                raise AssertionError("scaffold must refuse symlinked project roots")
+
+        linked_control_project = base / "linked-control"
+        linked_control_project.mkdir()
+        (linked_control_project / ".agentic-sdlc").symlink_to(
+            victim, target_is_directory=True)
+        linked_force = run(str(SCAFFOLD), "--target", str(linked_control_project),
+                           "--profile", "SMALL", "--product-id", "TEST", "--force")
+        if linked_force.returncode == 0 or sentinel.read_text(encoding="utf-8") != "protected":
+            raise AssertionError("scaffold followed symlinked --force target")
+        
+
     print("SCAFFOLD SELF-TEST PASSED")
     print(f"- generated and validated {len(PROFILES)} profiles")
     print("- SMALL remains minimal")
