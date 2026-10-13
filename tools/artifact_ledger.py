@@ -331,9 +331,12 @@ def gc_plan(project, data):
 
 
 def operate(a):
-    project = Path(a.project).absolute()
-    if not project.is_dir() or project.is_symlink():
+    supplied = Path(a.project).absolute()
+    if not supplied.is_dir() or supplied.is_symlink():
         raise LedgerHold("PROJECT_UNTRUSTED")
+    # Windows may present TEMP as RUNNER~1 while resolve() expands it.
+    # Use ONE canonical root for os.walk, relative_to and Git identity.
+    project = supplied.resolve()
     path = ledger_file(project, a.control_dir)
     if a.action == "report":
         data = load(path)
