@@ -48,7 +48,7 @@ Verwenden Sie --language auto|en|es|pt|fr|de|it|ja|zh. Zum Abschalten enabled=fa
 
 ### 12. Was ist getestet und wie melde ich Fehler?
 
-v1.1 ist stabil, v1.2 bleibt ein Kandidat bis zu unabhängigen Praxistests. Erstellen Sie ein Issue mit Reproduktionsschritten und bereinigten Logs. Originalmaterial steht unter MIT.
+1.1.0 ist stabil, v1.2 bleibt ein Kandidat bis zu unabhängigen Praxistests. Erstellen Sie ein Issue mit Reproduktionsschritten und bereinigten Logs. Originalmaterial steht unter MIT.
 
 ---
 
