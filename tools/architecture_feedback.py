@@ -8,11 +8,44 @@ import sys
 from collections import Counter
 from datetime import date
 from pathlib import Path
+import re
 from typing import Any
 
 
 ALLOWED_REVIEW_RATINGS = {"GOOD", "MIXED", "POOR", "UNKNOWN"}
 ALLOWED_TRIGGER = {"WEEKLY", "MONTHLY", "MANUAL"}
+
+ALLOWED_STATUS_TOKENS = {
+    "UNKNOWN", "DRAFT", "CONFIRMED", "CURRENT", "PENDING", "READY",
+    "HOLD", "ACTIVE", "BLOCKED", "PAUSED", "DONE", "COMPLETE", "FAILED",
+    "VALIDATED", "SUPERSEDED", "CANCELLED", "RETRY",
+    "CAPACITY_CHECKPOINT", "STRATEGIC_TERMINAL",
+    "UNTRUSTED_CONTEXT", "TRUSTED_CONTEXT", "TO_BE_ASSESSED",
+    "NOT_ASSESSED", "NOT_CONFIGURED", "DEPLOYED",
+    "LOCAL", "LOCAL_ONLY", "LAN", "INTERNET", "CLOUD", "HYBRID",
+    "OFFLINE", "NONE", "NO_EXPOSURE", "SYSTEM_ONLY", "PRIVATE", "PUBLIC",
+}
+ALLOWED_PROFILES = {
+    "SMALL", "STATEFUL", "ARTIFACT_HEAVY", "MULTI_WORKSTREAM",
+    "MULTI_PRODUCT", "HIGH_CONSEQUENCE", "STARTER_OR_UNKNOWN",
+}
+
+
+def safe_enum(value: Any, *, category: str = "status") -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        return "UNKNOWN"
+    token = value.upper().replace("-", "_")
+    known = ALLOWED_PROFILES if category == "profile" else ALLOWED_STATUS_TOKENS
+    return token if token in known else "UNKNOWN"
+
+
+def safe_version(value: Any) -> str:
+    if isinstance(value, str) and re.fullmatch(r"\d+\.\d+\.\d+", value):
+        return value
+    return "UNKNOWN"
+
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -119,7 +152,7 @@ def build_report(control: Path, trigger: str) -> dict[str, Any]:
     work_status_counts = Counter()
     for item in runtime.get("work_units", []) if isinstance(runtime.get("work_units"), list) else []:
         if isinstance(item, dict) and isinstance(item.get("status"), str):
-            work_status_counts[item["status"]] += 1
+            work_status_counts[safe_enum(item["status"])] += 1
 
     event_counts = count_runtime_events(runtime)
     machine = tech.get("environment", {}).get("machine_profile", {}) if tech else {}
@@ -141,15 +174,15 @@ def build_report(control: Path, trigger: str) -> dict[str, Any]:
 
     report = {
         "schema_version": "architecture-feedback-report-0.1",
-        "starter_version": starter_version,
+        "starter_version": safe_version(starter_version),
         "trigger": trigger,
-        "profile": profile.get("profile") if isinstance(profile.get("profile"), str) else "STARTER_OR_UNKNOWN",
+        "profile": safe_enum(profile.get("profile"), category="profile") or "STARTER_OR_UNKNOWN",
         "runtime_enabled": bool(profile.get("runtime_enabled", bool(runtime))),
         "control": {
             "validation_passed": validate_control(control),
-            "bootstrap_status": bootstrap.get("status") if isinstance(bootstrap.get("status"), str) else None,
+            "bootstrap_status": safe_enum(bootstrap.get("status")),
             "currentness_verified": bool(currentness.get("verified", False)),
-            "product_status": product.get("status") if isinstance(product.get("status"), str) else None,
+            "product_status": safe_enum(product.get("status")),
             "owner_count": len(current_owners),
             "capability_count": len(capabilities),
             "active_campaign": bool(product.get("active_campaign")),
@@ -158,17 +191,17 @@ def build_report(control: Path, trigger: str) -> dict[str, Any]:
         "project_baseline": {
             "present": bool(tech or delivery),
             "ready": baseline_ready(control) if tech or delivery else False,
-            "technical_status": tech.get("status") if isinstance(tech.get("status"), str) else None,
-            "machine_assessment_status": machine.get("assessment_status") if isinstance(machine.get("assessment_status"), str) else None,
-            "network_mode": network_mode if isinstance(network_mode, str) else None,
-            "delivery_status": delivery.get("status") if isinstance(delivery.get("status"), str) else None,
+            "technical_status": safe_enum(tech.get("status")),
+            "machine_assessment_status": safe_enum(machine.get("assessment_status")),
+            "network_mode": safe_enum(network_mode),
+            "delivery_status": safe_enum(delivery.get("status")),
             "milestone_count": len(milestones),
             "overdue_milestone_count": overdue,
             "schedule_change_count": len(delivery.get("schedule_changes", [])) if isinstance(delivery.get("schedule_changes"), list) else 0,
         },
         "runtime": {
             "present": bool(runtime),
-            "campaign_status": runtime.get("campaign_status") if isinstance(runtime.get("campaign_status"), str) else None,
+            "campaign_status": safe_enum(runtime.get("campaign_status")),
             "work_status_counts": dict(sorted(work_status_counts.items())),
             **event_counts,
         },
