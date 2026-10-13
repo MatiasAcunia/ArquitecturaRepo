@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import tempfile
 import shutil
 import sys
 from datetime import datetime, timezone
@@ -56,7 +58,7 @@ def build_currentness_set(include_identity: bool) -> list[str]:
     return refs
 
 
-def create_scaffold(
+def _populate_staging_project(
     target: Path,
     control_dir_name: str,
     profile_name: str,
@@ -893,7 +895,7 @@ This is process-improvement evidence, not product authority.
 - campaign execution: NOT_YET_AUTHORIZED
 - product acceptance: NOT_ESTABLISHED
 - architecture feedback workflow: {feedback_workflow_status}
-- architecture feedback external submission: DISABLED_BY_DEFAULT
+- architecture feedback external submission: COLLECTOR_NOT_CONFIGURED / OPT_OUT_PREFERENCE_ONLY
 
 ## Open HOLDs
 
@@ -999,6 +1001,126 @@ Do not claim installation success until the fresh-context probe has been exercis
     write_text(control / "README.md", readme)
 
     return control
+
+
+def create_scaffold(
+    target: Path,
+    control_dir_name: str,
+    profile_name: str,
+    product_id: str,
+    objective: str,
+    force: bool,
+    with_runtime: bool,
+    install_feedback_workflow: bool,
+    language: str = "auto",
+    execution_mode: str = "SYNCHRONOUS",
+    collaboration: str = "SOLO",
+    work_scope: str = "SOFTWARE",
+    project_type: str = "OTHER",
+) -> Path:
+    """Stage the control layer before publishing it into an adopting project.
+
+    No existing control layer is replaced. The companion GitHub workflow is a
+    second filesystem surface and CANNOT be committed atomically with control;
+    it must be preserved on collision and is never accepted as proof of
+    a complete external integration merely because source was copied.
+    """
+    if force:
+        raise ValueError("UNSAFE_FORCE_HOLD: use an isolated target or reviewed migration")
+    if target.is_symlink():
+        raise ValueError("SYMLINKED_PROJECT_ROOT_REFUSED")
+    if target.exists() and not target.is_dir():
+        raise ValueError("INSTALL_ROOT_NOT_DIRECTORY")
+    # The inner population performs all name and profile validation.
+    # If a new project root is created, a failed installation removes only
+    # its own empty directory, never unrelated or concurrently added files.
+    created_root = not target.exists()
+    if created_root:
+        target.mkdir(parents=True, exist_ok=False)
+    stage_root: Path | None = None
+    try:
+        if not isinstance(control_dir_name, str):
+            raise ValueError("INVALID_CONTROL_DIR")
+        final_control = target / control_dir_name
+        if final_control.exists() or final_control.is_symlink():
+            raise FileExistsError(
+                "EXISTING_CONTROL_PRESERVED: explicit migration required"
+            )
+        final_workflow = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+        if (final_workflow.is_symlink()
+            or (target / ".github").is_symlink()
+            or (target / ".github" / "workflows").is_symlink()):
+            raise ValueError("SYMLINKED_WORKFLOW_BOUNDARY_REFUSED")
+        existing_workflow = final_workflow.exists()
+        if existing_workflow and not final_workflow.is_file():
+            raise ValueError("PREEXISTING_WORKFLOW_NOT_A_REGULAR_FILE")
+        # A previously managed workflow may have been modified by its user;
+        # preserving it is safer than silently overwriting the adopted repo.
+        stage_root = Path(tempfile.mkdtemp(prefix=".agentic-sdlc-stage-", dir=target))
+        generate_workflow = install_feedback_workflow and not existing_workflow
+        stage_control = _populate_staging_project(
+            target=stage_root,
+            control_dir_name=control_dir_name,
+            profile_name=profile_name,
+            product_id=product_id,
+            objective=objective,
+            force=False,
+            with_runtime=with_runtime,
+            install_feedback_workflow=generate_workflow,
+            language=language,
+            execution_mode=execution_mode,
+            collaboration=collaboration,
+            work_scope=work_scope,
+            project_type=project_type,
+        )
+        if existing_workflow:
+            # Source installation reports must not misrepresent a workflow
+            # which was preserved instead of installed by this operation.
+            for name in ("INSTALLATION_REPORT.md", "README.md"):
+                document = stage_control / name
+                content = document.read_text(encoding="utf-8")
+                document.write_text(
+                    content.replace(
+                        "DISABLED_BY_INSTALL_OPTION", "PRESERVED_EXISTING_WORKFLOW"
+                    ),
+                    encoding="utf-8",
+                )
+        if final_control.exists() or final_control.is_symlink():
+            raise FileExistsError("CONCURRENT_CONTROL_CREATION_HOLD")
+        os.rename(stage_control, final_control)
+        if generate_workflow:
+            staged_workflow = (
+                stage_root / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+            )
+            # No upgrade path: never overwrite an existing workflow file.
+            try:
+                if final_workflow.exists() or final_workflow.is_symlink():
+                    raise FileExistsError("WORKFLOW_ADDED_DURING_INSTALL")
+                final_workflow.parent.mkdir(parents=True, exist_ok=True)
+                os.rename(staged_workflow, final_workflow)
+            except (OSError, ValueError) as exc:
+                # Do not delete newly installed canonical CLIENT state because
+                # a secondary workflow failed. Record a durable HOLD instead.
+                for name in ("INSTALLATION_REPORT.md", "README.md"):
+                    document = final_control / name
+                    content = document.read_text(encoding="utf-8")
+                    document.write_text(
+                        content.replace("INSTALLED", "WORKFLOW_INSTALL_HOLD"),
+                        encoding="utf-8",
+                    )
+                raise OSError(
+                    "WORKFLOW_INSTALL_HOLD: control safely staged; "
+                    "workflow not installed, preserve state and repair explicitly"
+                ) from exc
+        return final_control
+    finally:
+        if stage_root is not None:
+            shutil.rmtree(stage_root, ignore_errors=False)
+        if created_root:
+            try:
+                target.rmdir()
+            except OSError:
+                pass
 
 
 def main() -> int:

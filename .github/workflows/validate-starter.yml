@@ -82,5 +82,7 @@ jobs:
         run: python tools/selftest_v12_stabilization.py
       - name: Refuse tampered crash journals and verify bounded recovery
         run: python tools/selftest_v12_journal_security.py
+      - name: Falsify partial installs and user-owned workflow collisions
+        run: python tools/selftest_v12_install_staging.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py
