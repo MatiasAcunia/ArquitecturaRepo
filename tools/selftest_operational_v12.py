@@ -24,6 +24,7 @@ def must_fail(fn, expected: type[Exception]) -> None:
 
 
 def test_goal(tmp: Path) -> None:
+    tmp.mkdir(parents=True, exist_ok=True)
     assert assess(tmp)["status"] == "NOT_CONFIGURED"
     (tmp / "state").mkdir()
     (tmp / "runtime").mkdir()
