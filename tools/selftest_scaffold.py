@@ -251,6 +251,33 @@ def main() -> int:
         if rerun.returncode == 0:
             raise AssertionError("scaffold must refuse overwrite without --force")
 
+        # v1.2 forbids destructive --force even for a pristine scaffold:
+        # a still-DRAFT project might contain uncommitted CLIENT theory.
+        baseline_dir = base / "small" / ".agentic-sdlc"
+        original_requirements = (baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md").read_bytes()
+        original_profile = (baseline_dir / "PROFILE.json").read_bytes()
+        pristine_force = run(str(SCAFFOLD), "--target", str(base / "small"),
+                             "--profile", "SMALL", "--product-id", "EXAMPLE_SMALL",
+                             "--force")
+        if pristine_force.returncode == 0:
+            raise AssertionError("v1.2 must refuse destructive --force on every existing layer")
+        if ((baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md").read_bytes()
+                != original_requirements or (baseline_dir / "PROFILE.json").read_bytes()
+                != original_profile):
+            raise AssertionError("refused --force modified uncommitted CLIENT theory")
+        # A malicious existing marker is not permission to delete any project.
+        saved = original_requirements
+        edited = saved + b"\nUnsaved private CLIENT decision, must survive rejected force.\n"
+        (baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md").write_bytes(edited)
+        modified_force = run(str(SCAFFOLD), "--target", str(base / "small"),
+                             "--profile", "SMALL", "--product-id", "EXAMPLE_SMALL",
+                             "--force")
+        if modified_force.returncode == 0 or (
+            baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md"
+        ).read_bytes() != edited:
+            raise AssertionError("force destroyed an unconfirmed CLIENT requirement")
+        (baseline_dir / "state" / "CLIENT_REQUIREMENTS_CURRENT.md").write_bytes(saved)
+
         # Adversarial installation path and overwrite tests.
         victim = base / "victim"
         victim.mkdir()

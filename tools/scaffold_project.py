@@ -96,44 +96,24 @@ def create_scaffold(
     if control.is_symlink():
         raise ValueError("refuse symlinked control directory (even with --force)")
     if control.exists():
-        if not force:
-            raise FileExistsError(
-                f"{control} already exists; refuse to overwrite without --force"
+        # Replacing an apparently dormant scaffold can delete uncommitted
+        # CLIENT theory and artifacts. Force is intentionally disabled in
+        # v1.2 until a versioned, independently reviewed migration exists.
+        if force:
+            raise ValueError(
+                "UNSAFE_REINSTALL_HOLD: --force cannot replace an existing "
+                "control layer; preserve it and use an explicit migration "
+                "or a fresh disposable target"
             )
-        manifest_path = control / "state" / "STARTER_MANIFEST.json"
-        profile_path = control / "PROFILE.json"
-        if (not control.is_dir() or manifest_path.is_symlink()
-            or profile_path.is_symlink() or not manifest_path.is_file()
-            or not profile_path.is_file()):
-            raise ValueError("--force refuses unrecognized/non-starter control directory")
-        try:
-            old_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            old_profile = json.loads(profile_path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            raise ValueError("--force requires valid starter manifest/profile") from None
-        if (old_manifest.get("starter") != "agentic-sdlc-starter"
-            or old_profile.get("schema_version") != "starter-profile-selection-0.1"):
-            raise ValueError("--force refuses non-starter control state")
-        # Force is NOT an upgrade mechanism. Reject a live/verified/modified
-        # project before any deletion; updates require versioned migrations.
-        try:
-            existing_product = json.loads(
-                (control / "state" / "PRODUCT_STATE_CURRENT.json").read_text(encoding="utf-8"))
-            existing_bootstrap = json.loads(
-                (control / "state" / "CURRENT_BOOTSTRAP_STATE.json").read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            raise ValueError("--force requires reconstructible initial Product State") from None
-        if (existing_product.get("status") != "HOLD"
-            or existing_product.get("active_campaign")
-            or existing_bootstrap.get("status") != "UNTRUSTED_CONTEXT"
-            or existing_bootstrap.get("currentness", {}).get("verified") is not False
-            or (control / "runtime" / "transactions" / "CURRENT_TRANSACTION.json").exists()):
-            raise ValueError("--force refuses live/verified/pending-transaction state; use migrations")
-        # A linked subtree could be followed by a later write. Reject before
-        # any deletion rather than treating --force as a generic rm -rf.
-        if any(node.is_symlink() for node in control.rglob("*")):
-            raise ValueError("--force refuses symlinks in the existing control layer")
-        shutil.rmtree(control)
+        raise FileExistsError(
+            f"{control} already exists; preserve it and use migrations "
+            "instead of overwriting"
+        )
+    if force:
+        raise ValueError(
+            "UNSAFE_FORCE_HOLD: --force is not an installation mode in v1.2; "
+            "use a clean target without --force"
+        )
     profile = PROFILES[profile_name]
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     version = MANIFEST["version"]
@@ -1030,7 +1010,7 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Replace only the generated control directory if it already exists.",
+        help="Legacy flag: deliberately refused in v1.2; never deletes existing state.",
     )
     parser.add_argument(
         "--with-runtime",

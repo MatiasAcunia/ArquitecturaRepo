@@ -74,5 +74,9 @@ jobs:
         run: python tools/selftest_v12_longitudinal.py
       - name: Guard v1.2 privacy, language and longitudinal documentation defaults
         run: python tools/selftest_v12_documentation.py
+      - name: Falsify editable release PASS and independent-host claims
+        run: python tools/selftest_v12_release_falsifiers.py
+      - name: Falsify malformed CLIENT theory and stale baseline
+        run: python tools/selftest_v12_theory_hardening.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py

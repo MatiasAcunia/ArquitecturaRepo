@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 from pathlib import Path
 
 
@@ -39,15 +38,27 @@ def check(control: Path) -> dict:
         bootstrap = json.loads((control / REQUIRED[2]).read_text(encoding="utf-8"))
         requirements = (control / REQUIRED[0]).read_text(encoding="utf-8")
         overlay = (control / REQUIRED[3]).read_text(encoding="utf-8")
-        currentness = bootstrap.get("currentness", {})
+        if not isinstance(product, dict) or not isinstance(bootstrap, dict):
+            raise ValueError("JSON_CANONICAL_OBJECT_REQUIRED")
+        currentness = bootstrap.get("currentness")
+        if not isinstance(currentness, dict):
+            failures.append("CURRENTNESS_CONTRACT_MALFORMED")
+            currentness = {}
         if product.get("status") in {None, "HOLD", "UNKNOWN"}:
             failures.append("PRODUCT_STATE_NOT_BASELINED")
         if bootstrap.get("status") == "UNTRUSTED_CONTEXT" or currentness.get("verified") is not True:
             failures.append("CURRENTNESS_OR_BOOTSTRAP_UNTRUSTED")
         if len(requirements.strip()) < 30 or len(overlay.strip()) < 30:
             failures.append("CANONICAL_THEORY_INCOMPLETE")
+        if ("CLIENT confirmation: PENDING" in requirements or
+            "Baseline status: DRAFT" in requirements):
+            failures.append("CLIENT_THEORY_UNCONFIRMED")
+        if "TO_BE_DISCOVERED" in requirements:
+            failures.append("CLIENT_REQUIREMENTS_STILL_PLACEHOLDERS")
         # Presence of interaction evidence does not equal updated requirements;
         # there is no reliable semantic comparison without explicit reconciliation.
+        # Interactions are evidence, never proof of L1 reconciliation.
+        # No filesystem marker may certify CLIENT semantic acceptance.
         interactions = control / "interactions"
         evidence_present = interactions.is_dir() and any(
             f.suffix in {".json", ".md"} and f.name != "README.md"
