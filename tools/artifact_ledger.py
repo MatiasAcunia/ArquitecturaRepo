@@ -415,6 +415,8 @@ def operate(a):
             if a.safe_delete and (
                 a.category not in DELETABLE or a.ttl_hours is None):
                 raise LedgerHold("DELETE_CLASS_OR_TTL_INVALID")
+            if a.ttl_hours is not None and not (-24 <= a.ttl_hours <= 24 * 365):
+                raise LedgerHold("RETENTION_OUT_OF_RANGE")
             if fingerprint(confined(project, name)) != entry["fingerprint"]:
                 entry.update(category="QUARANTINE_UNRESOLVED", safe_delete=False)
                 save(path, data)

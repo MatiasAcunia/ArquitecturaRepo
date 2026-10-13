@@ -110,3 +110,5 @@ This capability remains candidate-only pending exact Linux/Windows CI and
 actual L3 adoption. The v1.2 release and governed-project transfer remain HOLD.
 
 Portable output filenames with Unicode letters and spaces are supported. Windows device-name aliases and trailing-dot/space paths remain invalid. Every file entry must match the registered root owner and campaign or the ledger fails closed.
+
+The generated control runtime includes a local .gitignore for the per-file ledger and its writer lock. The registry is retained physically across L3 sessions without forcing per-sample Git commits; any evidentiary snapshot must be deliberately sanitized/accepted at a meaningful checkpoint. Corrupt JSON, invalid owner bindings, changed root markers and existing writer locks all produce HOLD instead of permitting cleanup. No automatic stale-lock takeover is allowed.

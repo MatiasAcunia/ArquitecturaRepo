@@ -114,6 +114,11 @@ def main() -> int:
                     raise AssertionError(
                         f"{profile}: baseline surface missing: {baseline_surface}"
                     )
+            runtime_ignore = control / "runtime" / ".gitignore"
+            if not runtime_ignore.is_file() or "ARTIFACT_LIFECYCLE_CURRENT.json" not in runtime_ignore.read_text(encoding="utf-8"):
+                raise AssertionError(f"{profile}: local artifact index must be Git-ignored")
+            if not (control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md").is_file():
+                raise AssertionError(f"{profile}: file GC manual missing from installed scaffold")
             inventory = json.loads(
                 (control / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json").read_text(encoding="utf-8")
             )

@@ -219,6 +219,7 @@ def _populate_staging_project(
     copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
     copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
+    copy_file(ROOT / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md", control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md")
     # Persistent local operational index, not a second Product State or DB.
     # No deletion owner is inferred until a new scratch root is registered.
     write_json(control / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json", {
@@ -229,6 +230,11 @@ def _populate_staging_project(
         "roots": {},
         "files": {},
     })
+    # Operational per-file state must survive context resets without creating
+    # a Git commit after every produced sample or exposing filenames in pushes.
+    write_text(control / "runtime" / ".gitignore",
+               "ARTIFACT_LIFECYCLE_CURRENT.json\n"
+               "ARTIFACT_LIFECYCLE_CURRENT.json.lock\n")
     preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
     preferences.update(execution_mode=execution_mode, collaboration=collaboration,
                        work_scope=work_scope, project_type=project_type)

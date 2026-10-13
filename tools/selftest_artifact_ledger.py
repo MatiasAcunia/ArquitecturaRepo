@@ -134,6 +134,37 @@ def main() -> int:
         assert run(project, "gc")["ready_count"] == 1
         assert run(project, "gc", "--execute")["deleted_count"] == 1
         assert not localized.exists()
+        # Samples awaiting review remain protected regardless of age.
+        review = project / root / "editorial_preview.mp4"
+        review.write_bytes(b"PENDING_HUMAN_REVIEW")
+        run(project, "reconcile", "--root", root)
+        assert run(project, "gc", "--execute")["deleted_count"] == 0
+        assert review.exists()
+        # A crashed/other writer lock blocks mutating GC, but not read-only inspection.
+        before_lock = ledger.read_bytes()
+        lock = ledger.with_name(ledger.name + ".lock")
+        lock.write_text("unresolved previous writer")
+        assert run(project, "gc", "--execute", code=2)["status"] == "HOLD"
+        assert ledger.read_bytes() == before_lock
+        assert run(project, "gc")["mode"] == "dry-run"
+        lock.unlink()
+        # Marker corruption is never interpreted as an opportunity to clean.
+        marker = project / root / ".agentic-artifact-root.json"
+        original_marker = marker.read_bytes()
+        marker.write_bytes(b"{}")
+        assert run(project, "gc", code=2)["status"] == "HOLD"
+        marker.write_bytes(original_marker)
+        # Reject forged owner in ledger even though the file hash is unchanged.
+        saved = ledger.read_bytes()
+        forged = json.loads(saved)
+        forged["files"][root + "/tracked.bin"]["owner"] = "FOREIGN"
+        ledger.write_text(json.dumps(forged), encoding="utf-8")
+        assert run(project, "gc", code=2)["status"] == "HOLD"
+        ledger.write_bytes(saved)
+        # A broken JSON file must fail closed without deleting/reconstructing it.
+        ledger.write_bytes(b"{not valid JSON")
+        assert run(project, "gc", code=2)["status"] == "HOLD"
+        ledger.write_bytes(saved)
         assert run(project, "init-root", "--root", root,
                    "--owner", "I4", "--campaign", "FOREIGN",
                    code=2)["status"] == "HOLD"
