@@ -225,7 +225,7 @@ def validate_structure_only(errors: list[str]) -> None:
             "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
         }:
             checked = re.sub(
-                r"(?m)^\\s*- uses: actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\\.[0-9]+\\.[0-9]+\\s*$",
+                r"(?m)^\s*- uses: actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
                 "",
                 checked,
             )
