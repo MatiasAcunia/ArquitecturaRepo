@@ -44,6 +44,21 @@ def main() -> int:
         ledger = project / ".agentic-sdlc" / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json"
         ledger.parent.mkdir(parents=True)
         ledger.write_text(json.dumps(initial()), encoding="utf-8")
+        observed = run(project, "observe-git")
+        assert observed["status"] == "SOURCE_GIT_OBSERVED"
+        assert observed["head"] and observed["changed_count"] == 0
+        assert run(project, "observe-git")["status"] == "SOURCE_GIT_UNCHANGED"
+        (project / "source.txt").write_text("PRODUCT_SOURCE_MODIFIED")
+        (project / "new_code.py").write_text("x=1")
+        modified = run(project, "observe-git")
+        assert modified["changed_count"] >= 2
+        observation = json.loads(ledger.read_text())["git_observations"][-1]
+        changed_paths = {r["path"] for r in observation["changed"]}
+        assert {"source.txt", "new_code.py"}.issubset(changed_paths)
+        # Repository changes are observations, not GC deletion permits.
+        (project / "source.txt").write_text("PRODUCT_SOURCE_PRESERVED")
+        (project / "new_code.py").unlink()
+        run(project, "observe-git")
         root = ".agentic-sdlc-scratch/campaign-A"
         assert run(project, "init-root", "--root", root,
                    "--owner", "I3", "--campaign", "CAMP_A")["status"] == "ROOT_REGISTERED"

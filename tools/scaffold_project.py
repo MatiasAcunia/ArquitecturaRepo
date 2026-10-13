@@ -230,6 +230,7 @@ def _populate_staging_project(
         "updated_at": now,
         "roots": {},
         "files": {},
+        "git_observations": [],
     })
     # Operational per-file state must survive context resets without creating
     # a Git commit after every produced sample or exposing filenames in pushes.

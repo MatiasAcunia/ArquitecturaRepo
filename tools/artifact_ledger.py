@@ -75,7 +75,7 @@ def ledger_file(project, control):
 def initial():
     s = stamp(now())
     return {"schema_version": VERSION, "revision": 0,
-            "created_at": s, "updated_at": s, "roots": {}, "files": {}}
+            "created_at": s, "updated_at": s, "roots": {}, "files": {}, "git_observations": []}
 
 
 def safe_root(name):
@@ -86,13 +86,24 @@ def safe_root(name):
 
 
 def validate(d):
-    if (not isinstance(d, dict) or set(d) != {
-        "schema_version", "revision", "created_at", "updated_at", "roots", "files"
-    } or d["schema_version"] != VERSION or
+    required = {"schema_version", "revision", "created_at", "updated_at", "roots", "files"}
+    if (not isinstance(d, dict) or not required.issubset(d) or
+        set(d) - (required | {"git_observations"}) or
+        d["schema_version"] != VERSION or
         type(d["revision"]) is not int or d["revision"] < 0 or
         not isinstance(d["roots"], dict) or not isinstance(d["files"], dict) or
         len(d["files"]) > 160000):
         raise LedgerHold("LEDGER_INVALID")
+    observations = d.get("git_observations", [])
+    if not isinstance(observations, list) or len(observations) > 32:
+        raise LedgerHold("GIT_OBSERVATION_HISTORY_INVALID")
+    for observation in observations:
+        if (not isinstance(observation, dict) or set(observation) !=
+            {"observed_at", "head", "changed"} or
+            not isinstance(observation["head"], str) or
+            not isinstance(observation["changed"], list) or
+            len(observation["changed"]) > 5000):
+            raise LedgerHold("GIT_OBSERVATION_ENTRY_INVALID")
     for root, owner in d["roots"].items():
         safe_root(root)
         if (not isinstance(owner, dict) or set(owner) !=
@@ -316,6 +327,51 @@ def ready(project, data, name, unknown_roots):
     return "DELETE_READY", "OWNED_EXPIRED_UNMODIFIED_IGNORED"
 
 
+def inspect_git(project):
+    """Read the actual canonical checkout; never copy source files into the ledger."""
+    def git(*params):
+        try:
+            return subprocess.run(
+                ["git", "-C", str(project), *params],
+                capture_output=True, text=False, check=False,
+                timeout=15,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            raise LedgerHold("GIT_SOURCE_READBACK_FAILED") from None
+    actual = git("rev-parse", "--show-toplevel")
+    if actual.returncode or Path(os.fsdecode(actual.stdout).strip()).resolve() != project.resolve():
+        raise LedgerHold("CANONICAL_GIT_CHECKOUT_MISMATCH")
+    head = git("rev-parse", "--verify", "HEAD")
+    if head.returncode:
+        # Unborn repos are observable, not release-current or mutation-authorized.
+        revision = "UNBORN"
+    else:
+        revision = os.fsdecode(head.stdout).strip()
+        if not re.fullmatch(r"[0-9a-f]{40,64}", revision):
+            raise LedgerHold("GIT_HEAD_UNVERIFIED")
+    current = git("-c", "status.renames=false", "status",
+                  "--porcelain=v1", "-z", "--untracked-files=all")
+    if current.returncode or len(current.stdout) > 2_000_000:
+        raise LedgerHold("GIT_STATUS_UNVERIFIABLE_OR_OVERSIZE")
+    records = current.stdout.split(b"\\x00")
+    if records and records[-1] == b"":
+        records.pop()
+    if len(records) > 5000:
+        raise LedgerHold("GIT_SOURCE_PATH_BUDGET_EXCEEDED")
+    changed = []
+    for raw in records:
+        if len(raw) < 4 or raw[2:3] != b" ":
+            raise LedgerHold("GIT_STATUS_RECORD_INVALID")
+        status = raw[:2].decode("ascii", errors="strict")
+        filename = os.fsdecode(raw[3:])
+        # Git porcelain -z keeps spaces and accents in file names verbatim.
+        # Values are local-only evidence; never concatenate them into shell.
+        if not filename or filename.startswith(("/", "\\")) or "\\x00" in filename:
+            raise LedgerHold("GIT_STATUS_PATH_INVALID")
+        changed.append({"status": status, "path": filename})
+    return {"observed_at": stamp(now()), "head": revision, "changed": changed}
+
+
 def gc_plan(project, data):
     observed = {root: inventory(project, data, root) for root in data["roots"]}
     unknown = {root for root, files in observed.items()
@@ -352,6 +408,19 @@ def operate(a):
         return gc_plan(project, load(path))
     with locked(path):
         data = load(path)
+        if a.action == "observe-git":
+            observation = inspect_git(project)
+            history = data.setdefault("git_observations", [])
+            newest = history[-1] if history else None
+            if newest and newest["head"] == observation["head"] and newest["changed"] == observation["changed"]:
+                return {"status": "SOURCE_GIT_UNCHANGED", "head": observation["head"],
+                        "changed_count": len(observation["changed"]), "ledger_revision": data["revision"]}
+            history.append(observation)
+            if len(history) > 32:
+                del history[:-32]
+            save(path, data)
+            return {"status": "SOURCE_GIT_OBSERVED", "head": observation["head"],
+                    "changed_count": len(observation["changed"]), "ledger_revision": data["revision"]}
         if a.action == "init-root":
             name = safe_root(a.root)
             p = confined(project, name)
@@ -464,6 +533,7 @@ def main():
     init.add_argument("--owner", required=True)
     init.add_argument("--campaign", required=True)
     sub.add_parser("report")
+    sub.add_parser("observe-git")
     rec = sub.add_parser("reconcile")
     rec.add_argument("--root", required=True)
     cap = sub.add_parser("capture")
