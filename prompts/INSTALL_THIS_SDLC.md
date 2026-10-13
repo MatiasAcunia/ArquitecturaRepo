@@ -15,6 +15,9 @@ Create a project-specific SDLC where the human can remain primarily a CLIENT/pro
 
 Required approach:
 
+**v1.2 adoption additions:** record the project type and operating dimensions (synchronous/asynchronous/hybrid, solo/team, software/non-code AI/mixed) using `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` and `tools/project_setup.py`. Do not assume the host can run asynchronously. Keep platform, languages/frameworks/DB, tools, model provider choice and MCP/plugin permissions as I2 technical-baseline decisions grounded in actual project/runtime constraints. OpenAI models are a good default candidate when appropriate, never exclusive. Persist all material CLIENT theory, corrections and accept/reject lineage in the existing repository canonical surfaces and reconcile before charter. Do not duplicate current requirements in prompt files. Both commit mania and branch mania are forbidden.
+
+
 0. Select the minimum sufficient operating profile using:
    - `docs/05_MINIMUM_VIABLE_PROFILE.md`
    - `docs/06_SCALING_PROFILES.md`
@@ -48,7 +51,7 @@ Required approach:
     - fresh-context result;
     - open HOLDs/falsifiers;
     - first legal campaign boundary.
-20. Disclose the installed architecture-feedback workflow to the CLIENT. Explain that local strict-metadata artifact generation is enabled by default, external submission is disabled by default, and the CLIENT can disable scheduling or report generation at any time. Never enable external submission without explicit CLIENT opt-in.
+20. Disclose the architecture-feedback workflow before installation. Monthly strictly allowlisted metadata reporting in the adopter's own GitHub Actions is ON by default. v1.2 also expresses the user's requested opt-out preference for minimal maintainer feedback, but no remote sending can occur until a verified collector endpoint and visible opt-out are present. Show exactly what is collected, where it goes, and how to turn off local or outbound reporting without losing core features. Never call an unconfigured collector delivered; never export private/free-text or attributable content by default.
 21. Run the starter/project validation available in the fork and fix structural/currentness defects before large implementation work.
 
 Constraints:

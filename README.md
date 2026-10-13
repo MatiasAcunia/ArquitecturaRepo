@@ -27,6 +27,15 @@ The isolated 1.2 development branch adds fail-closed Goal/invocation and tactica
 - [Resumen y privacidad en español](docs/24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md)
 - [Machine-readable 1.2 acceptance blockers](state/V1_2_ACCEPTANCE_CRITERIA.json)
 
+## v1.2 operating-mode and technology selection (draft)
+
+- [Execution / team / non-code AI modes and 14 project types](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md) — configurable dimensions and verified-gate HOLDs, not additional controllers
+- [Longitudinal isolated L3 pilot plan](docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md) — synthetic CRUD, repeated sessions, failures, critique and rollback
+- `tools/project_setup.py` — read-only stack/model/plugin suggestions; canonical technology decisions remain I2-owned
+- `tools/theory_guard.py` — read-only check of existing CLIENT requirements, Product State, domain overlay and bootstrap; not a parallel theory DB
+
+Project selection remains independent of the six existing profiles. OpenAI models are useful defaults when task fit, privacy and cost justify them; other providers and tools remain supported. No plugin or LLM subscription is installed automatically.
+
 ## What you get
 
 The starter defines four internal engineering roles:

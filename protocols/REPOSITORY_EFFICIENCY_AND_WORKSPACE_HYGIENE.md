@@ -179,3 +179,7 @@ This does not require remote CI after every local edit.
 ## 12. Success criterion
 
 Repository hygiene is healthy when Git history expresses meaningful causal/recovery/authority boundaries, currentness refresh transfers only required refs/objects, context reloads are delta-first, disposable local workspaces have ownership/expiry, GC can prove what it deletes and cleanup does not require CLIENT technical rescue.
+
+## 13. Branch-mania prevention
+
+The default is one canonical checkout and one continuously evolving, legally authorized I3 campaign. Branches are **not task counters**. Do not open a branch for every bug, helper, test, Plan revision, model session or milestone. A second branch/worktree is justified only by demonstrable incompatible concurrent writes, an independently reviewable release boundary, a controlled high-risk experiment or a necessary hotfix isolation. Prefer a temporary worktree sharing the object store; record the causal reason, protected surfaces, integration owner and cleanup trigger. For shared DB/state or common mutable outputs, separate branches alone never provide isolation. Retire the temporary worktree and prune on completion. No force push or stale-head overwrite. Persist meaningful commits only at coherent candidate, authority, recovery or release boundaries. Use exact HEAD CI; never equate commit count, branch count or tool activity with capability progress.

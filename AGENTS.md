@@ -132,3 +132,9 @@ Before claiming the adapted SDLC is installed, a fresh agent should be able to r
 - next legal and forbidden actions;
 
 without requiring chat archaeology or technical rescue from the CLIENT.
+
+## v1.2 operating and adoption dimensions
+
+Read `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` before recommending async/mixed/team modes, non-code AI workflows, model/plugin add-ons or a technical stack. These are orthogonal selectors, not extra I1/I2/I3/I4 roles. `configuration/OPERATING_PREFERENCES.json` is a non-authoritative setup proposal; actual stack/currentness lives in the existing canonical Technical Baseline and CLIENT/Product State.
+
+Read `docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md` for the isolated longitudinal CRUD pilot; never ship a test project's Product State as a user template. Abnormal agent behavior is investigated by causal owner and evidence, not by opening microcampaigns/branches. Repository CLIENT theory must be durable, accurately versioned and internally consistent before any material route.

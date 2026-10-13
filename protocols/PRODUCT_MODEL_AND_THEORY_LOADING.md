@@ -77,3 +77,7 @@ Before authorizing a campaign ask:
 "What local technical success could satisfy this campaign while still leaving the actual product materially wrong?"
 
 If a plausible answer exists and the charter does not guard against it, the strategic envelope is incomplete.
+
+## Reorganizing theory without rewriting authority
+
+Reorganization is permitted and encouraged when it reduces repeated reading or conflicting current summaries. Preserve the one canonical L1 owner, L0 interaction provenance, historic superseded decisions, immutable acceptance/rejection evidence, and affected downstream charters. Recompute currentness hashes and invalidate affected decisions; do not simply mark a refactor as semantically equivalent without review. No material client idea survives only in a model's temporary context. Any new domain shift requires reloading the relevant canonical theory.
