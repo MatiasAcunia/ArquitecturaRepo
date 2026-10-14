@@ -264,3 +264,13 @@ Implemented:
 - non-leakage self-test for project identifiers/content/paths/credentials.
 
 This is an evidence-driven capability addition, not a restart of open-ended architecture iteration.
+
+## v1.2.0 — Published portable engineering controls
+
+Published and tagged, with exact source-bound tests. Includes Goal/Plan diagnostics, improved source/SQLite WAL currentness, optional read-only host-package preflight, reviewed artifact lifecycle with durable GC intent, recovery and generalizable scaffolding. Host-specific coding-agent execution remains a separate opt-in supported-capability question; maintainer QA projects are not adopter prerequisites. The historical v1.2 tag is immutable.
+
+## Proposed v1.3.0 — Engineering quality and real end-to-end agentic SDLC
+
+**Not implemented or released.** The architecture is defined in [doc 40 — target engineering architecture](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md) and its gated development route in [doc 41 — M0–M6](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). The original research/framework transfer lives in [doc 39](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md); two independent test families in [doc 38](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md).
+
+Product emphasis: real independently accepted software delivery for an adopter using a supported optional agent host, plus rigorous internal Python/state/transaction tests; risk-proportionate simplicity, verified authority, persistence, recovery, privacy and source-bound independent review. A new event bus, extra agent organization or SOP layer must earn adoption by improving tested outcomes over the simpler baseline. Planning issue #4 tracks design; research issue #2 accumulates primary paper evaluations. No compulsory private project or vendor dependency.
