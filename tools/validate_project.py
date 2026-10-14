@@ -9,9 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
+from state_tx import contains_sqlite_or_sidecar, is_sqlite_or_sidecar, sha256_file, sha256_path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_DIR = REPO_ROOT / "schemas"
+PROJECT_ROOT: Path | None = None
 
 SCHEMA_BY_VERSION = {
     "product-state-0.1": "product-state.schema.json",
@@ -78,14 +80,69 @@ def validate_instance(path: Path, data: Any, schema_name: str, errors: list[str]
         errors.append(f"{rel(path)}: schema validation failed{suffix}: {error.message}")
 
 
-def resolve_ref(target_root: Path, value: str | None) -> bool:
+def resolve_ref_path(target_root: Path, value: str | None) -> Path | None:
     if not value:
-        return False
-    candidates = [
-        target_root / value,
-        REPO_ROOT / value,
-    ]
-    return any(p.exists() for p in candidates)
+        return None
+    target_root = target_root.resolve()
+    project_root = PROJECT_ROOT or (
+        target_root.parent if target_root.name.casefold() == ".agentic-sdlc" else target_root
+    )
+    project_root = project_root.resolve()
+    # Repository fixtures may intentionally bind to shared repository-level
+    # owners (for example the root AGENTS.md). Copied-control preflight is
+    # stricter: its explicit project root is the only external owner boundary.
+    allowed_roots = (
+        (target_root, project_root)
+        if PROJECT_ROOT is not None
+        else (target_root, project_root, REPO_ROOT)
+    )
+    reference = Path(value)
+    if reference.is_absolute():
+        candidates = [reference]
+    else:
+        candidates = []
+        parts = reference.parts
+        if PROJECT_ROOT is not None and parts and parts[0] == "..":
+            if parts.count("..") != 1:
+                return None
+            candidates.append(project_root.joinpath(*parts[1:]))
+        else:
+            candidates.append(target_root / reference)
+        candidates.append(REPO_ROOT / reference)
+
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if any(
+            resolved == allowed or resolved.is_relative_to(allowed)
+            for allowed in allowed_roots
+        ) and resolved.exists():
+            return resolved
+    return None
+
+
+def resolve_ref(target_root: Path, value: str | None) -> bool:
+    return resolve_ref_path(target_root, value) is not None
+
+
+def inside(path: Path, root: Path) -> bool:
+    resolved_path = path.resolve()
+    resolved_root = root.resolve()
+    return resolved_path == resolved_root or resolved_path.is_relative_to(resolved_root)
+
+
+def resolve_review_evidence(control_root: Path, value: str) -> Path | None:
+    reference = Path(value)
+    project_root = PROJECT_ROOT or control_root.parent
+    candidates = (
+        [reference]
+        if reference.is_absolute()
+        else [control_root / reference, project_root / reference]
+    )
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if inside(resolved, project_root) and resolved.is_file():
+            return resolved
+    return None
 
 
 def scan(target_root: Path, errors: list[str]) -> dict[str, list[tuple[Path, dict[str, Any]]]]:
@@ -151,6 +208,10 @@ def validate_product_state(
         "Product State owner",
         errors,
     )
+    reviewer_actors: dict[str, dict[str, Any]] = {}
+    for _, registry in buckets.get("identity-registry-0.1", []):
+        for actor in registry.get("actors", []):
+            reviewer_actors.setdefault(actor["actor_id"], actor)
     charters = one_by_key(
         buckets.get("campaign-charter-0.1", []),
         "campaign_id",
@@ -381,6 +442,78 @@ def validate_bootstrap(
                         f"{rel(path)}: currentness source_ref does not resolve: {ref}"
                     )
 
+            source_refs = set(currentness.get("source_refs", []))
+            state_refs = set(state.get("currentness_set", []))
+            for ref in sorted(source_refs | state_refs):
+                resolved = resolve_ref_path(target_root, ref)
+                if resolved is not None and contains_sqlite_or_sidecar(resolved):
+                    errors.append(
+                        f"{rel(path)}: SQLite currentness ref requires a "
+                        f"transactionally consistent snapshot witness: {ref}"
+                    )
+            bindings = currentness.get("source_bindings", [])
+            binding_by_ref: dict[str, str] = {}
+            for binding in bindings:
+                ref = binding["ref"]
+                if ref in binding_by_ref:
+                    errors.append(
+                        f"{rel(path)}: duplicate currentness source binding for {ref!r}"
+                    )
+                    continue
+                binding_by_ref[ref] = binding["sha256"]
+                if ref not in source_refs and ref not in state_refs:
+                    errors.append(
+                        f"{rel(path)}: source binding {ref!r} is absent from currentness refs"
+                    )
+                resolved = resolve_ref_path(target_root, ref)
+                if resolved is None or not (resolved.is_file() or resolved.is_dir()):
+                    errors.append(
+                        f"{rel(path)}: bound currentness source is not a file or directory: {ref}"
+                    )
+                elif contains_sqlite_or_sidecar(resolved):
+                    errors.append(
+                        f"{rel(path)}: SQLite currentness binding requires a "
+                        f"transactionally consistent snapshot witness: {ref}"
+                    )
+                elif sha256_path(resolved) != binding["sha256"]:
+                    errors.append(
+                        f"{rel(path)}: currentness source binding digest mismatch: {ref}"
+                    )
+
+            if currentness.get("verified") is True:
+                for ref in sorted(source_refs | state_refs):
+                    resolved = resolve_ref_path(target_root, ref)
+                    if resolved is not None and not inside(resolved, target_root):
+                        if ref not in binding_by_ref:
+                            errors.append(
+                                f"{rel(path)}: external currentness source is not digest-bound: {ref}"
+                            )
+
+            artifact_bindings = currentness.get("artifact_bindings", [])
+            seen_artifacts: set[str] = set()
+            for binding in artifact_bindings:
+                artifact_path = Path(binding["path"])
+                artifact_key = str(artifact_path.resolve())
+                if artifact_key in seen_artifacts:
+                    errors.append(
+                        f"{rel(path)}: duplicate currentness artifact binding: {artifact_path}"
+                    )
+                    continue
+                seen_artifacts.add(artifact_key)
+                if not artifact_path.is_absolute() or artifact_path.is_symlink() or not artifact_path.is_file():
+                    errors.append(
+                        f"{rel(path)}: currentness artifact is not an absolute regular file: {artifact_path}"
+                    )
+                elif is_sqlite_or_sidecar(artifact_path):
+                    errors.append(
+                        f"{rel(path)}: SQLite artifact binding requires a "
+                        f"transactionally consistent snapshot witness: {artifact_path}"
+                    )
+                elif sha256_file(artifact_path) != binding["sha256"]:
+                    errors.append(
+                        f"{rel(path)}: currentness artifact binding digest mismatch: {artifact_path}"
+                    )
+
         if bootstrap["status"] == "READY" and unresolved:
             errors.append(f"{rel(path)}: READY bootstrap cannot have unresolved currentness")
 
@@ -536,6 +669,10 @@ def validate_campaign_runtime(
         "Product State owner",
         errors,
     )
+    reviewer_actors: dict[str, dict[str, Any]] = {}
+    for _, registry in buckets.get("identity-registry-0.1", []):
+        for actor in registry.get("actors", []):
+            reviewer_actors.setdefault(actor["actor_id"], actor)
     authorities_by_campaign: dict[str, list[tuple[Path, dict[str, Any]]]] = defaultdict(list)
     for authority_path, authority in buckets.get("execution-authority-0.1", []):
         if authority.get("campaign_id"):
@@ -669,40 +806,100 @@ def validate_campaign_runtime(
                 )
 
         product_record = products.get(runtime["product_or_workstream"])
-        if product_record is not None:
+        if product_record is None:
+            errors.append(
+                f"{rel(path)}: runtime product {runtime['product_or_workstream']!r} has no Product State"
+            )
+        else:
             product_path, product = product_record
             active_campaign = product.get("active_campaign")
-            if active_campaign and active_campaign.get("campaign_id") == campaign_id:
+            if not isinstance(active_campaign, dict) or active_campaign.get("campaign_id") != campaign_id:
+                errors.append(
+                    f"{rel(product_path)}: active campaign does not match runtime campaign {campaign_id!r}"
+                )
+            if isinstance(active_campaign, dict) and active_campaign.get("campaign_id") == campaign_id:
                 if product["current_code_ref"] != runtime["integrated_ref"]:
                     errors.append(
                         f"{rel(product_path)}: Product State current_code_ref "
                         f"{product['current_code_ref']!r} != runtime integrated_ref "
                         f"{runtime['integrated_ref']!r}"
                     )
-                if checkpoint_id and active_campaign.get("checkpoint_or_terminal_ref") != checkpoint_id:
+                if active_campaign.get("checkpoint_or_terminal_ref") != checkpoint_id:
                     errors.append(
                         f"{rel(product_path)}: Product State pointer "
                         f"{active_campaign.get('checkpoint_or_terminal_ref')!r} "
                         f"!= runtime checkpoint {checkpoint_id!r}"
                     )
+                required_currentness = {"runtime/CAMPAIGN_RUNTIME_CURRENT.json"}
+                if checkpoint_id:
+                    required_currentness.add(
+                        f"campaigns/{campaign_id}/CHECKPOINT_CURRENT.json"
+                    )
+                currentness = set(product.get("currentness_set", []))
+                missing = sorted(required_currentness - currentness)
+                if missing:
+                    errors.append(
+                        f"{rel(product_path)}: Currentness Set omits runtime owner(s) {missing}"
+                    )
 
         freeze = runtime.get("review_freeze")
         if freeze and freeze["status"] == "REVIEWED":
+            control_root = path.parent.parent
             if freeze["candidate_ref"] != runtime["integrated_ref"]:
                 errors.append(
                     f"{rel(path)}: REVIEWED freeze candidate {freeze['candidate_ref']!r} "
                     f"!= runtime integrated_ref {runtime['integrated_ref']!r}"
                 )
             producer_actors = {
-                unit["actor_id"]
-                for unit in units.values()
-                if unit["actor_id"] and unit["status"] == "DONE"
+                unit["actor_id"] for unit in units.values() if unit["actor_id"]
             }
             if freeze.get("reviewer_actor_id") in producer_actors:
                 errors.append(
                     f"{rel(path)}: reviewer actor {freeze.get('reviewer_actor_id')!r} "
                     "also produced DONE work"
                 )
+            if not freeze.get("reviewer_actor_id") or not freeze.get("reviewer_run_id"):
+                errors.append(f"{rel(path)}: REVIEWED freeze requires reviewer identity and run")
+            if not freeze.get("evidence_refs"):
+                errors.append(f"{rel(path)}: REVIEWED freeze requires evidence_refs")
+            evidence_bindings = freeze.get("evidence_bindings", [])
+            bound_evidence = {
+                item["ref"]: item["sha256"] for item in evidence_bindings
+            }
+            if len(bound_evidence) != len(evidence_bindings):
+                errors.append(f"{rel(path)}: REVIEWED freeze has duplicate evidence bindings")
+            for ref in freeze.get("evidence_refs", []):
+                evidence_path = resolve_review_evidence(control_root, ref)
+                if evidence_path is None:
+                    errors.append(
+                        f"{rel(path)}: review evidence ref does not resolve to a project file: {ref}"
+                    )
+                elif ref not in bound_evidence:
+                    errors.append(
+                        f"{rel(path)}: REVIEWED freeze evidence is not digest-bound: {ref}"
+                    )
+                elif sha256_file(evidence_path) != bound_evidence[ref]:
+                    errors.append(
+                        f"{rel(path)}: REVIEWED freeze evidence digest mismatch: {ref}"
+                    )
+            for ref in bound_evidence:
+                if ref not in freeze.get("evidence_refs", []):
+                    errors.append(
+                        f"{rel(path)}: REVIEWED freeze has an unreferenced evidence binding: {ref}"
+                    )
+            if charter.get("independent_review_required") is True:
+                reviewer = reviewer_actors.get(freeze.get("reviewer_actor_id"))
+                if reviewer is None:
+                    errors.append(
+                        f"{rel(path)}: required reviewer actor is absent from identity registry"
+                    )
+                else:
+                    if reviewer.get("status") != "ACTIVE":
+                        errors.append(f"{rel(path)}: reviewer actor is not ACTIVE")
+                    if reviewer.get("current_run_id") != freeze.get("reviewer_run_id"):
+                        errors.append(
+                            f"{rel(path)}: reviewer_run_id does not match identity registry current_run_id"
+                        )
 
         terminal = runtime.get("terminal_request")
         if runtime["campaign_status"] == "STRATEGIC_TERMINAL" and terminal is None:
@@ -719,6 +916,15 @@ def validate_campaign_runtime(
             if not freeze or freeze["status"] != "REVIEWED":
                 errors.append(
                     f"{rel(path)}: readiness terminal request requires REVIEWED freeze"
+                )
+            elif freeze.get("verdict") != "PASS_FOR_STRATEGIC_RETURN":
+                errors.append(
+                    f"{rel(path)}: readiness terminal request requires "
+                    "verdict PASS_FOR_STRATEGIC_RETURN"
+                )
+            elif not freeze.get("evidence_refs"):
+                errors.append(
+                    f"{rel(path)}: readiness terminal request requires independent review evidence"
                 )
             unfinished = [
                 unit["id"]
@@ -973,11 +1179,20 @@ def main() -> int:
         default=".",
         help="Project/example root to validate. Defaults to the repository root.",
     )
+    parser.add_argument(
+        "--project-root",
+        help="Existing application root for a copied control-state preflight with external owner refs.",
+    )
     args = parser.parse_args()
 
+    global PROJECT_ROOT
+    PROJECT_ROOT = Path(args.project_root).resolve() if args.project_root else None
     target_root = (REPO_ROOT / args.root).resolve()
     if not target_root.exists():
         print(f"PROJECT VALIDATION FAILED\n- root does not exist: {target_root}")
+        return 1
+    if PROJECT_ROOT is not None and not PROJECT_ROOT.is_dir():
+        print(f"PROJECT VALIDATION FAILED\n- project root does not exist: {PROJECT_ROOT}")
         return 1
 
     errors: list[str] = []

@@ -29,6 +29,17 @@
       "governance/PROJECT_OVERLAY.md",
       "../evidence/STATEFUL_REFERENCE_EVIDENCE.json"
     ],
-    "unresolved": []
+    "unresolved": [],
+    "source_bindings": [
+      {
+        "ref": "../app/note_store.py",
+        "sha256": "eb43f66159865d48259a34b44927325b36894a53b3744113e05f7d1b2c05e50f"
+      },
+      {
+        "ref": "../evidence/STATEFUL_REFERENCE_EVIDENCE.json",
+        "sha256": "ba2bcf48779616d0019a4acda6ceac26b2ac9866a63ca63cf9cc7ded8a643def"
+      }
+    ],
+    "artifact_bindings": []
   }
 }

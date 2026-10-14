@@ -64,6 +64,19 @@
         "evidence_refs": {
           "type": "array",
           "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ref", "sha256"],
+            "properties": {
+              "ref": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "uniqueItems": true
         }
       }
     },

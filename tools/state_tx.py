@@ -7,6 +7,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import sys
 import tempfile
 import time
@@ -31,9 +32,110 @@ def sha256_bytes(payload: bytes) -> str:
 
 
 def sha256_file(path: Path) -> str | None:
-    if not path.exists():
+    try:
+        if not stat.S_ISREG(path.stat().st_mode):
+            return None
+    except OSError:
         return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def sha256_path(path: Path) -> str | None:
+    """Hash one regular file or a deterministic, symlink-free directory tree."""
+    if path.is_symlink():
+        return None
+    if path.is_file():
+        return sha256_file(path)
+    if not path.is_dir():
+        return None
+
+    root = path.resolve()
+    entries: list[tuple[str, int, str]] = []
+    for current, directories, files in os.walk(root, topdown=True, followlinks=False):
+        current_path = Path(current)
+        kept: list[str] = []
+        for name in sorted(directories):
+            directory = current_path / name
+            if directory.is_symlink():
+                return None
+            kept.append(name)
+        directories[:] = kept
+        for name in sorted(files):
+            file_path = current_path / name
+            if file_path.is_symlink():
+                return None
+            before = file_path.stat()
+            if not stat.S_ISREG(before.st_mode):
+                return None
+            file_digest = sha256_file(file_path)
+            after = file_path.stat()
+            if (
+                file_digest is None
+                or (before.st_size, before.st_mtime_ns)
+                != (after.st_size, after.st_mtime_ns)
+            ):
+                return None
+            entries.append(
+                (file_path.relative_to(root).as_posix(), after.st_size, file_digest)
+            )
+    digest = hashlib.sha256()
+    for relative, size, file_digest in sorted(entries):
+        digest.update(relative.encode("utf-8") + b"\0")
+        digest.update(str(size).encode("ascii") + b"\0")
+        digest.update(file_digest.encode("ascii") + b"\n")
+    return digest.hexdigest()
+
+
+def is_sqlite_or_sidecar(path: Path) -> bool:
+    """Identify SQLite main files and journal sidecars without opening a DB."""
+    def protected_name(name: str) -> bool:
+        lowered = name.casefold()
+        return lowered.endswith(("-wal", "-shm", "-journal")) or Path(name).suffix.casefold() in {
+        ".db", ".sqlite", ".sqlite3"
+        }
+
+    if protected_name(path.name):
+        return True
+    try:
+        resolved_name = path.resolve(strict=False).name
+    except (OSError, RuntimeError):
+        return True
+    if protected_name(resolved_name):
+        return True
+    if not path.is_file():
+        return False
+    try:
+        if path.stat().st_nlink != 1:
+            # A hard link loses the protected sidecar's filename. Treat any
+            # multiply-linked file as opaque rather than binding ambiguous DB
+            # bytes without a transactional snapshot witness.
+            return True
+        with path.open("rb") as handle:
+            return handle.read(16) == b"SQLite format 3\x00"
+    except OSError:
+        return True
+
+
+def contains_sqlite_or_sidecar(path: Path) -> bool:
+    """Inspect one currentness surface, including files under a directory ref."""
+    if path.is_symlink() and path.is_dir():
+        # Directory links can hide arbitrary currentness surfaces. Do not
+        # traverse outside the declared tree or treat the opaque link as safe.
+        return True
+    if is_sqlite_or_sidecar(path):
+        return True
+    if not path.is_dir():
+        return False
+    for candidate in path.rglob("*"):
+        if candidate.is_symlink() and candidate.is_dir():
+            return True
+        if is_sqlite_or_sidecar(candidate):
+            return True
+    return False
 
 
 def fsync_dir(path: Path) -> None:

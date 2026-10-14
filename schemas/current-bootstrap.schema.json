@@ -58,6 +58,32 @@
           "items": {"type": "string", "minLength": 1},
           "uniqueItems": true
         },
+        "source_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ref", "sha256"],
+            "properties": {
+              "ref": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "uniqueItems": true
+        },
+        "artifact_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "uniqueItems": true
+        },
         "unresolved": {
           "type": "array",
           "items": {"type": "string", "minLength": 1},

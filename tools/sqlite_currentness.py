@@ -90,6 +90,8 @@ def inspect_store(path: Path, record: dict[str, Any]) -> list[str]:
         expected = record.get("sqlite_snapshot_sha256")
         has_snapshot = expected is not None
         valid_db = is_sqlite_database(path)
+        if not valid_db:
+            return ["SQLITE_SNAPSHOT_SOURCE_INVALID"]
         wal_exists = wal_nonempty(path)
         if not has_snapshot and valid_db:
             failures.append(

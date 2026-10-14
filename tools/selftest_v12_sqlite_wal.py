@@ -49,11 +49,13 @@ def main() -> int:
         }
         goal_file=control/"state"/"GOAL_CONTRACT_CURRENT.json"
         goal_file.write_text(json.dumps(goal))
+        review_evidence=control/"runtime"/"review-evidence.json"
+        review_evidence.write_text('{"synthetic_review":"wal fixture"}')
         diagnostic=assess(control)
         assert "SQLITE_WAL_CURRENTNESS_UNBOUND" in diagnostic["failure_codes"]
         try:
             update(control,expected_revision=-1,plan={"steps":[]},
-                   active_minutes=1,review_evidence_ref="synthetic")
+                   review_evidence_ref="runtime/review-evidence.json")
         except TacticalPlanError as e:
             assert "SQLITE_WAL_CURRENTNESS_UNBOUND" in str(e)
         else:
@@ -65,10 +67,12 @@ def main() -> int:
         assert checked["local_integrity_passed"] is False  # Plan not yet stored.
         assert "SQLITE_WAL_CURRENTNESS_UNBOUND" not in checked["failure_codes"]
         first=update(control,expected_revision=-1,plan={"steps":[]},
-                     active_minutes=2,review_evidence_ref="synthetic")
+                     review_evidence_ref="runtime/review-evidence.json")
         assert first["revision"]==0
-        assert assess(control)["local_integrity_passed"] is True
-        assert assess(control)["may_execute_material_goal"] is False
+        plan_diagnostic=assess(control)
+        assert plan_diagnostic["local_integrity_passed"] is False
+        assert "TACTICAL_REVIEW_DUE_OR_UNVERIFIED" in plan_diagnostic["failure_codes"]
+        assert plan_diagnostic["may_execute_material_goal"] is False
 
         # WAL changes can leave the main DB file byte-identical.
         connection.execute("INSERT INTO item(name) VALUES ('second')")
@@ -79,7 +83,7 @@ def main() -> int:
         assert "SQLITE_SNAPSHOT_STALE" in stale["failure_codes"]
         try:
             update(control,expected_revision=0,plan={"steps":[]},
-                   active_minutes=3,review_evidence_ref="stale")
+                   review_evidence_ref="runtime/review-evidence.json")
         except TacticalPlanError as e:
             assert "SQLITE_SNAPSHOT_STALE" in str(e)
         else:

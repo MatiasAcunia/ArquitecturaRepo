@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from sqlite_currentness import inspect_store
+from state_tx import sha256_file
 
 
 SCHEMA = "agentic-goal-contract-v1"
@@ -38,6 +39,8 @@ def digest(data: Any) -> str:
 
 
 def read(path: Path) -> dict[str, Any]:
+    if path.is_symlink():
+        raise GoalGuardError("SYMLINKED_CONTROL_FILE")
     if path.stat().st_size > MAX_JSON_BYTES:
         raise GoalGuardError("CONTROL_JSON_TOO_LARGE")
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -63,14 +66,30 @@ def confined(root: Path, relative: str) -> Path:
     return path
 
 
+def fixed_control_path(root: Path, relative: str) -> Path:
+    """Resolve a fixed control path while rejecting symlinked components."""
+    root = root.resolve()
+    if (not isinstance(relative, str) or not relative or "\\" in relative
+        or Path(relative).is_absolute()
+        or any(part in {"", ".", ".."} for part in relative.split("/"))):
+        raise GoalGuardError("INVALID_FIXED_CONTROL_PATH")
+    path = root
+    for part in relative.split("/"):
+        path = path / part
+        if path.is_symlink():
+            raise GoalGuardError("SYMLINKED_CONTROL_PATH")
+    if not path.resolve().is_relative_to(root):
+        raise GoalGuardError("CONTROL_PATH_ESCAPES_ROOT")
+    return path
+
+
 def file_sha(path: Path) -> str:
     if not path.is_file() or path.stat().st_size > MAX_AUTHORITY_BYTES:
         raise GoalGuardError("AUTHORITY_REFERENCE_UNREADABLE_OR_TOO_LARGE")
-    h = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            h.update(block)
-    return h.hexdigest()
+    digest = sha256_file(path)
+    if digest is None:
+        raise GoalGuardError("AUTHORITY_REFERENCE_UNREADABLE_OR_TOO_LARGE")
+    return digest
 
 
 def goal_fingerprint(goal: dict[str, Any]) -> str:
@@ -110,8 +129,18 @@ def goal_fingerprint(goal: dict[str, Any]) -> str:
 def assess(control: Path) -> dict[str, Any]:
     """Return local integrity evidence; *never* authorize the host."""
     control = control.resolve()
-    goal_path = control / "state" / "GOAL_CONTRACT_CURRENT.json"
-    plan_path = control / "runtime" / "TACTICAL_PLAN_CURRENT.json"
+    try:
+        goal_path = fixed_control_path(control, "state/GOAL_CONTRACT_CURRENT.json")
+        plan_path = fixed_control_path(control, "runtime/TACTICAL_PLAN_CURRENT.json")
+        fixed_control_path(control, "runtime/.campaignctl.lock")
+    except GoalGuardError as exc:
+        return {
+            "schema_version": "goal-invocation-attestation-v1",
+            "status": "HOLD",
+            "local_integrity_passed": False,
+            "may_execute_material_goal": False,
+            "failure_codes": ["UNTRUSTED_GOAL_OR_REFERENCE:" + type(exc).__name__],
+        }
     if not goal_path.is_file():
         return {"schema_version": "goal-invocation-attestation-v1",
                 "status": "NOT_CONFIGURED",
@@ -152,9 +181,29 @@ def assess(control: Path) -> dict[str, Any]:
                 failures.append("TACTICAL_PLAN_CAMPAIGN_DRIFT")
             if type(plan.get("revision")) is not int or plan["revision"] < 0:
                 failures.append("TACTICAL_PLAN_REVISION_INVALID")
+            evidence_ref = plan.get("review_evidence_ref")
+            evidence_digest = plan.get("review_evidence_sha256")
+            if not isinstance(evidence_digest, str) or not SHA.fullmatch(evidence_digest):
+                failures.append("TACTICAL_REVIEW_EVIDENCE_DIGEST_INVALID")
+            else:
+                try:
+                    evidence_path = confined(control, evidence_ref)
+                    if not evidence_path.is_file() or file_sha(evidence_path) != evidence_digest:
+                        failures.append("TACTICAL_REVIEW_EVIDENCE_STALE_OR_MISSING")
+                except (GoalGuardError, OSError, ValueError, TypeError):
+                    failures.append("TACTICAL_REVIEW_EVIDENCE_INVALID")
             active = plan.get("active_progress_minutes_since_review")
-            if type(active) is not int or active < 0 or active >= MAX_ACTIVE_MINUTES:
-                failures.append("TACTICAL_REVIEW_DUE_OR_UNVERIFIED")
+            # No authenticated native progress-attestation path is connected
+            # in this candidate. Only the local writer's explicitly unknown
+            # state is representable; native-looking JSON fields are not proof.
+            if (active is not None
+                or plan.get("progress_clock") != "HOST_UNVERIFIED_ADVISORY"
+                or plan.get("invocation_permit_issued") is not False
+                or plan.get("progress_tool") != "NATIVE_HOST_PROGRESS_UNAVAILABLE"):
+                failures.append("TACTICAL_PROGRESS_CLAIM_UNTRUSTED")
+            # The only accepted local state is unknown; unknown active time
+            # cannot clear a host-enforced review checkpoint.
+            failures.append("TACTICAL_REVIEW_DUE_OR_UNVERIFIED")
     except (OSError, ValueError, TypeError, KeyError) as exc:
         failures.append("UNTRUSTED_GOAL_OR_REFERENCE:" + type(exc).__name__)
 

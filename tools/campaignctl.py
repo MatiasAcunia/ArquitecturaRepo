@@ -15,6 +15,7 @@ from state_tx import (
     atomic_json,
     journal_path,
     recover as recover_pending_transaction,
+    sha256_file,
     state_lock as campaign_lock,
     write_json_set as transaction_write_json,
 )
@@ -104,6 +105,22 @@ def relative_to_control(control: Path, path: Path) -> str:
         return str(path.resolve())
 
 
+def evidence_file(control: Path, value: str) -> Path:
+    reference = Path(value)
+    project_root = control.resolve().parent
+    candidates = [reference] if reference.is_absolute() else [control / reference, project_root / reference]
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if (
+            (resolved == project_root or resolved.is_relative_to(project_root))
+            and resolved.is_file()
+        ):
+            return resolved
+    raise CampaignError(
+        f"review evidence must resolve to a regular file inside the project: {value!r}"
+    )
+
+
 def load_runtime(control: Path) -> dict[str, Any]:
     return load_json(runtime_path(control))
 
@@ -158,11 +175,11 @@ def invalidate_freeze(state: dict[str, Any], reason: str) -> None:
     freeze["status"] = "INVALIDATED"
     freeze["invalidated_at"] = now()
     freeze["invalidation_reason"] = reason
-    freeze["reviewer_actor_id"] = None
-    freeze["reviewer_run_id"] = None
-    freeze["verdict"] = None
-    freeze["evidence_refs"] = []
-    event(state, "REVIEW_FREEZE_INVALIDATED", details={"reason": reason})
+    event(
+        state,
+        "REVIEW_FREEZE_INVALIDATED",
+        details={"reason": reason, "freeze": dict(freeze)},
+    )
 
 
 def dependencies_done(state: dict[str, Any], unit: dict[str, Any]) -> bool:
@@ -240,7 +257,57 @@ def require_campaign_active(state: dict[str, Any]) -> None:
         raise CampaignError(f"campaign is not ACTIVE: {state['campaign_status']}")
 
 
+def require_product_state_matches_runtime(control: Path, state: dict[str, Any]) -> None:
+    path = product_state_path(control)
+    if not path.exists():
+        raise CampaignError(f"Product State is missing: {path}")
+    product = load_json(path)
+    if product.get("product_or_workstream") != state.get("product_or_workstream"):
+        raise CampaignError("Product State and campaign runtime product/workstream differ")
+    active = product.get("active_campaign")
+    if not isinstance(active, dict) or active.get("campaign_id") != state.get("campaign_id"):
+        raise CampaignError("Product State active campaign does not match campaign runtime")
+    if product.get("current_code_ref") != state.get("integrated_ref"):
+        raise CampaignError(
+            f"Product State current_code_ref {product.get('current_code_ref')!r} "
+            f"!= campaign runtime integrated_ref {state.get('integrated_ref')!r}"
+        )
+    if active.get("checkpoint_or_terminal_ref") != state.get("current_checkpoint_id"):
+        raise CampaignError(
+            "Product State checkpoint pointer does not match runtime current checkpoint"
+        )
+    checkpoint_id = state.get("current_checkpoint_id")
+    if checkpoint_id:
+        checkpoint_path = control / "campaigns" / state["campaign_id"] / "CHECKPOINT_CURRENT.json"
+        if not checkpoint_path.is_file():
+            raise CampaignError(f"current checkpoint file is missing: {checkpoint_path}")
+        checkpoint = load_json(checkpoint_path)
+        if (
+            checkpoint.get("campaign_id") != state["campaign_id"]
+            or checkpoint.get("checkpoint_id") != checkpoint_id
+            or checkpoint.get("exact_integrated_ref") != state.get("integrated_ref")
+        ):
+            raise CampaignError("current checkpoint does not match Product State/runtime identity")
+
+    currentness = set(product.get("currentness_set", []))
+    required_refs = {"runtime/CAMPAIGN_RUNTIME_CURRENT.json"}
+    if state.get("current_checkpoint_id"):
+        required_refs.add(
+            f"campaigns/{state['campaign_id']}/CHECKPOINT_CURRENT.json"
+        )
+    if authority_path(control).exists():
+        required_refs.add("state/EXECUTION_AUTHORITY_CURRENT.json")
+    if identity_path(control).exists():
+        required_refs.add("state/IDENTITY_REGISTRY_CURRENT.json")
+    missing_refs = sorted(required_refs - currentness)
+    if missing_refs:
+        raise CampaignError(
+            f"Product State Currentness Set omits runtime owner(s): {missing_refs}"
+        )
+
+
 def require_authority_if_present(control: Path, state: dict[str, Any]) -> None:
+    require_product_state_matches_runtime(control, state)
     path = authority_path(control)
     if not path.exists():
         return
@@ -320,8 +387,10 @@ def cmd_init(args: argparse.Namespace) -> None:
     control = control_root(args)
     require_project_baseline_if_present(control)
     rt_path = runtime_path(control)
-    if rt_path.exists() and not args.force:
-        raise CampaignError(f"runtime already exists: {rt_path}")
+    if rt_path.exists():
+        raise CampaignError(
+            f"runtime already exists and cannot be replaced by init (including --force): {rt_path}"
+        )
 
     charter_path = resolve(control, args.charter)
     charter = load_json(charter_path)
@@ -351,12 +420,41 @@ def cmd_init(args: argparse.Namespace) -> None:
         for capability in ps["capabilities"]:
             if capability["id"] == charter["capability"]:
                 capability["physical_state"] = "ACTIVE_CAMPAIGN"
+    elif not isinstance(active, dict):
+        raise CampaignError("Product State active_campaign must be an object or null")
     elif active.get("campaign_id") != charter["campaign_id"]:
         raise CampaignError(
             f"Product State already has different active campaign: {active.get('campaign_id')}"
         )
+    elif active.get("checkpoint_or_terminal_ref") is not None:
+        raise CampaignError(
+            "runtime is missing but Product State names an existing checkpoint/terminal; "
+            "the checkpoint does not contain a complete runtime recovery snapshot, so init "
+            "cannot reconstruct or replace campaign history"
+        )
+    elif (control / "campaigns" / charter["campaign_id"] / "CHECKPOINT_CURRENT.json").exists():
+        raise CampaignError(
+            "runtime is missing but an unreferenced current checkpoint exists; init cannot "
+            "discard or reinterpret campaign history"
+        )
+
+    authority_path_current = authority_path(control)
+    if authority_path_current.exists():
+        authority = load_json(authority_path_current)
+        if authority.get("authority_status") == "ACTIVE":
+            if authority.get("campaign_id") != charter["campaign_id"]:
+                raise CampaignError("active execution authority belongs to a different campaign")
+            if authority.get("checkpoint_ref") is not None:
+                raise CampaignError(
+                    "runtime is missing but active execution authority names a checkpoint; "
+                    "init cannot reconstruct or replace campaign history"
+                )
 
     integrated_ref = args.integrated_ref or ps["current_code_ref"]
+    if integrated_ref != ps.get("current_code_ref"):
+        raise CampaignError(
+            "init integrated_ref must match Product State current_code_ref; reconcile Product State first"
+        )
     state = {
         "schema_version": "campaign-runtime-0.1",
         "campaign_id": charter["campaign_id"],
@@ -742,6 +840,13 @@ def cmd_freeze(args: argparse.Namespace) -> None:
         raise CampaignError(
             f"freeze candidate {args.candidate_ref!r} != integrated_ref {state['integrated_ref']!r}"
         )
+    previous_freeze = state.get("review_freeze")
+    if previous_freeze is not None:
+        event(
+            state,
+            "REVIEW_FREEZE_SUPERSEDED",
+            details={"freeze": dict(previous_freeze)},
+        )
     state["review_freeze_counter"] += 1
     state["review_freeze"] = {
         "freeze_id": f"FREEZE_{state['review_freeze_counter']:04d}",
@@ -754,6 +859,7 @@ def cmd_freeze(args: argparse.Namespace) -> None:
         "reviewer_run_id": None,
         "verdict": None,
         "evidence_refs": [],
+        "evidence_bindings": [],
     }
     event(
         state,
@@ -770,21 +876,21 @@ def cmd_freeze(args: argparse.Namespace) -> None:
 def cmd_review(args: argparse.Namespace) -> None:
     control = control_root(args)
     state = load_runtime(control)
+    require_authority_if_present(control, state)
     freeze = state.get("review_freeze")
     if not freeze or freeze["status"] != "FROZEN":
         raise CampaignError("independent review requires an active FROZEN review freeze")
 
-    producer_actors = {
-        unit["actor_id"]
-        for unit in state["work_units"]
-        if unit["actor_id"] and unit["status"] == "DONE"
-    }
+    producer_actors = {unit["actor_id"] for unit in state["work_units"] if unit["actor_id"]}
     if args.reviewer in producer_actors:
         raise CampaignError(
             f"reviewer {args.reviewer!r} produced work in this candidate and is not independent"
         )
 
     id_path = identity_path(control)
+    _, charter = read_charter(control, state)
+    if charter.get("independent_review_required") is True and not id_path.exists():
+        raise CampaignError("charter requires independent review but identity registry is missing")
     if id_path.exists():
         registry = load_json(id_path)
         actors = {item["actor_id"]: item for item in registry.get("actors", [])}
@@ -793,17 +899,29 @@ def cmd_review(args: argparse.Namespace) -> None:
             raise CampaignError(f"reviewer actor not found in identity registry: {args.reviewer}")
         if actor.get("status") != "ACTIVE":
             raise CampaignError(f"reviewer actor is not ACTIVE: {args.reviewer}")
-        if actor.get("current_run_id") not in {None, args.run}:
+        if actor.get("current_run_id") != args.run:
             raise CampaignError(
                 f"reviewer run {args.run!r} != registry current_run_id "
                 f"{actor.get('current_run_id')!r}"
             )
 
+    refs = args.evidence or []
+    if args.verdict == "PASS_FOR_STRATEGIC_RETURN" and not refs:
+        raise CampaignError("PASS review requires at least one existing evidence file")
+    bindings = []
+    for ref in refs:
+        evidence = evidence_file(control, ref)
+        digest = sha256_file(evidence)
+        if digest is None:
+            raise CampaignError(f"review evidence is unavailable: {ref}")
+        bindings.append({"ref": ref, "sha256": digest})
+
     freeze["status"] = "REVIEWED"
     freeze["reviewer_actor_id"] = args.reviewer
     freeze["reviewer_run_id"] = args.run
     freeze["verdict"] = args.verdict
-    freeze["evidence_refs"] = args.evidence or []
+    freeze["evidence_refs"] = refs
+    freeze["evidence_bindings"] = bindings
     event(
         state,
         "INDEPENDENT_REVIEW_RECORDED",
@@ -817,6 +935,7 @@ def cmd_review(args: argparse.Namespace) -> None:
 def cmd_terminal(args: argparse.Namespace) -> None:
     control = control_root(args)
     state = load_runtime(control)
+    require_authority_if_present(control, state)
     if state["campaign_status"] == "STRATEGIC_TERMINAL":
         raise CampaignError("campaign already has a strategic terminal request")
 
@@ -826,6 +945,14 @@ def cmd_terminal(args: argparse.Namespace) -> None:
             raise CampaignError("readiness terminal requires REVIEWED exact-candidate freeze")
         if freeze["candidate_ref"] != state["integrated_ref"]:
             raise CampaignError("reviewed candidate is not current integrated_ref")
+        if freeze.get("verdict") != "PASS_FOR_STRATEGIC_RETURN":
+            raise CampaignError(
+                "readiness terminal requires verdict PASS_FOR_STRATEGIC_RETURN"
+            )
+        if not freeze.get("reviewer_actor_id") or not freeze.get("reviewer_run_id"):
+            raise CampaignError("readiness terminal requires bound reviewer identity and run")
+        if not freeze.get("evidence_refs"):
+            raise CampaignError("readiness terminal requires independent review evidence refs")
         unfinished = [
             u["id"] for u in state["work_units"] if u["status"] not in TERMINAL_WORK_STATUSES
         ]
@@ -864,6 +991,7 @@ def cmd_terminal(args: argparse.Namespace) -> None:
 def cmd_authority_acquire(args: argparse.Namespace) -> None:
     control = control_root(args)
     state = load_runtime(control)
+    require_product_state_matches_runtime(control, state)
     _, charter = read_charter(control, state)
     registry = load_json(identity_path(control))
     actors = {item["actor_id"]: item for item in registry.get("actors", [])}
@@ -922,6 +1050,7 @@ def cmd_authority_acquire(args: argparse.Namespace) -> None:
 def cmd_authority_release(args: argparse.Namespace) -> None:
     control = control_root(args)
     state = load_runtime(control)
+    require_product_state_matches_runtime(control, state)
     path = authority_path(control)
     authority = load_json(path)
     if authority.get("authority_status") != "ACTIVE":

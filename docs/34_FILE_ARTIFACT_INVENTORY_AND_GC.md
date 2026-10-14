@@ -74,11 +74,20 @@ local writer lock; unresolved crash locks require owner review, not guessing.
    Archive a bounded evidence snapshot at meaningful engineering milestones
    when needed, but never create a commit after every individual generated file.
 
-A category and a TTL are necessary but not sufficient permissions. SQLite
-files, SQL, WAL/SHM and secret-looking files are protected even when someone
+A category and a TTL are necessary but not sufficient permissions. A dry-run
+receipt is current for five minutes; approval rechecks its age and exact source,
+ledger, file, dependency and evidence bindings, then issues a separate short
+execution lease. This local receipt does not authenticate a human reviewer or
+prove a native host lease. SQLite files, SQL, WAL/SHM/rollback-journal sidecars and secret-looking files are protected even when someone
 mistakenly selects DERIVED_REBUILDABLE. Missing files are marked MISSING after
 reconciliation; they are never silently recreated. Artifact roots are separate
 from productive paths, even inside a Git repository.
+
+SQLite currentness checks inspect main-file magic and resolved sidecar target
+names while scanning directory refs; multiply-linked files are treated as
+ambiguous because a hard link can hide a sidecar name. Directory links remain
+opaque and cause a fail-closed decision. Directory hashing accepts regular
+files only, so FIFOs and other special entries cannot block a hash operation.
 
 ## Critical limitations and validation
 

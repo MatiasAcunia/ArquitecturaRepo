@@ -6,8 +6,11 @@
   "steps": [],
   "hypotheses": [],
   "blockers": [],
-  "active_progress_minutes_since_review": 0,
+  "active_progress_minutes_since_review": null,
   "review_evidence_ref": "TO_BE_VERIFIED",
+  "review_evidence_sha256": "TO_BE_VERIFIED",
+  "progress_clock": "HOST_UNVERIFIED_ADVISORY",
+  "invocation_permit_issued": false,
   "plan_mode": "UNVERIFIED",
-  "progress_tool": "UNVERIFIED"
+  "progress_tool": "NATIVE_HOST_PROGRESS_UNAVAILABLE"
 }

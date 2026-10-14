@@ -13,7 +13,10 @@
     "hypotheses",
     "blockers",
     "review_evidence_ref",
+    "review_evidence_sha256",
     "active_progress_minutes_since_review",
+    "progress_clock",
+    "invocation_permit_issued",
     "plan_mode",
     "progress_tool"
   ],
@@ -49,9 +52,20 @@
       "type": "string",
       "minLength": 1
     },
+    "review_evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "active_progress_minutes_since_review": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "minimum": 0
+    },
+    "progress_clock": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_permit_issued": {
+      "type": "boolean"
     },
     "plan_mode": {
       "type": "string"

@@ -61,6 +61,19 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="agentic-sdlc-runtime-") as tmp:
         control = Path(tmp) / "control"
         shutil.copytree(ROOT / "examples" / "active_campaign", control)
+        evidence_dir = control / "evidence"
+        evidence_dir.mkdir()
+        for name in (
+            "review-001",
+            "review-002",
+            "review-003",
+            "review-fail",
+            "review-stale-run",
+        ):
+            (evidence_dir / name).write_text(
+                f"Synthetic review evidence for candidate/ref-runtime-003: {name}\n",
+                encoding="utf-8",
+            )
 
         registry_path = control / "IDENTITY_REGISTRY_CURRENT.json"
         registry = load(registry_path)
@@ -99,13 +112,44 @@ def main() -> int:
             "CAMPAIGN_API_001_CHARTER.json",
             "CHECKPOINT_API_002.json",
         ]
+        ps["active_campaign"]["checkpoint_or_terminal_ref"] = None
+        ps["currentness_set"].remove("CHECKPOINT_API_002.json")
         save(ps_path, ps)
+
+        authority_path = state_dir / "EXECUTION_AUTHORITY_CURRENT.json"
+        authority = load(authority_path)
+        authority["checkpoint_ref"] = None
+        save(authority_path, authority)
 
         bs_path = state_dir / "CURRENT_BOOTSTRAP_STATE.json"
         bs = load(bs_path)
         bs["requirements_ref"] = "CLIENT_REQUIREMENTS_CURRENT.md"
         bs["product_state_ref"] = "state/PRODUCT_STATE_CURRENT.json"
+        bs["active_checkpoint_or_terminal_ref"] = None
         save(bs_path, bs)
+
+        # A checkpoint-only pointer cannot recreate the full runtime, so missing
+        # runtime history must be preserved for an explicit recovery decision.
+        orphan_control = Path(tmp) / "orphan_control"
+        shutil.copytree(control, orphan_control)
+        orphan_ps_path = orphan_control / "state" / "PRODUCT_STATE_CURRENT.json"
+        orphan_ps = load(orphan_ps_path)
+        orphan_ps["active_campaign"]["checkpoint_or_terminal_ref"] = "CHECKPOINT_API_002"
+        save(orphan_ps_path, orphan_ps)
+        orphan_init = ctl(
+            orphan_control,
+            "init",
+            "--charter",
+            "CAMPAIGN_API_001_CHARTER.json",
+            "--force",
+        )
+        if orphan_init.returncode == 0 or (
+            "does not contain a complete runtime recovery snapshot"
+            not in orphan_init.stdout + orphan_init.stderr
+        ):
+            raise AssertionError("init accepted an orphaned checkpoint without runtime history")
+        if (orphan_control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json").exists():
+            raise AssertionError("failed orphaned init created a replacement runtime")
 
         must_pass(
             control,
@@ -168,6 +212,18 @@ def main() -> int:
             "--resource",
             "db:notes",
         )
+        runtime_path = control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json"
+        runtime_before_forced_init = runtime_path.read_bytes()
+        must_fail(
+            control,
+            "cannot be replaced by init",
+            "init",
+            "--charter",
+            "CAMPAIGN_API_001_CHARTER.json",
+            "--force",
+        )
+        if runtime_path.read_bytes() != runtime_before_forced_init:
+            raise AssertionError("--force init overwrote an existing campaign runtime")
         must_pass(
             control,
             "add",
@@ -252,6 +308,18 @@ def main() -> int:
             "--evidence",
             "evidence/w1-integration",
         )
+
+        # I3 checkpointing must not promote the strategic/Product State gate
+        # merely because one unit reached DONE.
+        gate_control = Path(tmp) / "gate_control"
+        shutil.copytree(control, gate_control)
+        gate_ps_path = gate_control / "state" / "PRODUCT_STATE_CURRENT.json"
+        gate_ps = load(gate_ps_path)
+        gate_ps["current_gate"] = "STATIC_STRUCTURAL"
+        save(gate_ps_path, gate_ps)
+        must_pass(gate_control, "checkpoint", "--summary", "mixed work gate probe")
+        if load(gate_ps_path)["current_gate"] != "STATIC_STRUCTURAL":
+            raise AssertionError("checkpoint advanced Product State gate from DONE work")
 
         must_pass(
             control,
@@ -417,6 +485,41 @@ def main() -> int:
                 + recovered_validation.stderr
             )
 
+        # Stale/missing canonical Product State must block all lifecycle writes
+        # before runtime or authority records are touched.
+        stale_control = Path(tmp) / "stale_product_control"
+        shutil.copytree(control, stale_control)
+        stale_ps_path = stale_control / "state" / "PRODUCT_STATE_CURRENT.json"
+        stale_ps = load(stale_ps_path)
+        stale_ps["current_code_ref"] = "stale/product-ref"
+        save(stale_ps_path, stale_ps)
+        stale_runtime_path = stale_control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json"
+        stale_runtime_before = stale_runtime_path.read_bytes()
+        stale_mutations = [
+            ("add", "--id", "STALE_ADD", "--title", "Must not write"),
+            ("checkpoint",),
+            ("review", "--reviewer", "REVIEWER_NOTE_API_001", "--run", "RUN_REVIEW_001", "--verdict", "PASS_FOR_STRATEGIC_RETURN"),
+            ("terminal", "--type", "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE", "--reason", "Must not write"),
+            ("authority-acquire", "--actor", "CAMPAIGN_LEAD_NOTE_API_001", "--run", "RUN_I3_002"),
+            ("authority-release", "--actor", "CAMPAIGN_LEAD_NOTE_API_001", "--run", "RUN_I3_002"),
+        ]
+        for command in stale_mutations:
+            must_fail(stale_control, "Product State current_code_ref", *command)
+            if stale_runtime_path.read_bytes() != stale_runtime_before:
+                raise AssertionError(f"stale Product State command mutated runtime: {command[0]}")
+        missing_ps_control = Path(tmp) / "missing_product_control"
+        shutil.copytree(control, missing_ps_control)
+        (missing_ps_control / "state" / "PRODUCT_STATE_CURRENT.json").unlink()
+        must_fail(
+            missing_ps_control,
+            "Product State is missing",
+            "add",
+            "--id",
+            "NO_PRODUCT_STATE",
+            "--title",
+            "Must fail closed",
+        )
+
         authority = load(state_dir / "EXECUTION_AUTHORITY_CURRENT.json")
         if authority["checkpoint_ref"] != "CHECKPOINT_0001":
             raise AssertionError("checkpoint did not reconcile active execution authority")
@@ -479,6 +582,32 @@ def main() -> int:
             "--candidate-ref",
             "candidate/ref-runtime-003",
         )
+        must_fail(
+            control,
+            "!= registry current_run_id",
+            "review",
+            "--reviewer",
+            "REVIEWER_NOTE_API_001",
+            "--run",
+            "RUN_REVIEW_STALE",
+            "--verdict",
+            "PASS_FOR_STRATEGIC_RETURN",
+            "--evidence",
+            "evidence/review-stale-run",
+        )
+        must_fail(
+            control,
+            "review evidence must resolve to a regular file",
+            "review",
+            "--reviewer",
+            "REVIEWER_NOTE_API_001",
+            "--run",
+            "RUN_REVIEW_001",
+            "--verdict",
+            "PASS_FOR_STRATEGIC_RETURN",
+            "--evidence",
+            "evidence/missing-review-file",
+        )
         must_pass(
             control,
             "review",
@@ -491,6 +620,24 @@ def main() -> int:
             "--evidence",
             "evidence/review-001",
         )
+
+        evidence_drift_control = Path(tmp) / "evidence_drift_control"
+        shutil.copytree(control, evidence_drift_control)
+        drifted_evidence = evidence_drift_control / "evidence" / "review-001"
+        drifted_evidence.write_text(
+            drifted_evidence.read_text(encoding="utf-8") + "changed after review\n",
+            encoding="utf-8",
+        )
+        evidence_drift_validation = run(
+            str(VALIDATOR), "--root", str(evidence_drift_control)
+        )
+        if evidence_drift_validation.returncode == 0 or (
+            "REVIEWED freeze evidence digest mismatch"
+            not in evidence_drift_validation.stdout + evidence_drift_validation.stderr
+        ):
+            raise AssertionError(
+                "independent validator did not reject changed review evidence"
+            )
 
         # Any new tactical work after review must invalidate the favorable freeze.
         must_pass(
@@ -541,6 +688,89 @@ def main() -> int:
         )
         must_pass(
             control,
+            "freeze",
+            "--candidate-ref",
+            "candidate/ref-runtime-003",
+        )
+        must_pass(
+            control,
+            "review",
+            "--reviewer",
+            "REVIEWER_NOTE_API_001",
+            "--run",
+            "RUN_REVIEW_001",
+            "--verdict",
+            "FAIL",
+            "--evidence",
+            "evidence/review-fail",
+        )
+        must_fail(
+            control,
+            "verdict PASS_FOR_STRATEGIC_RETURN",
+            "terminal",
+            "--type",
+            "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+            "--reason",
+            "A failed exact-candidate review cannot authorize readiness.",
+        )
+        failed_terminal_control = Path(tmp) / "failed_review_terminal_control"
+        shutil.copytree(control, failed_terminal_control)
+        failed_runtime_path = (
+            failed_terminal_control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json"
+        )
+        failed_runtime = load(failed_runtime_path)
+        failed_runtime["campaign_status"] = "STRATEGIC_TERMINAL"
+        failed_runtime["terminal_request"] = {
+            "terminal_type": "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+            "reason": "Adversarial validator fixture with a failed review.",
+            "created_at": failed_runtime["updated_at"],
+        }
+        failed_runtime["event_log"].append(
+            {
+                "seq": len(failed_runtime["event_log"]) + 1,
+                "at": failed_runtime["updated_at"],
+                "action": "STRATEGIC_TERMINAL_REQUESTED",
+                "work_unit_id": None,
+                "actor_id": None,
+                "details": {
+                    "terminal_type": "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
+                    "reason": "Adversarial validator fixture with a failed review.",
+                },
+            }
+        )
+        failed_runtime["revision"] = len(failed_runtime["event_log"])
+        save(failed_runtime_path, failed_runtime)
+        failed_validation = run(
+            str(VALIDATOR), "--root", str(failed_terminal_control)
+        )
+        failed_validation_output = failed_validation.stdout + failed_validation.stderr
+        if failed_validation.returncode == 0 or (
+            "verdict PASS_FOR_STRATEGIC_RETURN" not in failed_validation_output
+        ):
+            raise AssertionError(
+                "independent validator accepted a readiness terminal backed by failed review\n"
+                + failed_validation_output
+            )
+        must_pass(
+            control,
+            "freeze",
+            "--candidate-ref",
+            "candidate/ref-runtime-003",
+        )
+        must_pass(
+            control,
+            "review",
+            "--reviewer",
+            "REVIEWER_NOTE_API_001",
+            "--run",
+            "RUN_REVIEW_001",
+            "--verdict",
+            "PASS_FOR_STRATEGIC_RETURN",
+            "--evidence",
+            "evidence/review-003",
+        )
+        must_pass(
+            control,
             "terminal",
             "--type",
             "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE",
@@ -570,6 +800,22 @@ def main() -> int:
             raise AssertionError("runtime did not reach strategic terminal")
         if runtime["review_freeze"]["status"] != "REVIEWED":
             raise AssertionError("final review freeze is not REVIEWED")
+        if runtime["review_freeze"]["verdict"] != "PASS_FOR_STRATEGIC_RETURN":
+            raise AssertionError("final freeze has no favorable exact-candidate verdict")
+        superseded = [
+            item
+            for item in runtime["event_log"]
+            if item["action"] == "REVIEW_FREEZE_SUPERSEDED"
+            and item["details"].get("freeze", {}).get("verdict") == "FAIL"
+        ]
+        invalidated = [
+            item
+            for item in runtime["event_log"]
+            if item["action"] == "REVIEW_FREEZE_INVALIDATED"
+            and item["details"].get("freeze", {}).get("evidence_refs") == ["evidence/review-001"]
+        ]
+        if not superseded or not invalidated:
+            raise AssertionError("prior reviewer verdict/evidence was lost from append-only history")
         if runtime["terminal_request"]["terminal_type"] != (
             "CAPABILITY_READY_FOR_PLANNER_ACCEPTANCE"
         ):
@@ -589,6 +835,9 @@ def main() -> int:
     print("- external recovery conflict failed closed without overwrite")
     print("- checkpoint currentness reconciled")
     print("- review freeze invalidation verified")
+    print("- reviewer evidence files must exist and remain byte-bound")
+    print("- append-only prior reviewer identity/verdict/evidence retained")
+    print("- independent validator rejects readiness terminal after failed review")
     print("- exact-candidate strategic terminal verified")
     print("- final runtime passed independent project validation")
     return 0

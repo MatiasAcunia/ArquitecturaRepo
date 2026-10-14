@@ -89,12 +89,24 @@ def main() -> int:
         plan_file = Path(temp) / "tactical-proposal.json"
         plan_file.write_text(json.dumps({"steps": [{"id": "A", "status": "READY"}]}),
                              encoding="utf-8")
+        review_evidence = control / "runtime" / "review-evidence.json"
+        review_evidence.write_text(json.dumps({"review": "synthetic-bound-evidence"}),
+                                   encoding="utf-8")
         first = invoke(str(control / "tools" / "goal_plan.py"), "--control-root",
                        str(control), "--expected-revision", "-1", "--plan-file",
-                       str(plan_file), "--active-minutes", "0",
-                       "--review-evidence-ref", "synthetic/checkpoint0")
+                       str(plan_file),
+                       "--review-evidence-ref", "runtime/review-evidence.json")
         assert first.returncode == 0, first.stdout + first.stderr
-        assert read(control / "runtime" / "TACTICAL_PLAN_CURRENT.json")["revision"] == 0
+        first_plan = read(control / "runtime" / "TACTICAL_PLAN_CURRENT.json")
+        assert first_plan["revision"] == 0
+        assert first_plan["active_progress_minutes_since_review"] is None
+        assert first_plan["invocation_permit_issued"] is False
+        assert len(first_plan["review_evidence_sha256"]) == 64
+        forged_time = invoke(str(control / "tools" / "goal_plan.py"), "--control-root",
+                             str(control), "--expected-revision", "0", "--plan-file",
+                             str(plan_file), "--active-minutes", "0",
+                             "--review-evidence-ref", "runtime/review-evidence.json")
+        assert forged_time.returncode == 2
 
         # Invocation B: a separate interpreter sees same durable identity.
         hold = invoke(str(control / "tools" / "goal_guard.py"),
@@ -103,14 +115,14 @@ def main() -> int:
         assert json.loads(hold.stdout)["may_execute_material_goal"] is False
         second = invoke(str(control / "tools" / "goal_plan.py"), "--control-root",
                         str(control), "--expected-revision", "0", "--plan-file",
-                        str(plan_file), "--active-minutes", "40",
-                        "--review-evidence-ref", "synthetic/checkpoint1")
+                        str(plan_file),
+                        "--review-evidence-ref", "runtime/review-evidence.json")
         assert second.returncode == 0, second.stdout + second.stderr
         assert read(control / "runtime" / "TACTICAL_PLAN_CURRENT.json")["revision"] == 1
         conflict = invoke(str(control / "tools" / "goal_plan.py"), "--control-root",
                           str(control), "--expected-revision", "0", "--plan-file",
-                          str(plan_file), "--active-minutes", "45",
-                          "--review-evidence-ref", "synthetic/stale")
+                          str(plan_file),
+                          "--review-evidence-ref", "runtime/review-evidence.json")
         assert conflict.returncode == 2
 
         # External effect crash simulation: mark the request before any
@@ -144,7 +156,7 @@ def main() -> int:
         stale_plan = invoke(
             str(control / "tools" / "goal_plan.py"), "--control-root", str(control),
             "--expected-revision", "1", "--plan-file", str(plan_file),
-            "--active-minutes", "41", "--review-evidence-ref", "synthetic/stale-plan",
+            "--review-evidence-ref", "runtime/review-evidence.json",
         )
         assert stale_plan.returncode == 2, stale_plan.stdout + stale_plan.stderr
         assert "PLAN_AUTHORITY_REF_STALE_OR_MISSING" in stale_plan.stderr

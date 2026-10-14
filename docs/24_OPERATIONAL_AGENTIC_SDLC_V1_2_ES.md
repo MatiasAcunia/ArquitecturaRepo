@@ -21,3 +21,7 @@ El paquete de referencia correcto es **Codex Daily Control 2.0.2-hardening-candi
 Toda aceptación requiere código, tests y evidencia física. La prueba en esta rama es independiente de cualquier aceptación que hubiera tenido tu controlador Windows anterior.
 
 Guía técnica completa: docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md.
+
+## Límite de adopción de proyectos existentes
+
+La adopción liga por SHA-256 las referencias de currentness y los artefactos existentes declarados; la validación vuelve a comprobar esos bytes. Si ya existe un Product State canónico externo para el mismo proyecto, la promoción se detiene para evitar un segundo owner. La candidata sigue en HOLD hasta que exista un protocolo explícito de attachment sin Product State paralelo.

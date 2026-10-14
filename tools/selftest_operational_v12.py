@@ -43,23 +43,59 @@ def test_goal(tmp: Path) -> None:
     }
     (tmp / "state" / "GOAL_CONTRACT_CURRENT.json").write_text(json.dumps(goal))
     assert assess(tmp)["status"] == "HOLD"
+    evidence = tmp / "runtime" / "review-evidence.json"
+    evidence.write_text(json.dumps({"synthetic_review": "source-bound-only"}))
     plan = update(tmp, expected_revision=-1, plan={"steps": [{"id": "A", "status": "READY"}]},
-                  active_minutes=0, review_evidence_ref="synthetic-evidence")
+                  review_evidence_ref="runtime/review-evidence.json")
     assert plan["goal_digest"] == digest(goal)
+    assert plan["active_progress_minutes_since_review"] is None
+    assert plan["invocation_permit_issued"] is False
+    assert plan["review_evidence_sha256"] == hashlib.sha256(evidence.read_bytes()).hexdigest()
     assert assess(tmp)["status"] == "HOLD"
     good = assess(tmp)
-    assert good["local_integrity_passed"] is True
+    assert good["local_integrity_passed"] is False
+    assert "TACTICAL_REVIEW_DUE_OR_UNVERIFIED" in good["failure_codes"]
     assert good["may_execute_material_goal"] is False
     assert "HOST_INVOCATION_HOOK_NOT_PROVEN" in good["failure_codes"]
+    plan_path = tmp / "runtime" / "TACTICAL_PLAN_CURRENT.json"
+    forged = json.loads(plan_path.read_text())
+    forged["active_progress_minutes_since_review"] = 0
+    plan_path.write_text(json.dumps(forged))
+    assert "TACTICAL_REVIEW_DUE_OR_UNVERIFIED" in assess(tmp)["failure_codes"]
+    forged["progress_clock"] = "NATIVE_HOST_VERIFIED"
+    forged["invocation_permit_issued"] = True
+    forged["progress_tool"] = "forged-local-json"
+    plan_path.write_text(json.dumps(forged))
+    forged_diagnostic = assess(tmp)
+    assert forged_diagnostic["local_integrity_passed"] is False
+    assert "TACTICAL_PROGRESS_CLAIM_UNTRUSTED" in forged_diagnostic["failure_codes"]
+    assert "TACTICAL_REVIEW_DUE_OR_UNVERIFIED" in forged_diagnostic["failure_codes"]
+    plan_path.write_text(json.dumps(plan))
+    malformed = [
+        {"steps": ["not-an-object"]},
+        {"steps": [], "hypotheses": "not-an-array"},
+        {"steps": [], "blockers": "not-an-array"},
+        {"steps": [], "plan_mode": ""},
+    ]
+    for proposal in malformed:
+        must_fail(lambda proposal=proposal: update(
+            tmp, expected_revision=0, plan=proposal,
+            review_evidence_ref="runtime/review-evidence.json"), TacticalPlanError)
     must_fail(lambda: update(tmp, expected_revision=-1, plan={"steps": []},
-                             active_minutes=0, review_evidence_ref="e"), TacticalPlanError)
+                             active_minutes=0,
+                             review_evidence_ref="runtime/review-evidence.json"), TypeError)
+    must_fail(lambda: update(tmp, expected_revision=0, plan={"steps": []},
+                             review_evidence_ref="runtime/missing-review.json"), TacticalPlanError)
+    evidence.write_text("changed after the bound digest")
+    assert "TACTICAL_REVIEW_EVIDENCE_STALE_OR_MISSING" in assess(tmp)["failure_codes"]
+    evidence.write_text(json.dumps({"synthetic_review": "source-bound-only"}))
     charter.write_text("changed charter")
     bad = assess(tmp)
     assert "AUTHORITY_REF_STALE" in bad["failure_codes"]
     must_fail(lambda: update(
         tmp, expected_revision=0,
         plan={"steps": [{"id": "UNAUTHORIZED_STALE", "status": "READY"}]},
-        active_minutes=1, review_evidence_ref="synthetic-stale",
+        review_evidence_ref="runtime/review-evidence.json",
     ), TacticalPlanError)
     assert json.loads((tmp / "runtime" / "TACTICAL_PLAN_CURRENT.json").read_text())["revision"] == 0
     charter.write_text("authorized charter\n")
@@ -79,8 +115,27 @@ def test_goal(tmp: Path) -> None:
     goal["charter_sha256"] = charter_sha
     (tmp / "state" / "GOAL_CONTRACT_CURRENT.json").write_text(json.dumps(goal))
     # New canonical goal needs formal reconciliation; plan update must not silently self-rebind.
-    must_fail(lambda: update(tmp, expected_revision=0, plan={"steps": []}, active_minutes=0,
-                             review_evidence_ref="e"), TacticalPlanError)
+    must_fail(lambda: update(tmp, expected_revision=0, plan={"steps": []},
+                             review_evidence_ref="runtime/review-evidence.json"), TacticalPlanError)
+
+    # Fixed top-level authority paths, not just nested refs, must reject links.
+    goal_path = tmp / "state" / "GOAL_CONTRACT_CURRENT.json"
+    original_goal = goal_path.read_bytes()
+    outside_goal = tmp.parent / "outside-goal-contract.json"
+    outside_goal.write_bytes(original_goal)
+    goal_path.unlink()
+    try:
+        goal_path.symlink_to(outside_goal)
+    except (OSError, NotImplementedError):
+        goal_path.write_bytes(original_goal)
+    else:
+        linked = assess(tmp)
+        assert linked["local_integrity_passed"] is False
+        assert any("UNTRUSTED_GOAL_OR_REFERENCE" in item for item in linked["failure_codes"])
+        must_fail(lambda: update(tmp, expected_revision=0, plan={"steps": []},
+                                 review_evidence_ref="runtime/review-evidence.json"), TacticalPlanError)
+        goal_path.unlink()
+        goal_path.write_bytes(original_goal)
 
 
 def test_effect(tmp: Path) -> None:

@@ -7,6 +7,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from candidate_manifest import verify_installed_tool_parity
+
 ROOT = Path(__file__).resolve().parents[1]
 SCAFFOLD = ROOT / "tools" / "scaffold_project.py"
 VALIDATOR = ROOT / "tools" / "validate_project.py"
@@ -46,6 +48,11 @@ def main() -> int:
                 )
 
             control = target / ".agentic-sdlc"
+            parity = verify_installed_tool_parity(ROOT, control / "tools")
+            if parity["status"] != "PASS":
+                raise AssertionError(
+                    f"{profile}: installed/root tool parity failed: {parity['mismatches']}"
+                )
             validation = run(str(VALIDATOR), "--root", str(control))
             if validation.returncode != 0:
                 raise AssertionError(
@@ -228,6 +235,11 @@ def main() -> int:
                 + runtime_result.stderr
             )
         runtime_control = runtime_target / ".agentic-sdlc"
+        parity = verify_installed_tool_parity(ROOT, runtime_control / "tools")
+        if parity["status"] != "PASS":
+            raise AssertionError(
+                f"runtime-enabled installed/root tool parity failed: {parity['mismatches']}"
+            )
         runtime_profile = json.loads(
             (runtime_control / "PROFILE.json").read_text(encoding="utf-8")
         )
@@ -379,6 +391,7 @@ def main() -> int:
     print("- HIGH_CONSEQUENCE includes security/privacy/rights protocol")
     print("- copied validator is self-contained")
     print("- generated bootstrap uses latest v0.2 contract")
+    print("- installed/root tool byte parity verified for six profiles and runtime")
     print("- copied migration registry/tool are self-contained")
     print("- copied reconstruction tool is self-contained")
     print("- discovery/adoption/recovery tools are self-contained")
