@@ -1,0 +1,17 @@
+{
+  "schema_version": "agentic-v12-client-scoped-release-decision-v1",
+  "decision_date": "2026-10-14",
+  "authority_source": "EXPLICIT_CLIENT_DIRECTIVE_IN_CONVERSATION_UNATTESTED_BY_NATIVE_HOST",
+  "version": "1.2.0",
+  "ship_scope": "PORTABLE_CORE_WITH_DECLARED_UNVERIFIED_NATIVE_CAPABILITIES",
+  "full_physical_release_accepted": false,
+  "physical_release_gates_overridden": false,
+  "note": "Client requested v1.1.0 and v1.2.0 GitHub releases after integration despite the remaining physical acceptance gates. This authorizes publication of portable code, not false host/provider acceptance.",
+  "excluded_claims": [
+    "authenticated native Codex Goal and 2.1 runtime control",
+    "protected MUSIC governed attachment/currentness",
+    "independent external effects and provider delivery",
+    "noncooperating concurrent filesystem writer safety",
+    "independent physical host and perception acceptance"
+  ]
+}

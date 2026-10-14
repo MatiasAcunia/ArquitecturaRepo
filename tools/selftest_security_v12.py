@@ -59,8 +59,27 @@ def main() -> int:
     versions = json.loads((ROOT / "state" / "V1_2_ACCEPTANCE_CRITERIA.json").read_text(encoding="utf-8"))
     if versions["baseline_stable_version"] != "1.1.0":
         raise AssertionError("baseline version advanced without physical gates")
-    if (ROOT / "VERSION").read_text(encoding="utf-8").strip() != "1.1.0":
-        raise AssertionError("version was promoted before physical release acceptance")
+    release_version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    if release_version == "1.2.0":
+        # CLIENT authorized publishing the portable source independently of
+        # accepting the separately tracked, still-required native host gates.
+        scope_path = ROOT / "state" / "V1_2_RELEASE_SCOPE_DECISION.json"
+        scope = json.loads(scope_path.read_text(encoding="utf-8"))
+        if (scope.get("schema_version") != "agentic-v12-client-scoped-release-decision-v1"
+            or scope.get("version") != release_version
+            or scope.get("authority_source") != "EXPLICIT_CLIENT_DIRECTIVE_IN_CONVERSATION_UNATTESTED_BY_NATIVE_HOST"
+            or scope.get("ship_scope") != "PORTABLE_CORE_WITH_DECLARED_UNVERIFIED_NATIVE_CAPABILITIES"
+            or scope.get("full_physical_release_accepted") is not False
+            or scope.get("physical_release_gates_overridden") is not False
+            or not isinstance(scope.get("excluded_claims"), list)
+            or len(scope["excluded_claims"]) < 5):
+            raise AssertionError("scoped portable source release lacks explicit and bounded CLIENT decision")
+        gates = versions.get("gates", [])
+        if (len(gates) != 15 or not all(g.get("required") is True for g in gates)
+            or any(g.get("status") == "PHYSICALLY_VERIFIED_EXACT" for g in gates)):
+            raise AssertionError("physical acceptance criteria silently altered for source release")
+    elif release_version != "1.1.0":
+        raise AssertionError("release version unauthorized or no scoped CLIENT decision")
     verifier = subprocess.run(
         [sys.executable, str(ROOT / "tools" / "verify_v12_candidate.py"),
          "--json", "--require-release-ready"],
