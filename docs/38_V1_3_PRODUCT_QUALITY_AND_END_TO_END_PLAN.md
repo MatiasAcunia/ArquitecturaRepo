@@ -2,7 +2,7 @@
 
 Status: **PROPOSED v1.3 product plan; not implementation, acceptance or a v1.3 release**.
 Baseline: the currently published v1.2.0 generic portable starter; before execution re-read live `main`, tags, install surfaces, tools, docs and runtime.
-Authority: CLIENT direction to distinguish rigorous **Python/software-component testing** from **black-box whole-system software-engineering testing**. This document is the canonical v1.3 product proposal; academic intake and exploratory hypotheses live in [research issue #2](https://github.com/MatiasAcunia/ArquitecturaRepo/issues/2), not in another truth database.
+Authority: CLIENT direction to distinguish rigorous **Python/software-component testing** from **black-box whole-system software-engineering testing**. This document is the canonical v1.3 product proposal; academic intake and exploratory hypotheses live in issue #2, not in another truth database.
 
 ## 1. Product outcome and scope boundary
 
@@ -86,7 +86,7 @@ Every new capability needs portable contract + black-box observable effect (wher
 
 ## 6. Academic research pipeline: cumulative original papers, read with criticism
 
-Reuse the annotated research registry from [issue #2](https://github.com/MatiasAcunia/ArquitecturaRepo/issues/2); **do not reset or duplicate** its prior reading. The previously recorded seven full-text critically read works are P01 AutoGen, P02 MetaGPT, P03 ChatDev, P04 SWE-agent, P05 Agentless, P06 He/Treude/Lo systematic review of 71 studies, and P07 Wang et al. SDLC benchmark survey (current cited version: **178 benchmarks / 461 papers**). P08 SWE-Bench Pro (ICML 2026), P09 OpenHands, P10 agentic SE concepts, P11 agentic SDLC synthesis and P12 AIware agent/human PR study had only summary/metadata review at prior intake; do **not** silently upgrade them to full-read.
+Reuse the annotated research registry from issue #2; **do not reset or duplicate** its prior reading. The previously recorded seven full-text critically read works are P01 AutoGen, P02 MetaGPT, P03 ChatDev, P04 SWE-agent, P05 Agentless, P06 He/Treude/Lo systematic review of 71 studies, and P07 Wang et al. SDLC benchmark survey (current cited version: **178 benchmarks / 461 papers**). P08 SWE-Bench Pro (ICML 2026), P09 OpenHands, P10 agentic SE concepts, P11 agentic SDLC synthesis and P12 AIware agent/human PR study had only summary/metadata review at prior intake; do **not** silently upgrade them to full-read.
 
 For every new primary paper: stable ID, exact version/date/venue, actual sections read, question/methodology/baselines, task sampling, measurements/variance, limitations/contamination threats, replicability/source, what the paper **does** establish, our **inference** about product architecture, alternative simpler design, falsifier and measured before/after adoption result. Classify vendor docs/framework manuals separately from peer-reviewed research.
 
