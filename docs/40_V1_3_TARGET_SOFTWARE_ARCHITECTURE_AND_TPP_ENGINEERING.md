@@ -8,7 +8,7 @@ Related canonical records: [doc 38 — two-axis industrial testing](38_V1_3_PROD
 
 ## 1. Evidence-based starting point: what exists and what does not
 
-Physically inspected on 2026-10-14: GitHub main HEAD before this document was the then-current inspected Git HEAD (see Git history for immutable identity); immutable release tag v1.2.0 points to the then-current inspected Git HEAD (see Git history for immutable identity). Main contains newer docs/adaptor generalization. Never assume tag and main are byte-identical when comparing baselines: pin each exact SHA and list their differences. The v1.2.0 tag remains the public regression baseline, while main is the proposed next-work starting surface after its changes are independently inspected.
+Physically inspected on 2026-10-14: the v1.2.0 tag points to the historical release commit, while the later main branch contains further public-source changes and research documentation. Verify their two different exact SHAs from Git before using either as a baseline; never infer byte equality across them. The immutable v1.2.0 tag remains the public regression baseline, while a freshly inspected main is the proposed starting surface for v1.3.
 
 Existing source owners (do NOT fork them):
 - `tools/campaignctl.py` plus `schemas/campaign-runtime.schema.json`: persistent campaign lifecycle, typed work states, DAG/resource conflicts, `event()` revisioned activity log, failure/retry, freeze, independent review, strategic terminal and recovery. It is NOT itself a real LLM/agent host.
