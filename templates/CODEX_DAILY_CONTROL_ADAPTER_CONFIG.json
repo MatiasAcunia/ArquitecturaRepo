@@ -1,9 +1,9 @@
 {
   "schema_version": "codex-daily-control-adapter-v1",
-  "reference_version": "2.0.2-hardening-candidate",
+  "reference_version": "2.1.0-capability-rework-rc",
   "status": "NOT_YET_PROVEN_IN_THIS_STARTER",
   "enabled": false,
-  "install_source": "USER_APPROVED_LOCAL_2_0_2_ARTIFACT",
+  "install_source": "USER_APPROVED_LOCAL_2_1_ARTIFACT",
   "windowsapps_execution_forbidden": true,
   "native_app_server_required_for_resume_pause_delete": true,
   "read_only_goal_probe_required": true,

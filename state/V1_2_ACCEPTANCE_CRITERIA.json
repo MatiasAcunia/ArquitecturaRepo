@@ -3,7 +3,7 @@
   "target_release": "1.2.0",
   "branch_status": "IMPLEMENTATION_IN_PROGRESS__NOT_RELEASED",
   "baseline_stable_version": "1.1.0",
-  "codex_daily_control_reference": "2.0.2-hardening-candidate",
+  "codex_daily_control_reference": "2.1.0-capability-rework-rc",
   "principle": "No code/test/policy may replace a verified physical host, provider, external-delivery or product gate.",
   "gates": [
     {

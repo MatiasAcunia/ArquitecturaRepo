@@ -73,7 +73,7 @@ def test_reject_wrong_slot_set(tmp_path):
 
 
 def test_reject_new_or_old_version(tmp_path):
-    assert 'VERSION_NOT_2_0_2' in read(package(tmp_path,version='2.0.1'))['failure_codes']
+    assert 'CODEX_DAILY_CONTROL_VERSION_UNSUPPORTED' in read(package(tmp_path,version='2.0.1'))['failure_codes']
 
 
 def test_reject_archive_path_traversal(tmp_path):
@@ -153,3 +153,12 @@ def test_reject_installed_path_symlink(tmp_path):
     source=tmp_path/'source';source.mkdir(); (source/'target').write_text('text')
     (source/'pointer').symlink_to(source/'target')
     with pytest.raises(Hold): DirectorySource(source).read('pointer')
+
+
+def test_21_rc_manifest_good_but_host_still_unverified(tmp_path):
+    report = read(package(tmp_path, version='2.1.0-capability-rework-rc'))
+    assert report['manifest_mismatch_count'] == 0
+    assert report['version'] == '2.1.0-capability-rework-rc'
+    assert 'CODEX_DAILY_CONTROL_VERSION_UNSUPPORTED' not in report['failure_codes']
+    assert 'INSTALLED_HOST_AND_THREAD_READBACK_REQUIRED' in report['failure_codes']
+    assert report['native_goal_control_verified'] is False

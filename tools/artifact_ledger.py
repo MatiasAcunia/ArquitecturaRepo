@@ -124,7 +124,7 @@ def validate(d):
         if (relative(name) != name or not isinstance(item, dict) or
             item.get("path") != name or item.get("root") not in d["roots"] or
             item.get("category") not in CLASSES or
-            item.get("status") not in {"OBSERVED", "MISSING", "DELETED"} or
+            item.get("status") not in {"OBSERVED", "MISSING", "DELETED", "DELETE_INTENT"} or
             type(item.get("safe_delete")) is not bool or
             type(item.get("review_closed")) is not bool or
             not isinstance(item.get("dependencies"), list) or
@@ -133,6 +133,17 @@ def validate(d):
             not isinstance(item.get("fingerprint"), dict) or
             not re.fullmatch(r"[0-9a-f]{64}", str(item["fingerprint"].get("sha256")))):
             raise LedgerHold("LEDGER_FILE_RECORD_INVALID")
+        intent = item.get("delete_intent")
+        if intent is not None and (
+            not isinstance(intent, dict) or
+            set(intent) != {"approval_sha256", "fingerprint_sha256", "issued_at"} or
+            not re.fullmatch(r"[0-9a-f]{64}", str(intent.get("approval_sha256"))) or
+            not re.fullmatch(r"[0-9a-f]{64}", str(intent.get("fingerprint_sha256"))) or
+            not isinstance(intent.get("issued_at"), str)
+        ):
+            raise LedgerHold("DELETE_INTENT_RECORD_INVALID")
+        if item.get("status") == "DELETE_INTENT" and not intent:
+            raise LedgerHold("DELETE_INTENT_RECORD_REQUIRED")
         for dependent in item.get("dependents", []):
             relative(dependent)
         for dependency in item.get("dependencies", []):
@@ -450,6 +461,9 @@ def new_entry(project, data, root, name, category, safe, ttl):
 
 
 def reconcile(project, data, root, before, after, category, safe, ttl, success):
+    if any(entry["root"] == root and entry["status"] == "DELETE_INTENT"
+           for entry in data["files"].values()):
+        raise LedgerHold("DELETE_INTENT_REQUIRES_EXPLICIT_RECOVERY")
     added = changed = missing = 0
     for name, stat in after.items():
         entry = data["files"].get(name)
@@ -599,12 +613,12 @@ def inspect_git(project):
     return {"observed_at": stamp(now()), "head": revision, "changed": changed}
 
 
-def gc_plan(project, data, *, allow_locked=False):
+def gc_plan(project, data, *, ledger_path, allow_locked=False):
     observed = {root: inventory(project, data, root) for root in data["roots"]}
     unknown = {root for root, files in observed.items()
                if any(name not in data["files"] for name in files)}
     lock = None if allow_locked else read_lock_metadata(
-        ledger_file(project, ".agentic-sdlc"))
+        ledger_path)
     interrupted = bool(lock and lock.get("status") in {"active", "failed"} and not allow_locked)
     git_observation = inspect_git(project)
     git_binding = {"head": git_observation["head"], "changed": git_observation["changed"]}
@@ -673,7 +687,7 @@ def write_receipt_once(path, value):
         raise LedgerHold("RECEIPT_OUTPUT_PREEXISTS") from None
 
 
-def approve_gc(project, data, args):
+def approve_gc(project, data, args, *, ledger_path):
     plan = read_bounded_json(args.plan_file)
     stated_digest = plan.pop("plan_sha256", None)
     if (plan.get("schema_version") != "artifact-gc-report-v2" or
@@ -694,7 +708,7 @@ def approve_gc(project, data, args):
         raise LedgerHold("GC_DRY_RUN_RECEIPT_EXPIRED")
     if plan.get("decision_sha256") != gc_plan_decision_sha256(plan):
         raise LedgerHold("GC_DRY_RUN_RECEIPT_INTEGRITY_INVALID")
-    current = gc_plan(project, data)
+    current = gc_plan(project, data, ledger_path=ledger_path)
     if (plan.get("revision") != data["revision"] or
         plan.get("decision_sha256") != current.get("decision_sha256")):
         raise LedgerHold("GC_DRY_RUN_RECEIPT_STALE")
@@ -757,7 +771,7 @@ def parse_expiry(value, failure):
         raise LedgerHold(failure) from None
 
 
-def validate_gc_approval(project, data, args, *, allow_locked=False):
+def validate_gc_approval(project, data, args, *, ledger_path, allow_locked=False):
     if not args.approval:
         raise LedgerHold("GC_EXECUTION_REQUIRES_REVIEWED_APPROVAL")
     approval = read_bounded_json(args.approval)
@@ -772,7 +786,7 @@ def validate_gc_approval(project, data, args, *, allow_locked=False):
     evidence_sha = file_digest(project, approval.get("review_evidence_ref"))
     if evidence_sha != approval.get("review_evidence_sha256"):
         raise LedgerHold("GC_APPROVAL_EVIDENCE_STALE")
-    plan = gc_plan(project, data, allow_locked=allow_locked)
+    plan = gc_plan(project, data, ledger_path=ledger_path, allow_locked=allow_locked)
     if plan["git_binding"] != approval.get("git_binding"):
         raise LedgerHold("GC_APPROVAL_GIT_CURRENTNESS_STALE")
     if plan["decision_sha256"] != approval.get("decision_sha256"):
@@ -792,15 +806,25 @@ def validate_gc_approval(project, data, args, *, allow_locked=False):
     return approval, plan, stated_sha
 
 
-def execute_gc(project, data, args):
+def execute_gc(project, data, args, *, ledger_path):
     approval, plan, stated_sha = validate_gc_approval(
-        project, data, args, allow_locked=True)
+        project, data, args, ledger_path=ledger_path, allow_locked=True)
     target = approval["target"]
     physical = confined(project, target)
     before_identity = fingerprint(physical)
     if before_identity != approval["fingerprint"]:
         raise LedgerHold("GC_PREDELETE_FILE_IDENTITY_STALE")
     free_before = shutil.disk_usage(project).free
+    # Commit durable deletion intent BEFORE touching the approved object.
+    data["files"][target].update(status="DELETE_INTENT", safe_delete=False,
+        delete_intent={"approval_sha256": stated_sha,
+                       "fingerprint_sha256": before_identity["sha256"],
+                       "issued_at": stamp(now())})
+    save(ledger_path, data)
+    # Keep writer lease while rechecking identity. A noncooperating writer
+    # remains outside this managed-root guarantee.
+    if fingerprint(physical) != before_identity:
+        raise LedgerHold("GC_FILE_CHANGED_AFTER_DURABLE_INTENT")
     try:
         physical.unlink()
     except OSError:
@@ -808,7 +832,7 @@ def execute_gc(project, data, args):
     if physical.exists() or physical.is_symlink():
         raise LedgerHold("GC_DELETE_READBACK_FAILED")
     data["files"][target].update(status="DELETED", safe_delete=False)
-    save(ledger_file(project, ".agentic-sdlc"), data)
+    save(ledger_path, data)
     free_after = shutil.disk_usage(project).free
     return {"schema_version": "artifact-gc-report-v2", "mode": "execute",
             "revision": data["revision"], "target": target,
@@ -838,15 +862,15 @@ def operate(a):
                 "files": len(data["files"]), "roots": len(data["roots"]),
                 "writer_status": lock.get("status") if lock else "UNINITIALIZED"}
     if a.action in {"gc", "cleangarbage"} and not a.execute:
-        return gc_plan(project, load(path))
+        return gc_plan(project, load(path), ledger_path=path)
     if a.action in {"gc", "cleangarbage"} and a.execute:
         if not a.approval:
             raise LedgerHold("GC_EXECUTION_REQUIRES_REVIEWED_APPROVAL")
         # Fail obvious stale or forged approvals before opening the writer
         # lease; validate again while holding the exclusive lease at unlink.
-        validate_gc_approval(project, load(path), a, allow_locked=False)
+        validate_gc_approval(project, load(path), a, ledger_path=path, allow_locked=False)
     if a.action == "approve-gc":
-        return approve_gc(project, load(path), a)
+        return approve_gc(project, load(path), a, ledger_path=path)
     op_root = getattr(a, "root", None)
     if op_root is None and a.action in {"classify", "review", "dependency"}:
         try:
@@ -1059,7 +1083,7 @@ def operate(a):
                     "dependent": dependent, "operation": a.operation,
                     "evidence_sha256": evidence_sha}
         if a.action in {"gc", "cleangarbage"}:
-            return execute_gc(project, data, a)
+            return execute_gc(project, data, a, ledger_path=path)
     raise LedgerHold("UNKNOWN_ACTION")
 
 

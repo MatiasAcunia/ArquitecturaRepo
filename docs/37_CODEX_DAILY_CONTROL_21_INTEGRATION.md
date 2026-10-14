@@ -1,0 +1,9 @@
+# Codex Daily Control 2.1 — exact package integration disposition
+
+The 2.1.0 capability-rework-rc package supplied by the CLIENT is the current upstream candidate. Immutable ZIP SHA-256: `d2d699058eab3b50d0e7e5f19e4b32482ab932180491140681142ab2dd1569d5`. Exactly 93/93 `SOURCE_SHA256SUMS.txt` entries match the byte contents (93 hashes, zero disagreements), against the older 2.0.2 candidate with 13/86 mismatches. The ZIP test is a byte-integrity check, not vendor attestation.
+
+The 2.1 `release.json` explicitly declares `CAPABILITY_REWORK_RC__WINDOWS_NATIVE_ACCEPTANCE_PENDING` and `native_windows_execution: NOT_PERFORMED_IN_THIS_ENVIRONMENT`. Its four current slots remain ROBLOX, MUSIC, TRO and CTR5. New components include source-bound native thread send/report workers, at-most-once intent, durable receipts, pause-before-idle distinction, upgrade fencing and diagnostics. These source declarations are not physical Windows acceptance.
+
+The integrated adapter accepts exact version families 2.0.2 and 2.1.0 and checks package/installed manifest bytes; its status is always `HOLD` until a separate native authenticated host gives Goal/thread/lease/permission/quota/receipt readback. It executes NO PowerShell or app-server calls. Do not treat installed-root preflight as a safe no-write Status command; do not restart or change the four live Goals.
+
+Operational admission requires correct package owner, installed files/hashes, current native Codex Desktop/CLI app-server capacity, actual Goal pause/resume distinctions, daypack/Drive readback, native end-to-end test, and independent owner acceptance. Full 1.2 host gate is not independently satisfied by this source-only RC integration.

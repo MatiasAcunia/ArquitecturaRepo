@@ -143,8 +143,19 @@
             "enum": [
               "OBSERVED",
               "MISSING",
-              "DELETED"
+              "DELETED",
+              "DELETE_INTENT"
             ]
+          },
+          "delete_intent": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["approval_sha256", "fingerprint_sha256", "issued_at"],
+            "properties": {
+              "approval_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "fingerprint_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "issued_at": {"type": "string", "format": "date-time"}
+            }
           },
           "safe_delete": {
             "type": "boolean"

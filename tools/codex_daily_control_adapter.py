@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ArquitecturaRepo <-> Codex Daily Control 2.0.2 preflight adapter.
+"""ArquitecturaRepo <-> Codex Daily Control 2.0.2/2.1 read-only preflight adapter.
 
 Read-only physical-byte inspection. No native Codex API calls, network,
 PowerShell invocation, Goal mutation, journal repair, or package installation.
@@ -206,8 +206,8 @@ def inspect(source: Source, *, physical_package_sha256: str | None = None,
         slots = _json(source.read('config/slots.json')).get('slots')
         if v != release.get('version'):
             failures.append('PACKAGE_RELEASE_VERSION_INCONSISTENT')
-        if not v.startswith('2.0.2'):
-            failures.append('VERSION_NOT_2_0_2')
+        if not (v.startswith('2.0.2') or v.startswith('2.1.0')):
+            failures.append('CODEX_DAILY_CONTROL_VERSION_UNSUPPORTED')
         if (not isinstance(slots, list) or len(slots) != len(EXPECTED_SLOTS)
                 or set(x.get('key') for x in slots if isinstance(x, dict)) != set(EXPECTED_SLOTS)):
             failures.append('CONFIGURED_GOAL_SLOTS_NOT_EXPECTED_FOUR')
@@ -229,7 +229,7 @@ def inspect(source: Source, *, physical_package_sha256: str | None = None,
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description='Read-only 2.0.2 package and installed-byte preflight')
+    p = argparse.ArgumentParser(description='Read-only 2.0.2/2.1 package and installed-byte preflight')
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument('--package-zip', type=Path)
     group.add_argument('--installed-root', type=Path)
