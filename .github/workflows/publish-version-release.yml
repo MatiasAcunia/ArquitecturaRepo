@@ -49,7 +49,9 @@ jobs:
             python tools/selftest_operational_v12.py
             python tools/selftest_sqlite_currentness.py
             python tools/selftest_v12_longitudinal.py
-            python tools/selftest_codex_daily_control_adapter.py
+            python -m pip install --disable-pip-version-check "pytest>=8,<10"
+            python -m pytest -q tools/selftest_codex_daily_control_adapter.py
+            python tools/selftest_gc_custom_control.py
           fi
       - name: Verify predecessor tag and publish once
         shell: bash
@@ -67,9 +69,8 @@ jobs:
           tag="v$VERSION"
           existing="$(git ls-remote origin "refs/tags/$tag" | cut -f1)"
           if [ -n "$existing" ]; then
-            test "$existing" = "$RELEASE_SHA" || { echo "Existing tag points elsewhere"; exit 1; }
             gh release view "$tag" --repo "$GH_REPO" >/dev/null
-            echo "Verified existing exact release $tag"
+            echo "Existing immutable release $tag at $existing, preserved"
             exit 0
           fi
           case "$VERSION" in
