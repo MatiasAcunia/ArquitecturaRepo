@@ -37,7 +37,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 - [Maintainer hardening history](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
 - [Contributor test evidence template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
 
-The scaffold refuses destructive overwrites. Install into a fresh directory or follow a reviewed migration procedure for an existing control layer.
+The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or follow a reviewed migration procedure for an existing control layer.
 
 ## v1.2.0 — released portable features
 
