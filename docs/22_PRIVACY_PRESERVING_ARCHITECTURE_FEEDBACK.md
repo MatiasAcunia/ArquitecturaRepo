@@ -2,6 +2,8 @@
 
 The starter can generate recurring architecture-usage feedback without reading or exporting project content.
 
+The minimal monthly report is ON by default so the project owner can inspect structural adoption friction, error categories, recovery frequency and setup issues. This can help improve the starter architecture and organize engineering-process data. The report is stored in the adopter's own GitHub Actions artifacts; it is not silently delivered to the starter maintainer.
+
 ## Default behavior
 
 New scaffolds install a managed GitHub Actions workflow at:
@@ -15,12 +17,12 @@ and a project-local config at:
 Defaults:
 
 - feedback generation: enabled;
-- cadence: weekly;
+- cadence: monthly (automatically scheduled, where GitHub Actions schedules are active);
 - GitHub Actions artifact: enabled;
-- external submission: disabled;
+- external submission preference: on once a verified HTTPS collector has been configured; without one, transport cannot run and local artifacts remain the only delivery;
 - privacy mode: `STRICT_METADATA_ONLY`.
 
-The workflow also has a monthly schedule. The exporter only emits on the schedule that matches the configured cadence. Manual runs always work.
+The managed workflow schedules one monthly run by default. The exporter emits only when the configured cadence matches its trigger; manual dispatch remains available. Users who prefer weekly feedback may configure their own schedule and cadence explicitly.
 
 ## What the report can contain
 
@@ -76,15 +78,23 @@ The workflow uses read-only repository permissions.
 
 Scheduled GitHub Actions run on the default branch. On public repositories GitHub may disable schedules after a long inactivity period; manual dispatch remains available.
 
+## v1.2 outbound defaults and absence of a collector
+
+The default is **opt-out for minimized reporting** requested by the project maintainer. The installer prominently prints a report/recipient notice, links the exact JSON schema and documents the disable switches. No collector address is included in this candidate: **there is currently no physical route to send those reports to the maintainer**. Claiming central reception would be false.
+
+If a future verified maintainer endpoint is set through `AGENTIC_SDLC_FEEDBACK_ENDPOINT`, the managed job may send the allowlisted report each month unless `external_submission_enabled=false`, `enabled=false`, or repository variable `AGENTIC_SDLC_FEEDBACK_SUBMIT=false`. A network request is prohibited on missing endpoint, unsafe destination, invalid categories, or missing consent/privacy disclosures. Output remains in the adopter's repo; recipient replies must echo exact SHA256 receipt. No stable tracking identifier or source/repository URL is transmitted; a server may still observe network timestamps/runner metadata, so do not promise mathematically untraceable anonymity.
+
+No source code, prompts, file paths, usernames, tokens, client/business details or free-text error strings leave the project. Event categories are fixed, bounded numeric counts; this does not diagnose causality. User choices override automatic delivery without impacting SDLC operation. Disable before the first scheduled run by reading the generated README and config.
+
 ## External submission
 
-External submission is deliberately two-key opt-in.
+External submission is preference-on after a verified collector exists and remains explicitly opt-out. The collector is NOT configured in the current release candidate.
 
 It occurs only when all of these are true:
 
-1. `external_submission_enabled` is `true` in the feedback config;
-2. repository variable `AGENTIC_SDLC_FEEDBACK_SUBMIT` is exactly `true`;
-3. repository variable `AGENTIC_SDLC_FEEDBACK_ENDPOINT` contains an endpoint.
+1. `external_submission_enabled` is `true` in the feedback config (default);
+2. repository variable `AGENTIC_SDLC_FEEDBACK_SUBMIT` is not `false` (user opt-out);
+3. repository variable `AGENTIC_SDLC_FEEDBACK_ENDPOINT` contains a verified, intended collector endpoint.
 
 No personal access token is requested by the starter.
 
@@ -92,7 +102,7 @@ The endpoint must accept an unauthenticated JSON POST if this mode is used.
 
 This allows a future maintainer-owned collector to receive the already-sanitized report without giving the starter credentials to the user's project.
 
-Until a collector is explicitly configured, nothing is sent outside the repository's normal GitHub Actions artifact storage.
+Until a collector is physically configured, nothing is sent outside the repository's normal GitHub Actions artifact storage. The status must be reported as NOT_CONFIGURED, not SENT.
 
 ## Disable it
 

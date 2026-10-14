@@ -55,3 +55,9 @@ If unsafe:
 Before readiness, reconcile storage.
 
 Do not leave large known disposable populations as unnamed future cleanup debt.
+
+## File-level persistent lifecycle index (v1.2 candidate)
+
+New scaffolds include a project-local JSON file at .agentic-sdlc/runtime/ARTIFACT_LIFECYCLE_CURRENT.json. Its owner is the local artifact runtime, not Product State. Every system-controlled L3 output must be emitted into an explicitly registered .agentic-sdlc-scratch root through artifact_ledger.py capture, with owner/campaign, category, physical identity, expiry and evidence dependencies. Reconciliation after failures or resume quarantines unknown and modified files. The GC always begins as dry-run and deletes only exact-owned, expired, rebuildable, ignored/untracked files with independent safety checks. SQL/SQLite, canonical/evidence/secret paths, external assets and unknown files are never automatically deleted. The existing workspace_gc.py retains exclusive whole-directory/worktree cleanup ownership. See docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md.
+
+A host that cannot route an external tool's writes through the capture/reconciliation interface must report tracking as PARTIAL, not promise all native IDE process outputs were observed. The JSON persists across invocations; routine file registration is not a canonical Git-commit boundary. Cleanup must be in the terminal evidence and use meaningful reclaimed-byte readback.

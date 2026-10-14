@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import sys
 from pathlib import Path
 from typing import Any
+
+from state_tx import sha256_file
 
 EXCLUDED_DIRS = {".git", ".agentic-sdlc", "__pycache__", ".venv", "venv", "node_modules"}
 MANAGED_FEEDBACK_WORKFLOW = ".github/workflows/agentic-sdlc-feedback.yml"
@@ -29,11 +30,10 @@ def is_managed_control_file(project: Path, path: Path) -> bool:
 
 
 def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    digest = sha256_file(path)
+    if digest is None:
+        raise FileNotFoundError(path)
+    return digest
 
 
 def inventory(project: Path) -> dict[str, Any]:

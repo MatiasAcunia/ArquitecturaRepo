@@ -245,6 +245,54 @@
           "const": false
         }
       }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "erratic_agent_observations",
+        "misconfiguration_observations",
+        "stale_authority_observations",
+        "unbounded_retry_observations",
+        "ambiguous_external_effect_observations",
+        "resource_contention_observations"
+      ],
+      "properties": {
+        "source": {
+          "const": "ENUM_EVENT_COUNTS_ONLY"
+        },
+        "erratic_agent_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "misconfiguration_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "stale_authority_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "unbounded_retry_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "ambiguous_external_effect_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "resource_contention_observations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      }
     }
   }
 }

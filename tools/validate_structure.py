@@ -137,6 +137,7 @@ TOKEN_HINT_RE = re.compile(
     r"(?i)(?:api[_-]?key|secret|access[_-]?token|bearer)\s*[:=]\s*['\"][A-Za-z0-9_\-]{12,}"
 )
 MD_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|MatiasAcunia)\b|TRO/RED")
 
 
 def fail(message: str, errors: list[str]) -> None:
@@ -216,7 +217,27 @@ def validate_structure_only(errors: list[str]) -> None:
         rel = path.relative_to(ROOT)
         if EMAIL_RE.search(text):
             fail(f"possible personal email in public starter: {rel}", errors)
-        if SHA40_RE.search(text):
+        # The public starter can demonstrate arbitrary project categories,
+        # never identify the maintainer's own active product workstreams.
+        if (path.suffix.lower() == ".md"
+            and rel.parts[0] in {"docs", "prompts", "protocols"}
+            and PUBLIC_PROJECT_MARKER_RE.search(text)):
+            fail(f"project-specific source name in public documentation: {rel}", errors)
+        # Official immutable action pins are supply-chain controls, not
+        # project/source identity. Exception is limited to these two CI YAML
+        # surfaces and three official actions with semver comments.
+        checked = text
+        if rel.as_posix() in {
+            ".github/workflows/validate-starter.yml",
+            ".github/workflows/publish-version-release.yml",
+            "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
+        }:
+            checked = re.sub(
+                r"(?m)^\s*(?:-\s*)?uses:\s*actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
+                "",
+                checked,
+            )
+        if SHA40_RE.search(checked):
             fail(f"40-char commit-like identifier in structure-only starter: {rel}", errors)
         if PRIVATE_KEY_RE.search(text):
             fail(f"private-key material detected: {rel}", errors)

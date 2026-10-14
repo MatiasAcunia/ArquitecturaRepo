@@ -62,10 +62,27 @@ def main() -> int:
         config = json.loads(config_path.read_text(encoding="utf-8"))
         if config.get("enabled") is not True:
             raise AssertionError("feedback must default enabled")
-        if config.get("external_submission_enabled") is not False:
-            raise AssertionError("external submission must default disabled")
+        if config.get("cadence") != "MONTHLY":
+            raise AssertionError("feedback must default to monthly, not weekly")
+        if config.get("external_submission_enabled") is not True:
+            raise AssertionError("v1.2 must declare opt-out outbound preference; no endpoint means no transport")
         if config.get("privacy_mode") != "STRICT_METADATA_ONLY":
             raise AssertionError("feedback privacy mode is not strict metadata only")
+
+        # Adversarial fields: a user-controlled status must NEVER become report text.
+        product_path = control / "state" / "PRODUCT_STATE_CURRENT.json"
+        product = json.loads(product_path.read_text(encoding="utf-8"))
+        product["status"] = sensitive_fragments[0]
+        product_path.write_text(json.dumps(product), encoding="utf-8")
+        tech_path = control / "state" / "TECHNICAL_BASELINE_CURRENT.json"
+        tech = json.loads(tech_path.read_text(encoding="utf-8"))
+        tech.setdefault("environment", {})["network_mode"] = synthetic_email
+        tech_path.write_text(json.dumps(tech), encoding="utf-8")
+        profile_path = control / "PROFILE.json"
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        profile["starter_version"] = synthetic_hex40
+        profile["profile"] = sensitive_fragments[0]
+        profile_path.write_text(json.dumps(profile), encoding="utf-8")
 
         report_path = Path(tmp) / "report.json"
         generated = run(
@@ -149,8 +166,8 @@ def main() -> int:
 
     print("ARCHITECTURE FEEDBACK PRIVACY SELF-TEST PASSED")
     print("- scheduled feedback is installed by default")
-    print("- local report generation defaults enabled")
-    print("- external submission defaults disabled")
+    print("- local report generation defaults enabled, monthly")
+    print("- outbound preference defaults ON but no real remote sends until verified collector exists; easily disabled")
     print("- strict allowlisted metadata report validates")
     print("- product identifiers, requirements, paths, emails and SHA-like values do not leak")
     print("- cadence mismatch skips emission")

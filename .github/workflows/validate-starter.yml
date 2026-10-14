@@ -11,8 +11,11 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
       - name: Install validation dependency
@@ -53,7 +56,73 @@ jobs:
         run: python tools/selftest_runtime.py
       - name: Exercise repository efficiency and local workspace hygiene
         run: python tools/selftest_repository_hygiene.py
+      - name: Exercise persistent per-file L3 inventory and safe cleanup
+        run: python tools/selftest_artifact_ledger.py
       - name: Exercise hardening
         run: python tools/selftest_hardening.py
       - name: Verify complete v1 release gate
         run: python tools/verify_v1_release.py
+      - name: Exercise v1.2 operational controls (synthetic, no network)
+        run: python tools/selftest_operational_v12.py
+      - name: Verify localized installer, FAQ and eight offline languages
+        run: python tools/selftest_i18n.py
+      - name: Exercise privacy-gated collector and hash-receipt rejection tests
+        run: python tools/selftest_feedback_submit.py
+      - name: Verify v1.2 security and exact release gates stay fail closed
+        run: python tools/selftest_security_v12.py
+      - name: Verify project modes, discovery and canonical theory preflight
+        run: python tools/selftest_v12_setup.py
+      - name: Exercise three offline process boundaries and no-replay recovery
+        run: python tools/selftest_v12_longitudinal.py
+      - name: Guard v1.2 privacy, language and longitudinal documentation defaults
+        run: python tools/selftest_v12_documentation.py
+      - name: Falsify editable release PASS and independent-host claims
+        run: python tools/selftest_v12_release_falsifiers.py
+      - name: Falsify malformed CLIENT theory and stale baseline
+        run: python tools/selftest_v12_theory_hardening.py
+      - name: Verify release plan and private L3 terminal intake
+        run: python tools/selftest_v12_stabilization.py
+      - name: Reject unbound SQLite WAL currentness and stale snapshots
+        run: python tools/selftest_v12_sqlite_wal.py
+      - name: Verify read-only attachment of existing canonical owner references
+        run: python tools/selftest_v12_attachment.py
+      - name: Refuse tampered crash journals and verify bounded recovery
+        run: python tools/selftest_v12_journal_security.py
+      - name: Falsify partial installs and user-owned workflow collisions
+        run: python tools/selftest_v12_install_staging.py
+      - name: Check v1.2 candidate evidence without claiming physical host acceptance
+        run: python tools/verify_v12_candidate.py
+
+  windows-compatibility-smoke:
+    name: Windows portable-core smoke (not Codex Desktop acceptance)
+    # Avoid duplicate push/PR compute while the v1.2 candidate is reviewed.
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Install portable core validation dependencies
+        run: python -m pip install --disable-pip-version-check "jsonschema>=4.23,<5"
+      - name: Scaffold all profiles on Windows filesystem
+        run: python tools/selftest_scaffold.py
+      - name: Recover and reject tampered journals on Windows
+        run: python tools/selftest_v12_journal_security.py
+      - name: Validate staging, partial-install rollback and workflow preservation
+        run: python tools/selftest_v12_install_staging.py
+      - name: Verify local operating modes and frozen theory
+        run: python tools/selftest_v12_setup.py
+      - name: Verify cross-process plan and external-effect restart
+        run: python tools/selftest_v12_longitudinal.py
+      - name: Verify SQLite WAL logical currentness under Windows file locks
+        run: python tools/selftest_v12_sqlite_wal.py
+      - name: Verify existing governed source attachment is read-only
+        run: python tools/selftest_v12_attachment.py
+      - name: Test artifact lifecycle registry and file GC on Windows
+        run: python tools/selftest_artifact_ledger.py

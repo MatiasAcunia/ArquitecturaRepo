@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:artifact-ledger:1",
+  "title": "Project-local artifact lifecycle index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "created_at",
+    "updated_at",
+    "roots",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "artifact-ledger-v1"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "roots": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "owner",
+          "campaign",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "campaign": {
+            "type": "string",
+            "minLength": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "root",
+          "category",
+          "owner",
+          "campaign",
+          "fingerprint",
+          "status",
+          "safe_delete",
+          "review_closed",
+          "dependencies",
+          "created_at",
+          "last_seen_at",
+          "expires_at"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "root": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "enum": [
+              "SOURCE_VERSIONED",
+              "CANONICAL_STATE",
+              "IMMUTABLE_EVIDENCE",
+              "SHORT_TERM_EVIDENCE",
+              "DERIVED_REBUILDABLE",
+              "TEMP_TRANSACTION",
+              "SENSITIVE_LOCAL",
+              "EXTERNAL_CANONICAL",
+              "QUARANTINE_UNRESOLVED"
+            ]
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "campaign": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fingerprint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sha256",
+              "size",
+              "mtime_ns",
+              "device",
+              "inode"
+            ],
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "mtime_ns": {
+                "type": "integer"
+              },
+              "device": {
+                "type": "integer"
+              },
+              "inode": {
+                "type": "integer"
+              }
+            }
+          },
+          "status": {
+            "enum": [
+              "OBSERVED",
+              "MISSING",
+              "DELETED",
+              "DELETE_INTENT"
+            ]
+          },
+          "delete_intent": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["approval_sha256", "fingerprint_sha256", "issued_at"],
+            "properties": {
+              "approval_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "fingerprint_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "issued_at": {"type": "string", "format": "date-time"}
+            }
+          },
+          "safe_delete": {
+            "type": "boolean"
+          },
+          "review_closed": {
+            "type": "boolean"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "git_observations": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observed_at",
+          "head",
+          "changed"
+        ],
+        "properties": {
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "head": {
+            "type": "string"
+          },
+          "changed": {
+            "type": "array",
+            "maxItems": 5000,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "path"
+              ],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 2
+                },
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:existing-governed-attachment:1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mode",
+    "preserve_existing_authority",
+    "source_writes_allowed",
+    "external_actions_allowed",
+    "authority_surfaces"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "existing-governed-attachment-v1"
+    },
+    "mode": {
+      "const": "READ_ONLY_REFERENCE"
+    },
+    "preserve_existing_authority": {
+      "const": true
+    },
+    "source_writes_allowed": {
+      "const": false
+    },
+    "external_actions_allowed": {
+      "const": false
+    },
+    "authority_surfaces": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "concern",
+          "source_ref",
+          "sha256"
+        ],
+        "properties": {
+          "concern": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+          },
+          "source_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

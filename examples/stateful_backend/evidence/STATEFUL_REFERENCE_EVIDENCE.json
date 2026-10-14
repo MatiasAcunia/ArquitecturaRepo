@@ -5,9 +5,11 @@
     "same idempotency key and payload returns the same durable note",
     "same idempotency key with a different payload is rejected",
     "committed note survives store reconstruction",
+    "schema version 1 migrates transactionally to version 2 without changing legacy bodies or identities",
     "fault after note insertion rolls back note and request identity together",
-    "concurrent replay of one request creates one note"
+    "concurrent replay of one request creates one note",
+    "invalid request and note identifiers are rejected without persistence"
   ],
   "test_command": "python -m unittest discover -s tests -v",
-  "expected_test_count": 5
+  "expected_test_count": 8
 }

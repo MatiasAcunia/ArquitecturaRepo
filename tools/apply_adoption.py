@@ -16,6 +16,10 @@ from jsonschema import Draft202012Validator, FormatChecker
 from state_tx import (
     StateTransactionError,
     journal_path,
+    contains_sqlite_or_sidecar,
+    is_sqlite_or_sidecar,
+    sha256_file,
+    sha256_path,
     state_lock,
     write_state_set,
 )
@@ -48,8 +52,17 @@ def atomic_id(concern_id: str, surface_ref: str) -> str:
 def resolve_ref(control: Path, value: str) -> Path:
     candidate = Path(value)
     if candidate.is_absolute():
-        return candidate
-    return (control / candidate).resolve()
+        resolved = candidate.resolve()
+    else:
+        resolved = (control / candidate).resolve()
+    project_root = control.resolve().parent
+    try:
+        resolved.relative_to(project_root)
+    except ValueError:
+        raise AdoptionError(
+            f"adoption reference escapes target project root: {value!r}"
+        ) from None
+    return resolved
 
 
 def validate_spec(spec: dict[str, Any]) -> None:
@@ -224,6 +237,13 @@ def ensure_refs(control: Path, spec: dict[str, Any]) -> None:
         if not resolve_ref(control, ref).exists():
             raise AdoptionError(f"adoption ref does not resolve: {ref}")
 
+    for ref in spec.get("artifact_refs", []):
+        path = Path(ref)
+        if not path.is_absolute() or path.is_symlink() or not path.is_file():
+            raise AdoptionError(
+                f"explicit artifact ref must be an absolute existing regular file: {ref}"
+            )
+
     for owner in spec["custom_owners"]:
         if owner["surface_type"] == "EXTERNAL":
             continue
@@ -231,6 +251,70 @@ def ensure_refs(control: Path, spec: dict[str, Any]) -> None:
             raise AdoptionError(
                 f"custom owner surface does not resolve: {owner['surface_ref']}"
             )
+
+
+def reject_shadow_product_state(control: Path, spec: dict[str, Any]) -> None:
+    control_root = control.resolve()
+    for ref in spec["currentness_refs"]:
+        path = resolve_ref(control, ref)
+        if not path.is_file() or path.suffix.casefold() != ".json":
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(data, dict) or "active_campaign" not in data:
+            continue
+        product_id = data.get("product_or_workstream", data.get("product"))
+        if product_id != spec["product_or_workstream"]:
+            continue
+        if path == control_root or path.is_relative_to(control_root):
+            continue
+        raise AdoptionError(
+            "an existing external Product State for this workstream was found; "
+            "adoption cannot create a shadow Product State and requires an explicit attachment mode"
+        )
+
+
+def source_bindings(control: Path, spec: dict[str, Any]) -> list[dict[str, str]]:
+    bindings: list[dict[str, str]] = []
+    refs = list(spec["currentness_refs"])
+    refs.extend(
+        owner["surface_ref"]
+        for owner in spec["custom_owners"]
+        if owner["required_in_currentness_set"]
+        and owner["surface_type"] in {"FILE", "DIRECTORY"}
+    )
+    for ref in unique(refs):
+        path = resolve_ref(control, ref)
+        if contains_sqlite_or_sidecar(path):
+            raise AdoptionError(
+                "SQLite currentness refs require a transactionally consistent WAL witness; "
+                "use the existing-governed attachment currentness path"
+            )
+        digest = sha256_path(path)
+        if digest is None:
+            raise AdoptionError(f"currentness ref is not a stable file or directory: {ref}")
+        bindings.append({"ref": ref, "sha256": digest})
+    return bindings
+
+
+def artifact_bindings(spec: dict[str, Any]) -> list[dict[str, str]]:
+    bindings: list[dict[str, str]] = []
+    for ref in spec.get("artifact_refs", []):
+        path = Path(ref)
+        digest = (sha256_file(path)
+                  if path.is_absolute() and path.is_file() and not path.is_symlink()
+                  else None)
+        if digest is None:
+            raise AdoptionError(f"explicit artifact ref is unavailable: {ref}")
+        if is_sqlite_or_sidecar(path):
+            raise AdoptionError(
+                "SQLite artifact refs and sidecars require a transactionally consistent WAL witness; "
+                "use the existing-governed attachment currentness path"
+            )
+        bindings.append({"path": str(path.resolve()), "sha256": digest})
+    return bindings
 
 
 def planned_state(
@@ -336,6 +420,8 @@ def planned_state(
             ]
         ),
         "unresolved": [],
+        "source_bindings": source_bindings(control, spec),
+        "artifact_bindings": artifact_bindings(spec),
     }
 
     owners["updated_at"] = spec["verified_at"]
@@ -352,7 +438,14 @@ def planned_state(
 
 def validate_control(control: Path) -> None:
     result = subprocess.run(
-        [sys.executable, str(VALIDATOR), "--root", str(control)],
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--root",
+            str(control),
+            "--project-root",
+            str(control.resolve().parent),
+        ],
         cwd=CONTROL_ROOT_DEFAULT,
         text=True,
         capture_output=True,
@@ -425,6 +518,10 @@ def already_adopted(control: Path, spec: dict[str, Any]) -> bool:
     currentness = bootstrap.get("currentness", {})
     if currentness.get("verified") is not True or currentness.get("unresolved") != []:
         return False
+    if currentness.get("source_bindings") != source_bindings(control, spec):
+        return False
+    if currentness.get("artifact_bindings") != artifact_bindings(spec):
+        return False
 
     current_owners = {
         item["concern_id"]: item
@@ -456,7 +553,19 @@ def already_adopted(control: Path, spec: dict[str, Any]) -> bool:
 def preflight(control: Path, writes: dict[Path, dict[str, Any] | str]) -> None:
     with tempfile.TemporaryDirectory(prefix="agentic-sdlc-adoption-preflight-") as tmp:
         candidate = Path(tmp) / "control"
-        shutil.copytree(control, candidate)
+        lock_directory = (control / "runtime").resolve()
+
+        def ignore_active_lock(directory: str, names: list[str]) -> list[str]:
+            # The caller holds this lock while preflighting. Windows refuses to
+            # copy an open lock file, and the lock itself is not candidate state.
+            if (
+                Path(directory).resolve() == lock_directory
+                and ".campaignctl.lock" in names
+            ):
+                return [".campaignctl.lock"]
+            return []
+
+        shutil.copytree(control, candidate, ignore=ignore_active_lock)
 
         for target, payload in writes.items():
             relative = target.resolve().relative_to(control.resolve())
@@ -468,7 +577,14 @@ def preflight(control: Path, writes: dict[Path, dict[str, Any] | str]) -> None:
                 destination.write_text(payload, encoding="utf-8")
 
         result = subprocess.run(
-            [sys.executable, str(VALIDATOR), "--root", str(candidate)],
+            [
+                sys.executable,
+                str(VALIDATOR),
+                "--root",
+                str(candidate),
+                "--project-root",
+                str(control.resolve().parent),
+            ],
             cwd=CONTROL_ROOT_DEFAULT,
             text=True,
             capture_output=True,
@@ -499,6 +615,7 @@ def main() -> int:
         spec = load_json(spec_path)
         validate_spec(spec)
         ensure_refs(control, spec)
+        reject_shadow_product_state(control, spec)
 
         with state_lock(control, args.lock_timeout):
             if journal_path(control).exists():

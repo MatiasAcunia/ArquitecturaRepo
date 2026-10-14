@@ -46,3 +46,9 @@ Where useful classify:
 - NOT_APPLICABLE.
 
 Absence of evidence is UNKNOWN, not proof that no technical escape occurred.
+
+## Controlled reconciliation / supersession
+
+For every material CLIENT correction, capture only recoverable evidence (source ref, time, actor, classification and supported decision meaning), link it to the corresponding normalized L1 current requirements and affected Product State surface, and identify supersession of contradictory historical decisions. Historic records are append-only unless a privacy deletion obligation applies; they are not parallel CURRENT requirements.
+
+Reorganization may move/archive old theory within its owning repository, but must preserve lineage and mark dependent currentness invalid until reconciled. A mere chat message or Git commit cannot by itself certify acceptance, authorship, or consumption by an agent.

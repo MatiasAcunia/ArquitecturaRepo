@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:cognitive-consultation:1.2",
+  "title": "Read-only I4 consultation state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "consultation_id",
+    "campaign_id",
+    "source_digest",
+    "question_digest",
+    "model",
+    "export_classification",
+    "phase",
+    "network_attempt_count",
+    "response_sha256",
+    "host_delivery_ref",
+    "host_consumption_ref",
+    "disposition_evidence_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-i4-consultation-v1"
+    },
+    "consultation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "question_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "export_classification": {
+      "const": "PUBLIC_OR_SYNTHETIC"
+    },
+    "phase": {
+      "enum": [
+        "DUE",
+        "CLAIMED",
+        "REQUESTED_AMBIGUOUS",
+        "RESPONSE_RECORDED_UNCONSUMED",
+        "DELIVERY_ATTESTED_UNCONSUMED",
+        "CONSUMPTION_ATTESTED_UNVALIDATED",
+        "ADOPTED_PENDING_GATE",
+        "REJECTED_WITH_EVIDENCE"
+      ]
+    },
+    "network_attempt_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "response_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "host_delivery_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "host_consumption_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "disposition_evidence_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

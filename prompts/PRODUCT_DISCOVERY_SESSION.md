@@ -49,3 +49,9 @@ Create milestones with target dates, done conditions, dependencies, confidence a
 Never hide a date change.
 
 At the end, show the CLIENT a short summary: what will be built, what is not in scope, technical approach in plain language, target dates, main risks and next campaign.
+
+## v1.2 discovery extension
+
+Characterize the proposed project as CRUD, API, web, mobile, desktop, CLI, data pipeline, AI/ML, automation, game, media pipeline, infrastructure, research or OTHER. Identify operational phase (discovery, analysis, design, plan, implement, test, integrate, deploy, operate, maintain), platform/OS and environment, intended human-agent collaboration, synchronous/asynchronous/hybrid runtime, software/non-code/mixed scope, and potential optional tools/MCP plugins.
+
+Technical choices belong to Planner. Compare credible stacks based on existing project/machine skills, cost/security/rights, deployment, tests and recovery. Recommend OpenAI where it fits, but support other models/providers. Do not install models or plugins just because a catalog names them. Before a campaign, persist current CLIENT product theory and supersession/acceptance evidence; verify no contradictory older rule is still considered authoritative.

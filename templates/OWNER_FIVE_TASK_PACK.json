@@ -1,0 +1,44 @@
+{
+  "schema_version": "owner-five-task-pack-v1",
+  "enabled": false,
+  "install_scope": "MULTI_PRODUCT_ONLY",
+  "timezone": "USER_SELECTED",
+  "schedule": "AM_PM_USER_SELECTED",
+  "roles": [
+    {
+      "role": "Delivery",
+      "purpose": "deliverability, milestones, gates and constraints"
+    },
+    {
+      "role": "Architecture",
+      "purpose": "architecture, interfaces, DB, currentness, recovery and hardening"
+    },
+    {
+      "role": "Quality",
+      "purpose": "adversarial independent gate evidence and falsification"
+    },
+    {
+      "role": "Integrator",
+      "purpose": "cross-workstream integration and consumed routes"
+    },
+    {
+      "role": "Master",
+      "purpose": "global strategy, systemic fixes and final governance"
+    }
+  ],
+  "recovery": {
+    "scope": "EXACT_FIVE_IDS",
+    "inspect_other_four": true,
+    "only_allowed_mutation": "is_enabled=true",
+    "preserve_explicit_client_suspend": true,
+    "preserve_platform_or_security_suspend": true,
+    "no_prompt_or_schedule_edit": true,
+    "readback_required": true
+  },
+  "installation": {
+    "task_ids": "NOT_CONFIGURED",
+    "scheduler_adapter": "NOT_PROVEN",
+    "activation_requires_user_authorization": true,
+    "additional_llm_supervisor": false
+  }
+}

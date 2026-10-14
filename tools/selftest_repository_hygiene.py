@@ -160,6 +160,7 @@ def test_workspace_gc(base: Path) -> None:
     expired = root / "expired"
     protected = root / "protected"
     future = root / "future"
+    clean_canonical = root / "clean_canonical_git"
     dirty = root / "dirty"
     unmarked = root / "unmarked"
     outside = base / "outside"
@@ -167,10 +168,33 @@ def test_workspace_gc(base: Path) -> None:
     outside.mkdir()
     (outside / "keep.txt").write_text("keep\n", encoding="utf-8")
 
+    # Existing directories never become deletable by merely installing or
+    # forcibly replacing a lifecycle marker.
+    preexisting = root / "preexisting_user_data"
+    preexisting.mkdir()
+    (preexisting / "private.txt").write_text("NEVER_DELETE", encoding="utf-8")
+    denied = run(str(WORKSPACE_GC), "register", "--path", str(preexisting),
+                 "--class", "EPHEMERAL_RECONSTRUCTIBLE", "--owner", "I3",
+                 "--ttl-hours", "-1", "--safe-delete")
+    if denied.returncode == 0 or not (preexisting / "private.txt").exists():
+        raise AssertionError("preexisting unowned directory became deletable")
+    denied_force = run(str(WORKSPACE_GC), "register", "--path", str(preexisting),
+                       "--class", "EPHEMERAL_RECONSTRUCTIBLE", "--owner", "I3",
+                       "--ttl-hours", "-1", "--safe-delete", "--force")
+    if denied_force.returncode == 0:
+        raise AssertionError("forced workspace ownership takeover allowed")
+
     register(expired, "EPHEMERAL_RECONSTRUCTIBLE", safe=True, ttl=-1)
     register(protected, "PROTECTED_CURRENT_OR_EVIDENCE", safe=False, ttl=-1)
     register(future, "CACHE_RECONSTRUCTIBLE", safe=True, ttl=24)
     register(dirty, "EPHEMERAL_RECONSTRUCTIBLE", safe=True, ttl=-1)
+    register(clean_canonical, "EPHEMERAL_RECONSTRUCTIBLE", safe=True, ttl=-1)
+    git(clean_canonical, "init", "-b", "main")
+    git(clean_canonical, "config", "user.email", "example.invalid")
+    git(clean_canonical, "config", "user.name", "Example")
+    (clean_canonical / "app.txt").write_text("canonical source", encoding="utf-8")
+    git(clean_canonical, "add", ".")
+    git(clean_canonical, "commit", "-m", "canonical fixture")
     git(dirty, "init", "-b", "main")
     git(dirty, "config", "user.email", "example.invalid")
     git(dirty, "config", "user.name", "Example")
@@ -192,9 +216,13 @@ def test_workspace_gc(base: Path) -> None:
         raise AssertionError(rows["protected"])
     if rows["future"]["decision"] != "KEEP":
         raise AssertionError(rows["future"])
-    if rows["dirty"]["reason"] != "DIRTY_GIT_WORKSPACE":
+    if rows["dirty"]["reason"] != "CANONICAL_GIT_CHECKOUT_NEVER_AUTO_DELETED":
         raise AssertionError(rows["dirty"])
-    if dry_payload["unmarked_directories_ignored"] != 1:
+    if rows["clean_canonical_git"]["reason"] != "CANONICAL_GIT_CHECKOUT_NEVER_AUTO_DELETED":
+        raise AssertionError("clean canonical Git checkout was not protected")
+    if (preexisting / "private.txt").read_text(encoding="utf-8") != "NEVER_DELETE":
+        raise AssertionError("unowned source was lost")
+    if dry_payload["unmarked_directories_ignored"] != 2:
         raise AssertionError("unmarked directory was not ignored")
 
     execute = run(str(WORKSPACE_GC), "collect", "--root", str(root), "--execute")
@@ -202,7 +230,7 @@ def test_workspace_gc(base: Path) -> None:
         raise AssertionError(execute.stderr)
     if expired.exists():
         raise AssertionError("expired safe workspace was not deleted")
-    if not protected.exists() or not future.exists() or not dirty.exists() or not unmarked.exists():
+    if not protected.exists() or not future.exists() or not dirty.exists() or not unmarked.exists() or not clean_canonical.exists() or not preexisting.exists():
         raise AssertionError("GC deleted a blocked/kept/unmarked workspace")
     if not outside.exists():
         raise AssertionError("GC escaped explicit root")

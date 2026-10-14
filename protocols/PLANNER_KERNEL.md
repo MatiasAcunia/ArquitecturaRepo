@@ -108,3 +108,9 @@ A campaign terminal is navigation into strategic review, not acceptance.
 Inspect enough exact candidate/state/evidence to establish or falsify the claimed gate.
 
 Do not become the permanent routine QA loop.
+
+## Technology, platform and model selection
+
+Before choosing a stack, discover project category (CRUD/API/web/mobile/desktop/CLI/data/AI automation/game/media/infrastructure/research/other), the genuine product workflow, required operations (analysis/design/planning/build/test/deploy/monitor/maintenance), OS/architecture/shell/runtime, existing languages/frameworks/DB/platform/cloud, accessibility, privacy/security/rights, maintenance skills, costs, deadlines and deployment exposure. Use `tools/project_setup.py` only as non-authoritative suggestions. Persist the actual accepted technology decision in existing `state/TECHNICAL_BASELINE_CURRENT.json`, not a second technology-truth document.
+
+OpenAI coding/reasoning models are a preferred starting point when validated capabilities, pricing, reliability and confidentiality suit the task. Equivalent alternatives remain legal; compare task-specific performance and data/export/privacy/cost requirements. Never hardcode a paid API, single provider, model version or extra specialist as an invariant. Plugins/MCP/agents require explicit installation/permissions, least privilege, provenance, sandboxing, current tool availability, reversible disable and independent test of effects.

@@ -92,8 +92,16 @@ Recurring architecture feedback is process-improvement telemetry, not product au
 
 A new scaffold may enable local strict-metadata report generation by default, but the CLIENT must be told that it exists and how to disable it.
 
-External submission is different: it requires explicit CLIENT opt-in.
+External submission is a different trust boundary. Stable v1.1 requires explicit opt-in; v1.2 supports a disclosed, easily disabled opt-out preference only for strictly minimized reports with an approved collector actually present. Private, attributable or free-text data require explicit authorization. Missing collector means LOCAL_ONLY.
 
 Do not treat silence as permission to transmit outside the repository's normal GitHub Actions artifact storage.
 
 The feedback exporter must not include project identifiers, requirement text, code, paths, SHAs, free text, users, emails or credentials.
+
+## Canonical CLIENT theory and restructuring
+
+Material CLIENT product theory, preferences, constraints, approvals/rejections, semantic quality standards and exclusions MUST be reconstructible in the adopted project's own repository, in the already-owned `state/CLIENT_REQUIREMENTS_CURRENT.md`, `state/PRODUCT_STATE_CURRENT.json`, `governance/PROJECT_OVERLAY.md` and material `interactions/` lineage. Chat is transport, not current authority.
+
+Normalize L0 CLIENT evidence into L1 current requirements before a dependent I2 charter. If evidence is known but unavailable, HOLD only its dependent decision. A Planner may reorganize long theory into decision-domain sections and archive superseded material, retaining source IDs/dates and exact supersession arrows. Do not erase historical meaning, invent verbatim CLIENT quotations or make two competing CURRENT authorities. An I3 cannot reinterpret the CLIENT's product preference by technical convenience.
+
+The earlier feedback rule about explicit external opt-in applies until the v1.2 anonymous opt-out path has a verified collector and visible installation notice: monthly local artifact stays on by default. The CLIENT request to support default anonymous sending is implemented as **default intent with fail-closed transport readiness**. An actual remote transfer requires a configured and verified named destination and a visible pre-first-send disable path. Private/free-text or attributable data always require separate explicit consent. No missing collector, silent report or synthetic receipt is a claimed delivery.

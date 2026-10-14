@@ -100,6 +100,7 @@ The spec states, rather than guesses:
 - observed capabilities;
 - evidence refs;
 - currentness refs;
+- optional explicit existing artifact refs to bind by exact bytes;
 - custom canonical owners;
 - architecture invariants;
 - state semantics;
@@ -111,6 +112,8 @@ The spec states, rather than guesses:
 This is the strategic/human-readable judgment boundary.
 
 The tool does not create these decisions itself.
+
+Generic adoption binds ordinary artifact files by digest. It refuses SQLite database paths through `artifact_refs`, because a main-file digest does not include committed WAL state. Use the existing-governed attachment currentness path for SQLite, which requires the pointer, main-file digest, and a transactionally consistent snapshot witness; missing or stale witnesses remain HOLD.
 
 ## 4. Preflight
 
@@ -126,14 +129,19 @@ Before touching canonical current state, the tool:
 
 1. validates the adoption spec;
 2. resolves every local evidence/currentness/custom-owner ref;
-3. checks product identity across Product State/bootstrap/owner registry;
-4. rejects an active campaign;
-5. builds the complete proposed requirements/Product State/bootstrap/owners/overlay state;
-6. copies the existing control layer to a temporary candidate;
-7. applies the proposed state only to that copy;
-8. runs the normal project validator against the copied candidate.
+3. records SHA-256 bindings for currentness files and deterministic file-tree digests for directory refs;
+4. resolves and records SHA-256 bindings for every explicit absolute artifact ref without copying or writing the artifact;
+5. rejects a matching external Product State because promotion would create a shadow owner;
+6. checks product identity across Product State/bootstrap/owner registry;
+7. rejects an active campaign;
+8. builds the complete proposed requirements/Product State/bootstrap/owners/overlay state;
+9. copies the existing control layer to a temporary candidate;
+10. applies the proposed state only to that copy;
+11. runs the normal project validator against the copied candidate, which recomputes all recorded bindings.
 
 A candidate that does not validate never reaches canonical state.
+
+If a project already has a matching external Product State, this adoption path fails closed. The scaffold remains `UNTRUSTED_CONTEXT`; it does not claim to attach to that state. Supporting an existing canonical Product State without a second owner requires a separate attachment protocol.
 
 ## 5. Journaled promotion
 
@@ -192,6 +200,7 @@ RECONSTRUCTED_NO_ACTIVE_EXECUTION
 That means:
 
 - currentness has been positively verified;
+- referenced currentness and artifact bytes still match their recorded digests;
 - current durable owners are known;
 - the baseline capability model is reconstructible;
 - no I3 execution authority is invented;
@@ -225,6 +234,7 @@ For each project the test requires:
 - project validation succeeds;
 - fresh-context reconstruction succeeds;
 - reconstructed currentness is verified;
+- changed currentness bytes and missing/changed explicitly bound artifacts fail validation;
 - no active execution is invented;
 - original application files remain byte-identical;
 - profile-specific protocol burden is correct.

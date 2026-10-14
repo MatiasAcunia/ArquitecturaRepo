@@ -74,7 +74,7 @@ La licencia permite adaptar el código, pero **eso no certifica seguridad ni pre
 
 ### 15. ¿El starter envía información de mi proyecto a alguien?
 
-La arquitectura no presupone que debas compartir el contenido del proyecto. En scaffolds nuevos, un workflow programado puede producir en **GitHub Actions** un reporte de metadatos estrictamente limitados y conservarlo como artifact; la **transmisión a un endpoint externo está deshabilitada por defecto**. La generación programada también se puede desactivar. No equivale a que el uso de modelos o servicios externos sea privado por definición: revisá los proveedores que elijas. Ver [configuración, contenido y opt-out](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+La arquitectura no presupone que debas compartir el contenido del proyecto. En scaffolds nuevos, un workflow programado puede producir en **GitHub Actions** un reporte de metadatos estrictamente limitados y conservarlo como artifact; **el envío externo necesita un receptor HTTPS aprobado, todavía no configurado**; con receptor comprobado, v1.2 usará una preferencia opt-out, con aviso visible y desactivación antes del primer envío. La generación programada también se puede desactivar. No equivale a que el uso de modelos o servicios externos sea privado por definición: revisá los proveedores que elijas. Ver [configuración, contenido y opt-out](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
 ## Documentación y colaboración
 
@@ -97,6 +97,14 @@ También sirven experiencias de adopción: qué te aportó, qué te complicó y 
 ### 18. ¿Lo puedo modificar, compartir o incorporar a otro proyecto?
 
 Sí: el código y la documentación originales se publican bajo [licencia MIT](../LICENSE), con las condiciones indicadas allí. El material de terceros no queda automáticamente cubierto por esa licencia.
+
+### 19. ¿Qué modos y proyectos admite v1.2?
+
+Podés describir proyectos CRUD, API, web, móviles, datos, automatización, videojuegos, infraestructura y tareas de IA no dedicadas a programación. La configuración es por dimensiones: síncrono/asíncrono/híbrido, solo/equipo y software/no-código/mixto. No habilita ejecución autónoma por sí sola; se exige host, autoridad, permisos, recovery y evidencia física. Consultá [modos y tecnología](27_PROJECT_MODES_AND_STACK_SELECTION.md).
+
+### 20. ¿El feedback se envía automáticamente al mantenedor y cómo lo desactivo?
+
+El informe mínimo mensual local está activado y queda en los artifacts de GitHub Actions del proyecto. La preferencia de envío al mantenedor es opt-out **cuando haya un receptor HTTPS aprobado**. Esta candidata todavía no tiene uno: no hay entrega central real que podamos afirmar. No incluye código, conversaciones, nombres, rutas, secretos ni texto libre. Para desactivar todo, poné `enabled=false`; para cortar sólo el envío, `external_submission_enabled=false`, o borrá el workflow. Más detalles en la [guía de privacidad](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
 ---
 

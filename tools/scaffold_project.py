@@ -3,11 +3,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import re
+import tempfile
 import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from i18n import SUPPORTED, choose_language
+from project_setup import WORK_SCOPE, EXECUTION, COLLABORATION, PROJECT_TYPES, defaults
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "state" / "STARTER_MANIFEST.json").read_text(encoding="utf-8"))
@@ -53,7 +59,7 @@ def build_currentness_set(include_identity: bool) -> list[str]:
     return refs
 
 
-def create_scaffold(
+def _populate_staging_project(
     target: Path,
     control_dir_name: str,
     profile_name: str,
@@ -62,20 +68,72 @@ def create_scaffold(
     force: bool,
     with_runtime: bool,
     install_feedback_workflow: bool,
+    language: str = "auto",
+    execution_mode: str = "SYNCHRONOUS",
+    collaboration: str = "SOLO",
+    work_scope: str = "SOFTWARE",
+    project_type: str = "OTHER",
 ) -> Path:
+    selected_lang, selection_source = choose_language(language)
+    # Reject explicitly unsafe force on a non-existent root before creating
+    # a half-installed project directory. Existing project paths are checked
+    # below, without any destructive operation.
+    if force and not target.exists():
+        raise ValueError("UNSAFE_FORCE_HOLD: no project directory created")
+    # Never allow a caller-provided control-dir to escape or replace the
+    # project root. --force is legal only for a recognizable starter layer.
+    if (not isinstance(control_dir_name, str)
+        or not control_dir_name or control_dir_name in {".", ".."}
+        or "/" in control_dir_name or "\\" in control_dir_name
+        or ":" in control_dir_name or "\x00" in control_dir_name
+        or not re.fullmatch(r"[A-Za-z0-9._-]{1,64}", control_dir_name)):
+        raise ValueError("control-dir must be one safe directory name within target")
+    # Windows device names, Git metadata and dotted-space aliases may
+    # redirect/install into reserved locations or fail after partial writes.
+    low = control_dir_name.lower()
+    device_stem = low.split(".", 1)[0]
+    if (low in {".git", ".github", ".svn", ".hg", ".vscode", ".idea"}
+        or control_dir_name != control_dir_name.rstrip(" .")
+        or control_dir_name.startswith(" ")
+        or device_stem in {"con", "prn", "aux", "nul"}
+        or device_stem in {"com" + str(i) for i in range(1, 10)}
+        or device_stem in {"lpt" + str(i) for i in range(1, 10)}):
+        raise ValueError("RESERVED_CONTROL_DIRECTORY_NAME")
+    if target.is_symlink():
+        raise ValueError("target symlink is not an authorized install root")
     if not target.exists():
         target.mkdir(parents=True, exist_ok=True)
     if not target.is_dir():
         raise ValueError(f"target is not a directory: {target}")
 
-    control = target / control_dir_name
-    if control.exists():
-        if not force:
-            raise FileExistsError(
-                f"{control} already exists; refuse to overwrite without --force"
-            )
-        shutil.rmtree(control)
+    workflow_target = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+    if (workflow_target.is_symlink()
+        or (target / ".github").is_symlink()
+        or (target / ".github" / "workflows").is_symlink()):
+        raise ValueError("refuse symlinked managed workflow or workflow directory")
 
+    control = target / control_dir_name
+    if control.is_symlink():
+        raise ValueError("refuse symlinked control directory (even with --force)")
+    if control.exists():
+        # Replacing an apparently dormant scaffold can delete uncommitted
+        # CLIENT theory and artifacts. Force is intentionally disabled in
+        # v1.2 until a versioned, independently reviewed migration exists.
+        if force:
+            raise ValueError(
+                "UNSAFE_REINSTALL_HOLD: --force cannot replace an existing "
+                "control layer; preserve it and use an explicit migration "
+                "or a fresh disposable target"
+            )
+        raise FileExistsError(
+            f"{control} already exists; preserve it and use migrations "
+            "instead of overwriting"
+        )
+    if force:
+        raise ValueError(
+            "UNSAFE_FORCE_HOLD: --force is not an installation mode in v1.2; "
+            "use a clean target without --force"
+        )
     profile = PROFILES[profile_name]
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     version = MANIFEST["version"]
@@ -152,6 +210,49 @@ def create_scaffold(
         ROOT / "tools" / "architecture_feedback.py",
         control / "tools" / "architecture_feedback.py",
     )
+    copy_file(ROOT / "tools" / "feedback_submit.py", control / "tools" / "feedback_submit.py")
+    copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
+    copy_file(ROOT / "tools" / "project_setup.py", control / "tools" / "project_setup.py")
+    copy_file(ROOT / "tools" / "branch_guard.py", control / "tools" / "branch_guard.py")
+    copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
+    copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
+    copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
+    copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
+    copy_file(ROOT / ".agents" / "skills" / "cleangarbage" / "SKILL.md", control / "skills" / "cleangarbage" / "SKILL.md")
+    copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
+    copy_file(ROOT / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md", control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md")
+    # Persistent local operational index, not a second Product State or DB.
+    # No deletion owner is inferred until a new scratch root is registered.
+    write_json(control / "runtime" / "ARTIFACT_LIFECYCLE_CURRENT.json", {
+        "schema_version": "artifact-ledger-v1",
+        "revision": 0,
+        "created_at": now,
+        "updated_at": now,
+        "roots": {},
+        "files": {},
+        "git_observations": [],
+    })
+    # Operational per-file state must survive context resets without creating
+    # a Git commit after every produced sample or exposing filenames in pushes.
+    write_text(control / "runtime" / ".gitignore",
+               "ARTIFACT_LIFECYCLE_CURRENT.json\n"
+               "ARTIFACT_LIFECYCLE_CURRENT.json.lock\n")
+    preferences = defaults(profile_name=profile_name, runtime_installed=with_runtime)
+    preferences.update(execution_mode=execution_mode, collaboration=collaboration,
+                       work_scope=work_scope, project_type=project_type)
+    write_json(control / "configuration" / "OPERATING_PREFERENCES.json", preferences)
+    for lang_code in SUPPORTED:
+        for kind in ("README", "FAQ"):
+            name = f"{kind}_{lang_code}.md"
+            copy_file(ROOT / "docs" / "i18n" / name,
+                      control / "docs" / "i18n" / name)
+    write_json(control / "docs" / "LANGUAGE_SELECTION.json", {
+        "schema_version": "starter-language-selection-v1",
+        "language": selected_lang,
+        "source": selection_source,
+        "supported": list(SUPPORTED),
+        "local_documentation_only": True,
+    })
     copy_file(
         ROOT / "templates" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
         control / "feedback" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
@@ -174,6 +275,16 @@ def create_scaffold(
             ROOT / "tools" / "campaignctl.py",
             control / "tools" / "campaignctl.py",
         )
+        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py"):
+            copy_file(ROOT / "tools" / tool, control / "tools" / tool)
+    if with_runtime:
+        for filename in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
+                         "CODEX_DAILY_CONTROL_ADAPTER_CONFIG.json"):
+            copy_file(ROOT / "templates" / filename, control / "templates" / filename)
+    if profile_name == "MULTI_PRODUCT":
+        copy_file(ROOT / "tools" / "owner_task_recovery.py", control / "tools" / "owner_task_recovery.py")
+        copy_file(ROOT / "templates" / "OWNER_FIVE_TASK_PACK.json",
+                  control / "templates" / "OWNER_FIVE_TASK_PACK.json")
 
     include_identity = any(
         item in profile["recommended_current_contracts"]
@@ -682,6 +793,19 @@ I4 workers do not create canonical commits by default. I3/controller owns ordina
 With a trusted local baseline, refresh remote state delta-first; do not default to git pull, reclone or reread of the entire repository.
 
 System-created local workspaces should be lifecycle-marked and cleaned only through explicit safe-delete authority.
+All generated samples, temporary files and test outputs must use a
+new system-owned scratch root and tools/artifact_ledger.py capture/reconcile
+where the CLI controls their producer. Persist its JSON file across sessions.
+Unregistered, modified and protected files are never auto garbage.
+Unwrapped host writes are not yet intercepted and require separate audit.
+L3/I3 is the primary owner of the persistent JSON file inventory. For all
+material source changes, retain Git HEAD/status evidence; for generated
+samples, use artifact_ledger.py capture and reconciliation before/after runs.
+On /cleangarbage, load skills/cleangarbage/SKILL.md: check Git and JSON,
+reconcile registered roots, review file classifications, dry-run, reclaim
+only previously authorized exact-safe disposable files, read back disk space.
+Do not promise native slash-menu registration until tested on this Codex host.
+
 """
     write_text(control / "AGENTS.md", agents)
 
@@ -761,6 +885,21 @@ This is process-improvement evidence, not product authority.
             copy_file(template_path, feedback_workflow_path)
             feedback_workflow_status = "INSTALLED"
 
+    if feedback_workflow_status == "INSTALLED" and control_dir_name != ".agentic-sdlc":
+        # The managed workflow must address the actual installed control root.
+        # The installer restricts names to shell-safe single directory tokens.
+        workflow = feedback_workflow_path.read_text(encoding="utf-8")
+        old = 'if [ -d ".agentic-sdlc" ]; then'
+        old_output = 'echo "control_root=.agentic-sdlc" >> "$GITHUB_OUTPUT"'
+        if old not in workflow or old_output not in workflow:
+            raise ValueError("WORKFLOW_TEMPLATE_CONTROL_ROOT_CONTRACT_CHANGED")
+        workflow = workflow.replace(old, f'if [ -d "{control_dir_name}" ]; then')
+        workflow = workflow.replace(
+            old_output,
+            f'echo "control_root={control_dir_name}" >> "$GITHUB_OUTPUT"',
+        )
+        feedback_workflow_path.write_text(workflow, encoding="utf-8")
+
     runtime_report_line = (
         "- optional campaign runtime/controller;"
         if with_runtime
@@ -807,7 +946,7 @@ This is process-improvement evidence, not product authority.
 - campaign execution: NOT_YET_AUTHORIZED
 - product acceptance: NOT_ESTABLISHED
 - architecture feedback workflow: {feedback_workflow_status}
-- architecture feedback external submission: DISABLED_BY_DEFAULT
+- architecture feedback external submission: COLLECTOR_NOT_CONFIGURED / OPT_OUT_PREFERENCE_ONLY
 
 ## Open HOLDs
 
@@ -876,15 +1015,39 @@ Validate this control layer with its copied validator:
 python {control_dir_name}/tools/validate_project.py --root .
 ```
 
+## Operating dimensions
+
+- execution: {execution_mode}; coordination: {collaboration}; work scope: {work_scope};
+- product category: {project_type};
+- configuration: configuration/OPERATING_PREFERENCES.json; see docs/27_PROJECT_MODES_AND_STACK_SELECTION.md;
+- asynchronous and team operation require physical host, scheduler and authority gates;
+- this selection is NOT current Product State or authority, and cannot grant background work.
+- canonical CLIENT intent remains in state/CLIENT_REQUIREMENTS_CURRENT.md,
+  state/PRODUCT_STATE_CURRENT.json and governance/PROJECT_OVERLAY.md.
+
+## File lifecycle and safe GC
+
+The persistent local runtime/ARTIFACT_LIFECYCLE_CURRENT.json records owned
+scratch outputs with owner, campaign, category, hash, retention and delete
+permission. It is NOT a global DB or a second Product State.
+Use python {control_dir_name}/tools/artifact_ledger.py --project .
+--control-dir {control_dir_name} init-root --root
+.agentic-sdlc-scratch/campaign --owner I3 --campaign CAMPAIGN to claim a fresh
+output root, then route generators via capture. Reconcile after interruption.
+The gc command is read-only by default; gc --execute only removes exact,
+expired, ignored, owned rebuildables/temporaries, never unknown/DB/source.
+Unwrapped IDE/host writes still need real host integration and Git review.
+
 ## Architecture feedback
 
 A strict metadata-only feedback exporter is enabled in `feedback/ARCHITECTURE_FEEDBACK_CONFIG.json`.
 
-- default cadence: weekly;
-- default delivery: GitHub Actions artifact only;
-- external submission: disabled by default;
+- default cadence: monthly, automatic on GitHub Actions where supported;
+- default delivery: strict anonymous metadata artifact in this project's own Actions;
+- outbound preference: on by default only AFTER a named HTTPS collector is configured; no collector is bundled and no external delivery can happen before that;
 - no project/repository name, product id, requirements text, code, paths, SHAs, free text, emails, users or credentials are included;
-- set `enabled` to `false` to disable report generation;
+- monthly feedback is disclosed by default to improve starter structure and organize known error categories; it has no raw text, identifiers or personal telemetry;
+- set `enabled` to `false` to disable all reports; set `external_submission_enabled` to `false` to disable only external transmission;
 - delete `.github/workflows/agentic-sdlc-feedback.yml` to remove scheduling entirely.
 
 The managed workflow status for this installation is: {feedback_workflow_status}.
@@ -893,9 +1056,135 @@ The managed workflow status for this installation is: {feedback_workflow_status}
 
 Do not claim installation success until the fresh-context probe has been exercised and the installation report is updated with physical evidence.
 """
+    if selected_lang != "en":
+        localized = (control / "docs" / "i18n" / f"README_{selected_lang}.md").read_text(encoding="utf-8")
+        localized = localized.replace(f"(FAQ_{selected_lang}.md)",
+                                      f"(docs/i18n/FAQ_{selected_lang}.md)")
+        localized = localized.replace("(../../README.md)", "(README.md)")
+        readme = localized + "\n---\n\n" + readme
     write_text(control / "README.md", readme)
 
     return control
+
+
+def create_scaffold(
+    target: Path,
+    control_dir_name: str,
+    profile_name: str,
+    product_id: str,
+    objective: str,
+    force: bool,
+    with_runtime: bool,
+    install_feedback_workflow: bool,
+    language: str = "auto",
+    execution_mode: str = "SYNCHRONOUS",
+    collaboration: str = "SOLO",
+    work_scope: str = "SOFTWARE",
+    project_type: str = "OTHER",
+) -> Path:
+    """Stage the control layer before publishing it into an adopting project.
+
+    No existing control layer is replaced. The companion GitHub workflow is a
+    second filesystem surface and CANNOT be committed atomically with control;
+    it must be preserved on collision and is never accepted as proof of
+    a complete external integration merely because source was copied.
+    """
+    if force:
+        raise ValueError("UNSAFE_FORCE_HOLD: use an isolated target or reviewed migration")
+    if target.is_symlink():
+        raise ValueError("SYMLINKED_PROJECT_ROOT_REFUSED")
+    if target.exists() and not target.is_dir():
+        raise ValueError("INSTALL_ROOT_NOT_DIRECTORY")
+    # The inner population performs all name and profile validation.
+    # If a new project root is created, a failed installation removes only
+    # its own empty directory, never unrelated or concurrently added files.
+    created_root = not target.exists()
+    if created_root:
+        target.mkdir(parents=True, exist_ok=False)
+    stage_root: Path | None = None
+    try:
+        if not isinstance(control_dir_name, str):
+            raise ValueError("INVALID_CONTROL_DIR")
+        final_control = target / control_dir_name
+        if final_control.exists() or final_control.is_symlink():
+            raise FileExistsError(
+                "EXISTING_CONTROL_PRESERVED: explicit migration required"
+            )
+        final_workflow = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+        if (final_workflow.is_symlink()
+            or (target / ".github").is_symlink()
+            or (target / ".github" / "workflows").is_symlink()):
+            raise ValueError("SYMLINKED_WORKFLOW_BOUNDARY_REFUSED")
+        existing_workflow = final_workflow.exists()
+        if existing_workflow and not final_workflow.is_file():
+            raise ValueError("PREEXISTING_WORKFLOW_NOT_A_REGULAR_FILE")
+        # A previously managed workflow may have been modified by its user;
+        # preserving it is safer than silently overwriting the adopted repo.
+        stage_root = Path(tempfile.mkdtemp(prefix=".agentic-sdlc-stage-", dir=target))
+        generate_workflow = install_feedback_workflow and not existing_workflow
+        stage_control = _populate_staging_project(
+            target=stage_root,
+            control_dir_name=control_dir_name,
+            profile_name=profile_name,
+            product_id=product_id,
+            objective=objective,
+            force=False,
+            with_runtime=with_runtime,
+            install_feedback_workflow=generate_workflow,
+            language=language,
+            execution_mode=execution_mode,
+            collaboration=collaboration,
+            work_scope=work_scope,
+            project_type=project_type,
+        )
+        if existing_workflow:
+            # Source installation reports must not misrepresent a workflow
+            # which was preserved instead of installed by this operation.
+            for name in ("INSTALLATION_REPORT.md", "README.md"):
+                document = stage_control / name
+                content = document.read_text(encoding="utf-8")
+                document.write_text(
+                    content.replace(
+                        "DISABLED_BY_INSTALL_OPTION", "PRESERVED_EXISTING_WORKFLOW"
+                    ),
+                    encoding="utf-8",
+                )
+        if final_control.exists() or final_control.is_symlink():
+            raise FileExistsError("CONCURRENT_CONTROL_CREATION_HOLD")
+        os.rename(stage_control, final_control)
+        if generate_workflow:
+            staged_workflow = (
+                stage_root / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+            )
+            # No upgrade path: never overwrite an existing workflow file.
+            try:
+                if final_workflow.exists() or final_workflow.is_symlink():
+                    raise FileExistsError("WORKFLOW_ADDED_DURING_INSTALL")
+                final_workflow.parent.mkdir(parents=True, exist_ok=True)
+                os.rename(staged_workflow, final_workflow)
+            except (OSError, ValueError) as exc:
+                # Do not delete newly installed canonical CLIENT state because
+                # a secondary workflow failed. Record a durable HOLD instead.
+                for name in ("INSTALLATION_REPORT.md", "README.md"):
+                    document = final_control / name
+                    content = document.read_text(encoding="utf-8")
+                    document.write_text(
+                        content.replace("INSTALLED", "WORKFLOW_INSTALL_HOLD"),
+                        encoding="utf-8",
+                    )
+                raise OSError(
+                    "WORKFLOW_INSTALL_HOLD: control safely staged; "
+                    "workflow not installed, preserve state and repair explicitly"
+                ) from exc
+        return final_control
+    finally:
+        if stage_root is not None:
+            shutil.rmtree(stage_root, ignore_errors=False)
+        if created_root:
+            try:
+                target.rmdir()
+            except OSError:
+                pass
 
 
 def main() -> int:
@@ -923,13 +1212,26 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Replace only the generated control directory if it already exists.",
+        help="Legacy flag: deliberately refused in v1.2; never deletes existing state.",
     )
     parser.add_argument(
         "--with-runtime",
         action="store_true",
         help="Copy the optional campaign runtime/controller into the generated control layer.",
     )
+    parser.add_argument(
+        "--language", default="auto",
+        choices=["auto", *sorted(SUPPORTED)],
+        help="Documentation language; auto detects system language. No remote locale tracking.",
+    )
+    parser.add_argument("--execution-mode", choices=EXECUTION,
+                        default="SYNCHRONOUS")
+    parser.add_argument("--collaboration", choices=COLLABORATION,
+                        default="SOLO")
+    parser.add_argument("--work-scope", choices=WORK_SCOPE,
+                        default="SOFTWARE")
+    parser.add_argument("--project-type", choices=PROJECT_TYPES,
+                        default="OTHER")
     parser.add_argument(
         "--no-feedback-workflow",
         action="store_true",
@@ -939,7 +1241,7 @@ def main() -> int:
 
     try:
         control = create_scaffold(
-            target=Path(args.target).resolve(),
+            target=Path(args.target).absolute(),
             control_dir_name=args.control_dir,
             profile_name=args.profile,
             product_id=args.product_id,
@@ -947,6 +1249,11 @@ def main() -> int:
             force=args.force,
             with_runtime=args.with_runtime,
             install_feedback_workflow=not args.no_feedback_workflow,
+            language=args.language,
+            execution_mode=args.execution_mode,
+            collaboration=args.collaboration,
+            work_scope=args.work_scope,
+            project_type=args.project_type,
         )
     except Exception as exc:
         print(f"SCAFFOLD FAILED: {exc}", file=sys.stderr)
@@ -955,6 +1262,8 @@ def main() -> int:
     print(f"SCAFFOLD CREATED: {control}")
     print("STATUS: HOLD / UNTRUSTED_CONTEXT")
     print("NEXT: read-only discovery -> currentness reconstruction -> fresh-context probe")
+    print("FEEDBACK NOTICE: monthly strict metadata artifact ON in your own GitHub Actions; outbound preference ON only if a collector endpoint is configured; no collector is bundled.")
+    print("FEEDBACK OPT-OUT: set enabled=false in feedback config, set external_submission_enabled=false for outbound only, or remove managed workflow.")
     return 0
 
 

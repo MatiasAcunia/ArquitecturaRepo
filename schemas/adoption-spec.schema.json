@@ -102,6 +102,12 @@
       "items": {"type": "string", "minLength": 1},
       "uniqueItems": true
     },
+    "artifact_refs": {
+      "description": "Explicit existing artifact files to read and bind by exact SHA-256 during adoption.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
     "custom_owners": {
       "type": "array",
       "items": {

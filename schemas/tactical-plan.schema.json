@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentic-sdlc:tactical-plan:1.2",
+  "title": "Versioned I3 tactical plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "goal_digest",
+    "revision",
+    "steps",
+    "hypotheses",
+    "blockers",
+    "review_evidence_ref",
+    "review_evidence_sha256",
+    "active_progress_minutes_since_review",
+    "progress_clock",
+    "invocation_permit_issued",
+    "plan_mode",
+    "progress_tool"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tactical-plan-v1"
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "goal_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "hypotheses": {
+      "type": "array"
+    },
+    "blockers": {
+      "type": "array"
+    },
+    "review_evidence_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "active_progress_minutes_since_review": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "progress_clock": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_permit_issued": {
+      "type": "boolean"
+    },
+    "plan_mode": {
+      "type": "string"
+    },
+    "progress_tool": {
+      "type": "string"
+    }
+  }
+}

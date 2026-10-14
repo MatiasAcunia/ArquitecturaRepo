@@ -3,7 +3,12 @@ from __future__ import annotations
 
 import json
 import py_compile
+import stat
 from pathlib import Path
+from types import SimpleNamespace
+
+from selftest_candidate_manifest import main as candidate_manifest_selftest
+from state_tx import sha256_file
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -16,7 +21,20 @@ def require_absent(path: Path, fragments: list[str]) -> None:
             raise AssertionError(f"{path.name} reintroduced duplicated primitive: {fragment}")
 
 
+def special_file_hash_probe() -> None:
+    class SpecialPath:
+        def stat(self):
+            return SimpleNamespace(st_mode=stat.S_IFIFO)
+
+        def open(self, *_args, **_kwargs):
+            raise AssertionError("non-regular path must not be opened while hashing")
+
+    if sha256_file(SpecialPath()) is not None:
+        raise AssertionError("special file must not be treated as a stable hashable file")
+
+
 def main() -> int:
+    special_file_hash_probe()
     for path in sorted(TOOLS.glob("*.py")):
         py_compile.compile(str(path), doraise=True)
 
@@ -66,6 +84,9 @@ def main() -> int:
     if "STATE_DB_LINEAGE_AND_IDEMPOTENCY" in core:
         raise AssertionError("stateful protocol must remain optional for SMALL projects")
 
+    if candidate_manifest_selftest() != 0:
+        raise AssertionError("canonical candidate digest/tool parity self-test failed")
+
     if (ROOT / "tools" / "campaignctl.py").name not in {"campaignctl.py"}:
         raise AssertionError("unexpected runtime surface")
 
@@ -76,6 +97,8 @@ def main() -> int:
     print("- adoption uses shared state_tx primitives")
     print("- SMALL profile carries no optional protocols")
     print("- MASTER OWNER/stateful machinery remain outside the core set")
+    print("- canonical source digest, immutable receipt creation and installed-tool parity verified")
+    print("- special files are rejected before hashing can block")
     return 0
 
 

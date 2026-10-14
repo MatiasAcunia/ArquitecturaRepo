@@ -1,0 +1,100 @@
+{
+  "schema_version": "agentic-v12-candidate-criteria-v1",
+  "target_release": "1.2.0",
+  "branch_status": "IMPLEMENTATION_IN_PROGRESS__NOT_RELEASED",
+  "baseline_stable_version": "1.1.0",
+  "codex_daily_control_reference": "2.1.0-capability-rework-rc",
+  "principle": "No code/test/policy may replace a verified physical host, provider, external-delivery or product gate.",
+  "gates": [
+    {
+      "id": "V11_BACKWARD_COMPATIBILITY",
+      "required": true,
+      "proof": "full existing v1 release suite on exact candidate",
+      "status": "LOCAL_EXACT_CANDIDATE_PASS__HOSTED_FINAL_SOURCE_CI_PENDING"
+    },
+    {
+      "id": "GOAL_PLAN_INVOCATION",
+      "required": true,
+      "proof": "same Goal across actual host invocations with changed-charter HOLD and 120-minute checkpoint",
+      "status": "THREE_PROCESS_OFFLINE_PASS__NATIVE_GOAL_HOOK_UNPROVEN"
+    },
+    {
+      "id": "EXTERNAL_EFFECT_RECOVERY",
+      "required": true,
+      "proof": "physical adapter exact receipt, restart and no duplicate remote effect",
+      "status": "SYNTHETIC_CODE_ONLY"
+    },
+    {
+      "id": "GEMINI_I4_IN_REAL_GOAL",
+      "required": true,
+      "proof": "two authorized non-private consults; delivery to same I3 and independent physical consumption readback",
+      "status": "NOT_YET_PROVEN"
+    },
+    {
+      "id": "CODEX_DAILY_CONTROL_2_0_2",
+      "required": true,
+      "proof": "native Windows install, quota resume, daypack/cloud readback and safe cleanup on approved disposable target",
+      "status": "ARCHIVE_FOUND_SOURCE_MANIFEST_MISMATCH_13__INSTALLED_HOST_AND_NATIVE_GATES_HOLD"
+    },
+    {
+      "id": "OPTIONAL_OWNER_FIVE_TASKS",
+      "required": true,
+      "proof": "scheduler adapter exactly five tasks; four-way recovery and explicit CLIENT suspend preserved",
+      "status": "POLICY_ONLY"
+    },
+    {
+      "id": "PROPORTIONAL_SCAFFOLD_AND_UPGRADE",
+      "required": true,
+      "proof": "six profiles, backward compatible migrations, no default expensive services",
+      "status": "LOCAL_FULL_V1_1_SUITE_PASS__HOSTED_FINAL_SOURCE_CI_PENDING"
+    },
+    {
+      "id": "PRIVACY_AND_FEEDBACK_DELIVERY",
+      "required": true,
+      "proof": "monthly local on, strict privacy, user opt-out, if sharing advertised real collector receipt and permission",
+      "status": "LOCAL_ONLY"
+    },
+    {
+      "id": "INDEPENDENT_TRANSFER_AND_RELEASE",
+      "required": true,
+      "proof": "one independent unrelated adoption, exact-head CI and separate host/human gates",
+      "status": "L3_TRANSFER_HOLD__LIVE_MUSIC_CURRENTNESS_STALE"
+    },
+    {
+      "id": "EXISTING_GOVERNED_ATTACHMENT",
+      "required": true,
+      "proof": "L3 must attach to a governed existing project without duplicating CURRENT owners, authority, or active I3; read-only map preflight is insufficient; exact private report and source-bound independent transfer evidence",
+      "status": "DISPOSABLE_GOVERNED_ATTACHMENT_PASS__LIVE_MUSIC_ATTACH_HOLD"
+    },
+    {
+      "id": "SQLITE_WAL_CURRENTNESS",
+      "required": true,
+      "proof": "Canonical DB currentness includes committed WAL via a transactionally consistent pinned snapshot; test stale WAL and restore on authorized disposable DB plus independent reviewer",
+      "status": "DISPOSABLE_WAL_PHYSICAL_PASS__LIVE_MUSIC_DB_HOLD"
+    },
+    {
+      "id": "LOCAL_CANDIDATE_EXACT_CI",
+      "required": true,
+      "proof": "Semantically reconcile any uncommitted L3 source patches against latest remote HEAD; audit applied diff and run full CI on identical final candidate; do not equate prior remote CI with local source tree",
+      "status": "LOCAL_V1_1_AND_TARGETED_V1_2_PASS__HOSTED_EXACT_DIRTY_CANDIDATE_CI_PENDING"
+    },
+    {
+      "id": "ARTIFACT_FILE_LIFECYCLE_AND_GC",
+      "required": true,
+      "proof": "Project-local JSON file inventory persists across I3 invocations; real producer capture or explicitly scoped reconciliation registers files, GC blocks unknown/canonical/Git/DB and stale identities; Windows physical crash/recovery and disk-readback evidence required for advertised automatic host coverage.",
+      "status": "WINDOWS_DISPOSABLE_GC_AND_RECOVERY_PASS__NATIVE_HOOK_HOLD"
+    },
+    {
+      "id": "L3_ARTIFACT_OWNERSHIP_AND_SLASH_WORKFLOW",
+      "required": true,
+      "proof": "L3 maintains persistent artifact JSON plus bounded Git source observation across real native sessions; /cleangarbage via actual supported skill/text/native entry performs reconcile, human-safe classification, dry-run, verified eligible deletion and physical disk readback. Native slash UI claimed only if actually observed.",
+      "status": "DISPOSABLE_GIT_ARTIFACT_OBSERVATION_PASS__NATIVE_SESSION_AND_SLASH_UNVERIFIED"
+    },
+    {
+      "id": "ENGINEERING_FIRST_NATIVE_WRITE_ENFORCEMENT",
+      "required": true,
+      "proof": "Demonstrate actual host operation boundary for Git/Goal/Plan/I4 YAML, bootstrap/currentness and writer lease; where native interception is absent label unsupported/advisory and obtain explicit supported-scope approval",
+      "status": "LOCAL_GUARDS_ADVISORY__NATIVE_WRITE_BOUNDARY_UNPROVEN"
+    }
+  ]
+}

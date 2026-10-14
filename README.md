@@ -1,5 +1,14 @@
 # Agentic SDLC Starter Architecture
 
+**Documentation languages / Idiomas / Langues / Sprachen / Lingue / 言語 / 语言:**
+
+[English](docs/i18n/README_en.md) · [Español](docs/i18n/README_es.md) · [Português](docs/i18n/README_pt.md) · [Français](docs/i18n/README_fr.md) · [Deutsch](docs/i18n/README_de.md) · [Italiano](docs/i18n/README_it.md) · [日本語](docs/i18n/README_ja.md) · [中文](docs/i18n/README_zh.md)
+
+[FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
+
+GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **no data can reach a maintainer until a verified collector endpoint is configured**; after that, minimal outbound reporting defaults ON with a conspicuous opt-out. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
+
+
 A forkable starter for building a durable multi-agent software-development system around a real project.
 
 The core idea:
@@ -9,6 +18,43 @@ The core idea:
 This repository is not a prompt collection. It is an operating architecture for long-running agentic software development.
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
+
+## Governed existing projects / SQLite WAL (v1.2 candidate)
+
+- [Read-only existing-governance attachment preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md) checks pinned source owners without installing a second Product State or I3; **it does not authorize material attachment**.
+- SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. Real DB currentness and native host gates still require physical verification.
+
+## Stabilization and release planning
+
+- [Engineering-first route, L3 ownership and bounded real test budget](docs/35_ENGINEERING_FIRST_EXECUTION_MASTER_ROUTE.md). This is a proposed execution plan, not a released host guarantee.
+
+- L3-managed `/cleangarbage` workflow: [the cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). It accepts this as a natural-language instruction; a native slash-menu entry is not claimed until host verification.
+
+- [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
+
+- [CLIENT capability-truth inventory and post-release integration design](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — proposals and falsifiers, not current execution or release authority.
+
+- [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
+- [L3 local evidence intake and independent review template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
+
+Version 1.2 forbids destructive scaffold `--force`; use a new isolated target or explicit reviewed migrations. Editable gate JSON and passing CI do not authorize product release.
+
+## v1.2 operational candidate (not a released version)
+
+The isolated 1.2 development branch adds fail-closed Goal/invocation and tactical-plan controls, ambiguous external-effect receipts, bounded Gemini I4 consultation plumbing and optional five-task OWNER mutual-recovery policy. A physical Codex Goal host adapter, scheduler readback, collector delivery and independent release gates are still **NOT YET PROVEN**. Stable releases remain on 1.1 until those gates pass.
+
+- [Operational implementation and exact limits](docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md)
+- [Resumen y privacidad en español](docs/24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md)
+- [Machine-readable 1.2 acceptance blockers](state/V1_2_ACCEPTANCE_CRITERIA.json)
+
+## v1.2 operating-mode and technology selection (draft)
+
+- [Execution / team / non-code AI modes and 14 project types](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md) — configurable dimensions and verified-gate HOLDs, not additional controllers
+- [Longitudinal isolated L3 pilot plan](docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md) — synthetic CRUD, repeated sessions, failures, critique and rollback
+- `tools/project_setup.py` — read-only stack/model/plugin suggestions; canonical technology decisions remain I2-owned
+- `tools/theory_guard.py` — read-only check of existing CLIENT requirements, Product State, domain overlay and bootstrap; not a parallel theory DB
+
+Project selection remains independent of the six existing profiles. OpenAI models are useful defaults when task fit, privacy and cost justify them; other providers and tools remain supported. No plugin or LLM subscription is installed automatically.
 
 ## What you get
 
@@ -88,7 +134,7 @@ python tools/scaffold_project.py \
 
 Generated control layers carry their own schemas, validator and validation dependency declaration.
 
-New scaffolds also install a weekly architecture-feedback workflow by default. It generates only strict metadata and stores the report as a GitHub Actions artifact; external submission is disabled by default.
+New scaffolds generate a **monthly**, strictly allowlisted metadata report in their own GitHub Actions artifacts, enabled by default. The outbound preference is opt-out **if a verified collector URL is configured**; this candidate has no collector and cannot claim external delivery.
 
 Disable scheduling at install time with:
 
@@ -248,15 +294,15 @@ New scaffolds include `tools/architecture_feedback.py` and a managed scheduled w
 
 Default behavior:
 
-- weekly strict-metadata report;
+- monthly strict-metadata report;
 - GitHub Actions artifact retained for 30 days;
 - read-only repository permission;
-- no external submission;
+- external transmission only after configuring an approved collector; no collector is bundled;
 - no project/repository names, product ids, requirements text, code, paths, SHAs, free text, users, emails or credentials.
 
 The report contains only allowlisted enums, booleans and counters useful for improving the architecture: validation/currentness state, profile, owner/capability counts, baseline readiness, network exposure category, milestone/overdue counts and generic runtime retry/failure/HOLD/recovery counters.
 
-External submission requires both `external_submission_enabled=true` in the control config and explicit repository variables for submission + endpoint. The starter does not request a personal access token.
+Default external-feedback preference is opt-out once a valid HTTPS collector endpoint is configured. Users can disable outbound delivery with external_submission_enabled=false or repository variable AGENTIC_SDLC_FEEDBACK_SUBMIT=false. Without a collector URL, nothing leaves the adopter's normal GitHub Actions artifact storage. The starter requests no personal access token.
 
 See `docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md`.
 
@@ -337,3 +383,8 @@ v1.1 adds a pre-campaign product-discovery baseline plus privacy-preserving recu
 ## License
 
 The original source code and documentation in this repository are licensed under the [MIT License](LICENSE). You may use, adapt and redistribute them under its terms, including retention of the copyright and permission notice. Third-party assets or materials, if any, retain their own terms; this license does not grant rights to material not owned by the copyright holder.
+
+
+## v1.2.0 release scope
+
+The v1.2 portable code integrates persistent Goal/Plan diagnostics, SQLite WAL currentness checks, reviewed artifact lifecycle and an optional read-only Codex Daily Control 2.1 capability-rework RC adapter. Native Windows Goal/session mutation, controller dispatch, external provider delivery, noncooperating GC writers and protected external-project transfer are **not certified** by portable CI. The separate fifteen physical-acceptance requirements remain tracked with their actual statuses; published source code is not a claim of physical host support.

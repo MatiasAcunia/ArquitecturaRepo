@@ -1,0 +1,21 @@
+{
+  "schema_version": "codex-daily-control-adapter-v1",
+  "reference_version": "2.1.0-capability-rework-rc",
+  "status": "NOT_YET_PROVEN_IN_THIS_STARTER",
+  "enabled": false,
+  "install_source": "USER_APPROVED_LOCAL_2_1_ARTIFACT",
+  "windowsapps_execution_forbidden": true,
+  "native_app_server_required_for_resume_pause_delete": true,
+  "read_only_goal_probe_required": true,
+  "safe_windows_physical_proof_required": true,
+  "capabilities": {
+    "goal_resume": "UNVERIFIED",
+    "plan_mode": "UNVERIFIED",
+    "invocation_guard": "UNVERIFIED",
+    "gemini_i4_delivery": "UNVERIFIED",
+    "daily_close": "UNVERIFIED",
+    "daypack_cloud_readback": "UNVERIFIED",
+    "safe_chat_cleanup": "UNVERIFIED"
+  },
+  "non_destructive_probe_before_activation": true
+}

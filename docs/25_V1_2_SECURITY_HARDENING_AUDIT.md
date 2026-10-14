@@ -1,0 +1,82 @@
+# v1.2 Security & Robustness Audit — candidate, not a release
+
+Date: 2026-10-13. Owner: starter repository. Scope: the v1.2 development PR and inherited v1.1 mechanics. This is a threat model + code/CI hardening ledger, **not** an independent penetration test, Windows deployment certificate, provider audit or general-purpose proof of safety.
+
+## Audit goals
+
+No accidental Product State replacement, privilege escalation, external paid action, data exfiltration, stale writer acceptance, fabricated receipt, duplicate external effect, incorrect Goal continuation, in-band reviewer acceptance, irreversible cleanup or upgrade incompatibility. Controls must be proportional to profile; the smallest profile must not quietly install resident supervisors or enabled LLM calls.
+
+## Findings and present dispositions
+
+| Severity | Finding / falsifier | Candidate disposition | Acceptance boundary |
+|---|---|---|---|
+| HIGH | Reinstallation could erase unsaved CLIENT theory while still in DRAFT | v1.2 refuses --force regardless of apparently dormant state; tests unchanged byte preservation | Use explicit versioned migrations or a fresh sandbox, never silent overwrite |
+| HIGH | Local Goal diagnostic accepted caller-supplied host-verified flags and could appear to grant execution authority | Removed forgeable CLI/argument path; the library now always returns may_execute_material_goal=false absent a separately verified host adapter | Real Codex Goal hook and remote currentness proof remain BLOCKED |
+| HIGH | External effect record called a caller-asserted provider receipt VERIFIED | Changed to RECEIPT_ATTESTED_UNVERIFIED; idempotency and ambiguous timeout still HOLD | Actual provider readback and source identity must be demonstrated |
+| HIGH | Generated/constructed feedback metadata might leak through arbitrary status strings or keys | Allowlist exporter fields, validate outgoing schema and enum keys, reject unrecognized value/key, no raw collector response logging | External collector receipt/real user consent remains independent |
+| HIGH | Outbound feedback could treat HTTP success as delivery, echo arbitrary response or accept redirects | Opt-out intent only when a verified named HTTPS collector is configured; until then LOCAL_ONLY. Bounded schema, strict fixed categories, and exact report SHA receipt, no content echo | Authenticated/authorized collector identity and real reception remain unproven |
+| HIGH | Currentness validation accepted stale bytes behind existing refs and did not check explicitly named external artifacts | Adoption records SHA-256 bindings for currentness files, deterministic digests for referenced directories, and declared artifact files; independent validation recomputes them | Existing projects with unbound external refs require an explicit currentness revalidation; undeclared artifact dependencies remain outside the check |
+| HIGH | Adoption could promote a second CURRENT Product State beside a matching external canonical Product State | Adoption now fails closed when the referenced project already has a matching external Product State; an attachment protocol is still needed | Established-project adoption remains HOLD until the starter can attach to the canonical owner without a shadow owner |
+| MEDIUM | Review evidence refs could be nonexistent or change after review | PASS review requires existing project files; exact file digests are stored in the review freeze and checked independently | The tool binds bytes and candidate ref, but reviewer judgment remains a human authority boundary |
+| MEDIUM | Worktree-local `.git` pointer made source manifests checkout-location-sensitive | Candidate manifests exclude the `.git` pointer file as well as the `.git` directory | Exact source identity is over tracked/untracked source bytes selected by the manifest policy, not Git metadata |
+| MEDIUM | Mutable third-party GitHub Action tags could change content | Pin checkout/setup-python/upload-artifact to exact reviewed upstream commits and disable persisted checkout credentials | Recheck upstream SHA, update dependencies with review |
+| MEDIUM | Gemini transport might be activated by a mere API key or unsafe model name | Require explicit AGENTIC_SDLC_GEMINI_ENABLED=true; restrict model name, request timeout and response size; no private data by default | Account/quota/data policy/real Goal consumption remain unproven |
+| MEDIUM | Context resets/long tactical plans can drift from authorized Goal | Goal->charter exact digest + versioned I3 plan + revision conflict + active-progress review due; fresh Goal changes HOLD | Current host invocation and active-time accounting must be physical |
+| MEDIUM | Stale mutator runs and self-review could falsely certify own output | Optional epoch-fenced local critical section, exact frozen candidate/source hash and reviewer separation | Never substitute for system physical gates or host-level permissions |
+| MEDIUM | Optional five-task OWNER config could override deliberate pauses | Pure recovery policy includes explicit CLIENT/platform/safety suspension holds and no extra supervisor | Scheduling/reads/writes are not implemented by this policy |
+| LOW | Language UI could claim GitHub README geo-locale auto-routing | Static explicit 8-language links; local OS/--language detection; fallback to English; offline docs | Translated *intro/FAQ* coverage, not translation of every technical protocol |
+
+## Defense-in-depth suites
+
+- Existing v1.1: schema/ownership/currentness/adoption, six profiles, transaction journal/crash recovery, independent review and shared state primitive.
+- v1.2 operational: impossible synthetic Goal host PASS, changed-source/charter hold, source traversal rejection, tactical revision conflict, external-effect duplicate dispatch block, stale I4 advice, bounded Gemini opt-in, actor fencing, exact reviewer/source binding.
+- v1.2 scaffolding: path traversal, nonstarter --force refusal, symlink rejection, no unrequested SMALL I4/OWNER deployment.
+- v1.2 i18n: explicit and OS-locale resolution, unsupported override errors, fallback, offline docs existence, consistent FAQ questions across eight languages.
+- v1.2 feedback: disabled-by-default external transport, safe HTTPS endpoint, wrong/missing digest refusal, unexpected status, schema-invalid payload, free-text metadata keys and status-value exfil tests.
+- The workflow is configured to run candidate gates in GitHub Actions. This campaign has verified remote CI only for the development base; the revised local candidate has no remote CI receipt. Run/test screenshots, successful earlier SHA, or the user-facing PASS string do **not** count as evidence for a later SHA.
+
+## Open / blocked items — do not promote
+
+1. Codex Desktop **2.0.2** native Goal Resume, context re-anchor and daily close transport must be tested on the user's authorized disposable Windows pilot, including active-writer HOLD, quota truth, cloud readback and rollback. Do not touch active workstream Goals.
+2. Gemini in a *real* continuing I3 Goal: verified export authority, quota, two distinct-evidence consultations, delivery, model consumption and falsifying test; read-only output cannot self-certify.
+3. The OWNER five-task pack needs actual provider scheduler installation, mutual recovery for exactly five IDs, explicit suspensions preserved and readbacks; fake task IDs are not acceptance.
+4. Opt-out remote telemetry is default-intent only; without a configured approved collector there is NO actual remote delivery. A real receipt, recipient identity, visible first-run disclosure, privacy guarantee and disable tests are needed before claiming central feedback.
+5. Security posture of real adopter applications: auth, backup, licensing, data retention, deployment exposure, code-specific tests and human/subjective gates are always project-owned.
+6. Current code still depends on Python/PyPI/GitHub runner supply chain; CI and SHA pins reduce but cannot eliminate that risk. No unrestricted auto-upgrade.
+7. The starter has not undergone an independent external code audit. Threat-model pass and synthetic tests are not equivalent to a penetration test.
+
+## Release verdict
+
+**DO NOT RELEASE 1.2.0** until all required physical gate IDs in state/V1_2_ACCEPTANCE_CRITERIA.json are individually accepted from exact immutable candidates. Keep the PR as draft; stable main remains 1.1.x. Do not let test-gate success replace host or product proof.
+
+## Additional synthetic endurance gate
+
+`python tools/selftest_v12_longitudinal.py` exercises three separate interpreter processes, durable plan identity, a revision race, a changed charter, ambiguous external-effect replay refusal and metadata-only diagnostics. It does not simulate hours of actual L3 execution or prove an external provider readback.
+
+## Post-plan critical finding: crash-journal reference confinement
+
+A persisted transaction journal previously carried relative target and stage references directly into recovery. v1.2 now validates the *entire* journal (transaction ID format, phase, bounded operations, hashes, unique destinations, confinement, protected runtime paths, symlinks and stage references) before applying any operation. A malformed journal remains untouched for deliberate reconciliation; it cannot authorize writes or cleanup outside its control root. The adversarial synthetic suite checks traversal, absolute paths, Windows drive paths, duplicate operations, tampered stage references, protected lock/journal, unsafe metadata and a positive genuine recovery. This is an essential boundary, not an invitation to treat arbitrary local journal edits as authenticated evidence.
+
+## Post-plan critical finding: partial first-install side effects
+
+Scaffold generation now stages the project-local control directory in a private temporary folder of the same target filesystem, renames the complete control into place only after population, and removes its temporary stage on failure. An injected mid-copy exception must leave existing source bytes and workflows intact, and a newly created empty target root is removed. A preexisting workflow, including a recognizable but possibly user-modified managed one, is preserved rather than silently overwritten. The GitHub Actions workflow resides in a distinct directory and cannot be atomically committed together with the control; a failure after the control move records an explicit workflow HOLD and never erases newly generated CLIENT theory. Concurrency races and real Windows filesystem behavior still require the L3 physical pilot.
+
+## Windows-hosted CI portability smoke
+
+In addition to the full Ubuntu v1.1/v1.2 suite, pull requests run a small Windows-hosted job for all profile scaffolds, interrupted installation staging, symlink/journal path confinement, cross-process Goal and effect continuity, and project mode defaults. Hosted Windows success is **not** equivalent to real native Codex Desktop 2.0.2, Windows 10 user permissions, installed toolchain, account quota, cloud/DB/media access, or human UI review. The L3 machine-specific gate remains mandatory. This job uses hosted CI resources; it does not install anything on the user's own machine or execute paid model/provider calls.
+
+## Configurable control directory and managed workflow coupling
+
+A custom `--control-dir` previously installed successfully but left the monthly GitHub feedback workflow checking only the hardcoded default directory. The installer now derives that managed workflow's actual root from the *same* validated control directory argument, rejects unsafe shell-metacharacters and reserved names, and tests non-default roots. Existing user workflows remain preserved, not silently rewritten. No scheduled job is interpreted as an independently verified external receiver.
+
+## Goal integrity applies at Plan revision too
+
+The diagnostic Goal guard already identified stale charter/authority files, but the tactical Plan writer formerly only compared the stored Goal document fingerprint. A changed charter could therefore be followed by a new local Plan revision until the separate guard ran again. The writer now checks each exact authority reference and any required canonical store before committing a Plan update, and refuses stale/missing references without incrementing the revision. This local invariant does not establish a real pre-dispatch Codex host hook or remote currentness; those remain physical HOLD gates.
+
+## L3 follow-up: SQLite WAL currentness
+
+L3 reported that a bare SHA-256 of the SQLite main database file can miss committed transactions in an active WAL. The optional canonical-store Goal contract now accepts `sqlite_snapshot_sha256`, derived from the SQLite online-backup API on a read-only connection. It is a digest of an ephemeral, transactionally consistent snapshot (including WAL), not of the `-shm` file or merely the main `.sqlite` file. A nonempty WAL with no pinned snapshot produces `SQLITE_WAL_CURRENTNESS_UNBOUND`, and a changed snapshot produces `SQLITE_SNAPSHOT_STALE`; Goal diagnostics and tactical Plan revisions both HOLD. All tests use a tiny disposable database and no external provider or production asset.
+
+These guards cannot authenticate the origin of a user-supplied digest or attest an actual Codex Desktop invocation. A busy/oversized/protected SQLite store, an absent canonical database, uncertain WAL read permission or missing independent authority remains HOLD. Run the audit on an explicitly authorized source copy for protected products. The origin DB must never be replaced by a fabricated fixture to obtain a PASS.
+
+For a genuine SQLite source, an application-consistent snapshot is required even in rollback-journal/non-WAL mode. Main-file hashing alone is never an accepted full currentness witness; a synthetic non-WAL test guards this rule too.

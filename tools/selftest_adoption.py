@@ -4,11 +4,14 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sqlite3
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+
+from apply_adoption import AdoptionError, artifact_bindings, ensure_refs, source_bindings
 
 ROOT = Path(__file__).resolve().parents[1]
 SCAFFOLD = ROOT / "tools" / "scaffold_project.py"
@@ -138,6 +141,7 @@ def build_spec(
     product_id: str,
     inventory_ref: str,
     inventory_hash: str,
+    artifact_ref: str | None = None,
 ) -> dict[str, Any]:
     return {
         "schema_version": "adoption-spec-0.1",
@@ -167,6 +171,7 @@ def build_spec(
         ],
         "evidence_refs": [inventory_ref],
         "currentness_refs": [inventory_ref],
+        "artifact_refs": [artifact_ref] if artifact_ref else [],
         "custom_owners": [
             {
                 "concern_id": "DISCOVERY_INVENTORY",
@@ -208,6 +213,10 @@ def adopt_case(base: Path, case: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
     product_id = f"ADOPTION_{profile}"
     project = base / profile.lower()
     write_fixture(project, case["files"])
+    artifact_path: Path | None = None
+    if profile == "STATEFUL":
+        artifact_path = project / "synthetic-canonical-reference.bin"
+        artifact_path.write_bytes(b"read-only external artifact fixture\n")
     before = application_snapshot(project)
 
     scaffold = run(
@@ -261,7 +270,13 @@ def adopt_case(base: Path, case: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
         )
     inventory_hash = hashlib.sha256(first_inventory).hexdigest()
     inventory_ref = "discovery/PROJECT_INVENTORY.json"
-    spec = build_spec(case, product_id, inventory_ref, inventory_hash)
+    spec = build_spec(
+        case,
+        product_id,
+        inventory_ref,
+        inventory_hash,
+        str(artifact_path.resolve()) if artifact_path else None,
+    )
     spec_path = control / "adoption" / "ADOPTION_SPEC.json"
     spec_path.parent.mkdir(parents=True, exist_ok=True)
     spec_path.write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
@@ -315,6 +330,79 @@ def adopt_case(base: Path, case: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
             + "\n"
             + validation.stderr
         )
+
+    bound_source_before = inventory_path.read_bytes()
+    inventory_path.write_bytes(bound_source_before + b"\n")
+    stale_source_validation = run(str(validator), "--root", str(control))
+    if stale_source_validation.returncode == 0 or (
+        "currentness source binding digest mismatch"
+        not in stale_source_validation.stdout + stale_source_validation.stderr
+    ):
+        raise AssertionError(
+            f"{profile}: validator accepted changed currentness source bytes"
+        )
+    inventory_path.write_bytes(bound_source_before)
+    restored_source_validation = run(str(validator), "--root", str(control))
+    if restored_source_validation.returncode != 0:
+        raise AssertionError(
+            f"{profile}: restored currentness source failed validation\n"
+            + restored_source_validation.stdout
+            + restored_source_validation.stderr
+        )
+
+    if artifact_path is not None:
+        artifact_before = artifact_path.read_bytes()
+        artifact_path.unlink()
+        absent_artifact_validation = run(str(validator), "--root", str(control))
+        if absent_artifact_validation.returncode == 0 or (
+            "currentness artifact is not an absolute regular file"
+            not in absent_artifact_validation.stdout + absent_artifact_validation.stderr
+        ):
+            raise AssertionError("validator accepted a missing explicit artifact")
+        artifact_path.write_bytes(artifact_before)
+        artifact_missing_restore = run(str(validator), "--root", str(control))
+        if artifact_missing_restore.returncode != 0:
+            raise AssertionError(
+                "restored missing artifact failed validation\n"
+                + artifact_missing_restore.stdout
+                + artifact_missing_restore.stderr
+            )
+        artifact_path.write_bytes(artifact_before + b"changed\n")
+        missing_artifact_validation = run(str(validator), "--root", str(control))
+        if missing_artifact_validation.returncode == 0 or (
+            "currentness artifact binding digest mismatch"
+            not in missing_artifact_validation.stdout + missing_artifact_validation.stderr
+        ):
+            raise AssertionError("validator accepted changed explicit artifact bytes")
+        artifact_path.write_bytes(artifact_before)
+        restored_artifact_validation = run(str(validator), "--root", str(control))
+        if restored_artifact_validation.returncode != 0:
+            raise AssertionError(
+                "restored explicit artifact failed validation\n"
+                + restored_artifact_validation.stdout
+                + restored_artifact_validation.stderr
+            )
+
+    if Path(case["surface"]).parts and Path(case["surface"]).parts[0] == "..":
+        external_source = (control / case["surface"]).resolve()
+        external_source_before = external_source.read_bytes()
+        external_source.write_bytes(external_source_before + b"stale source probe\n")
+        stale_external_validation = run(str(validator), "--root", str(control))
+        if stale_external_validation.returncode == 0 or (
+            "currentness source binding digest mismatch"
+            not in stale_external_validation.stdout + stale_external_validation.stderr
+        ):
+            raise AssertionError(
+                f"{profile}: validator accepted changed external owner bytes"
+            )
+        external_source.write_bytes(external_source_before)
+        restored_external_validation = run(str(validator), "--root", str(control))
+        if restored_external_validation.returncode != 0:
+            raise AssertionError(
+                f"{profile}: restored external owner failed validation\n"
+                + restored_external_validation.stdout
+                + restored_external_validation.stderr
+            )
 
     reconstruct = control / "tools" / "reconstruct_context.py"
     reconstructed_run = run(str(reconstruct), "--root", str(control))
@@ -462,13 +550,188 @@ def crash_recovery_probe(base: Path) -> None:
         raise AssertionError("recovered adoption has wrong posture")
 
 
+def adoption_reference_boundary_probe(base: Path) -> None:
+    project = base / "reference_boundary_project"
+    control = project / ".agentic-sdlc"
+    control.mkdir(parents=True)
+    outside = base / "outside-project-owner.json"
+    outside.write_text("{}\n", encoding="utf-8")
+    for reference in ("../../outside-project-owner.json", str(outside)):
+        spec = {
+            "currentness_refs": [reference],
+            "evidence_refs": [],
+            "custom_owners": [],
+        }
+        try:
+            ensure_refs(control, spec)
+        except AdoptionError as exc:
+            if "escapes target project root" not in str(exc):
+                raise
+        else:
+            raise AssertionError(
+                f"adoption accepted a reference outside the target project: {reference}"
+            )
+
+
+def sqlite_artifact_boundary_probe(base: Path) -> None:
+    project = base / "sqlite_currentness_project"
+    control = project / ".agentic-sdlc"
+    control.mkdir(parents=True)
+    database = project / "adoption-wal-boundary.sqlite-data"
+    connection = sqlite3.connect(database)
+    try:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA wal_autocheckpoint=0")
+        connection.execute("CREATE TABLE evidence(value TEXT NOT NULL)")
+        connection.execute("INSERT INTO evidence VALUES ('committed-in-wal')")
+        connection.commit()
+        wal = Path(str(database) + "-wal")
+        if not wal.exists() or wal.stat().st_size <= 0:
+            raise AssertionError("SQLite boundary fixture did not retain committed WAL bytes")
+        main_before = sha256(database)
+        wal_before = sha256(wal)
+        try:
+            artifact_bindings({"artifact_refs": [str(database)]})
+            raise AssertionError("generic adoption bound SQLite main-file bytes without WAL proof")
+        except AdoptionError as exc:
+            if "transactionally consistent WAL witness" not in str(exc):
+                raise
+        journal = Path(str(database) + "-JOURNAL")
+        journal.write_bytes(b"rollback journal fixture")
+        try:
+            artifact_bindings({"artifact_refs": [str(journal)]})
+            raise AssertionError("generic adoption bound a SQLite rollback journal alone")
+        except AdoptionError as exc:
+            if "transactionally consistent WAL witness" not in str(exc):
+                raise
+        try:
+            artifact_bindings({"artifact_refs": [str(wal)]})
+            raise AssertionError("generic adoption bound a SQLite WAL sidecar by itself")
+        except AdoptionError as exc:
+            if "transactionally consistent WAL witness" not in str(exc):
+                raise
+        for spec in (
+            {"currentness_refs": ["../adoption-wal-boundary.sqlite-data"], "custom_owners": []},
+            {"currentness_refs": ["../adoption-wal-boundary.sqlite-data-JOURNAL"], "custom_owners": []},
+            {"currentness_refs": [".."], "custom_owners": []},
+            {"currentness_refs": [], "custom_owners": [{
+                "surface_ref": "../adoption-wal-boundary.sqlite-data",
+                "surface_type": "FILE", "required_in_currentness_set": True,
+            }]},
+        ):
+            try:
+                ensure_refs(control, {**spec, "evidence_refs": []})
+                source_bindings(control, spec)
+                raise AssertionError("generic adoption bound SQLite through currentness")
+            except AdoptionError as exc:
+                if "transactionally consistent WAL witness" not in str(exc):
+                    raise
+        symlink_project = base / "sqlite_symlink_project"
+        symlink_control = symlink_project / ".agentic-sdlc"
+        symlink_control.mkdir(parents=True)
+        hidden_database = symlink_project / "hidden-extensionless-database.bin"
+        hidden_database.symlink_to(database)
+        symlink_spec = {"currentness_refs": [".."], "evidence_refs": [],
+                        "artifact_refs": [], "custom_owners": []}
+        try:
+            ensure_refs(symlink_control, symlink_spec)
+            source_bindings(symlink_control, symlink_spec)
+        except AdoptionError as exc:
+            if "transactionally consistent WAL witness" not in str(exc):
+                raise
+        else:
+            raise AssertionError("directory currentness ref hid SQLite behind a file symlink")
+    finally:
+        if "main_before" in locals() and "wal_before" in locals() and wal.exists() and (
+            sha256(database) != main_before or sha256(wal) != wal_before
+        ):
+            raise AssertionError("SQLite artifact boundary changed fixture bytes")
+        connection.close()
+
+
+def sqlite_validator_boundary_probe(control: Path) -> None:
+    project = control.parent
+    database = project / "validator-wal-boundary.bin"
+    connection = sqlite3.connect(database)
+    bootstrap_path = control / "state" / "CURRENT_BOOTSTRAP_STATE.json"
+    original = bootstrap_path.read_bytes()
+    try:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA wal_autocheckpoint=0")
+        connection.execute("CREATE TABLE evidence(value TEXT NOT NULL)")
+        connection.execute("INSERT INTO evidence VALUES ('committed-in-wal')")
+        connection.commit()
+        wal = Path(str(database) + "-wal")
+        if not wal.exists() or wal.stat().st_size <= 0:
+            raise AssertionError("validator SQLite fixture has no committed WAL")
+        sidecar_directory = project / "sqlite-sidecar-aliases"
+        sidecar_directory.mkdir()
+        (sidecar_directory / "wal-alias.bin").symlink_to(wal)
+        rollback_journal = project / "validator-rollback-journal"
+        rollback_journal.write_bytes(b"rollback journal fixture")
+        (sidecar_directory / "journal-alias.bin").symlink_to(rollback_journal)
+        validator = control / "tools" / "validate_project.py"
+        bootstrap = json.loads(original)
+        currentness = bootstrap["currentness"]
+        currentness["source_refs"].append("../validator-wal-boundary.bin")
+        currentness["source_bindings"].append({
+            "ref": "../validator-wal-boundary.bin", "sha256": sha256(database),
+        })
+        bootstrap_path.write_text(json.dumps(bootstrap, indent=2) + "\n", encoding="utf-8")
+        result = run(str(validator), "--root", str(control))
+        if result.returncode == 0 or "SQLite currentness ref requires" not in result.stdout + result.stderr:
+            raise AssertionError("validator accepted manually supplied main-file-only SQLite currentness")
+
+        bootstrap = json.loads(original)
+        bootstrap["currentness"]["artifact_bindings"].append({
+            "path": str(database), "sha256": sha256(database),
+        })
+        bootstrap_path.write_text(json.dumps(bootstrap, indent=2) + "\n", encoding="utf-8")
+        artifact_result = run(str(validator), "--root", str(control))
+        if (artifact_result.returncode == 0 or
+            "SQLite artifact binding requires" not in artifact_result.stdout + artifact_result.stderr):
+            raise AssertionError("validator accepted manually supplied SQLite artifact binding")
+
+        bootstrap = json.loads(original)
+        bootstrap["currentness"]["source_refs"].append("../sqlite-sidecar-aliases")
+        bootstrap_path.write_text(json.dumps(bootstrap, indent=2) + "\n", encoding="utf-8")
+        sidecar_result = run(str(validator), "--root", str(control))
+        if (sidecar_result.returncode == 0 or
+            "SQLite currentness ref requires" not in sidecar_result.stdout + sidecar_result.stderr):
+            raise AssertionError("validator accepted SQLite sidecars hidden behind file symlinks")
+
+        hardlink_directory = project / "sqlite-sidecar-hardlink-aliases"
+        hardlink_directory.mkdir()
+        wal_alias = hardlink_directory / "wal-hardlink-alias.bin"
+        try:
+            os.link(wal, wal_alias)
+        except (OSError, NotImplementedError) as exc:
+            raise AssertionError("physical fixture volume must support SQLite sidecar hard-link probe") from exc
+        if wal_alias.stat().st_nlink < 2:
+            raise AssertionError("hard-link fixture did not share the WAL file identity")
+        bootstrap = json.loads(original)
+        bootstrap["currentness"]["source_refs"].append("../sqlite-sidecar-hardlink-aliases")
+        bootstrap_path.write_text(json.dumps(bootstrap, indent=2) + "\n", encoding="utf-8")
+        hardlink_result = run(str(validator), "--root", str(control))
+        if (hardlink_result.returncode == 0 or
+            "SQLite currentness ref requires" not in hardlink_result.stdout + hardlink_result.stderr):
+            raise AssertionError("validator accepted SQLite WAL hidden behind a hard-link alias")
+    finally:
+        bootstrap_path.write_bytes(original)
+        connection.close()
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="agentic-sdlc-adoption-") as tmp:
         base = Path(tmp)
         for case in profile_cases():
             control, _ = adopt_case(base, case)
             assert_profile_burden(control, case["profile"])
+            if case["profile"] == "STATEFUL":
+                sqlite_validator_boundary_probe(control)
 
+        adoption_reference_boundary_probe(base)
+        sqlite_artifact_boundary_probe(base)
         crash_recovery_probe(base)
 
     print("TRANSFER / ADOPTION SELF-TEST PASSED")
@@ -479,7 +742,10 @@ def main() -> int:
     print("- all adopted projects validate and reconstruct without active execution")
     print("- SMALL remains minimal")
     print("- stateful/artifact/multi/high-consequence profiles retain required mechanisms")
+    print("- adoption rejects traversal and absolute references outside project root")
     print("- adoption crash recovered through generic state transaction journal")
+    print("- adoption currentness binds source bytes and explicit artifact digests")
+    print("- adoption and independent validation reject main-file-only SQLite, WAL/journal aliases and committed-WAL refs")
     return 0
 
 

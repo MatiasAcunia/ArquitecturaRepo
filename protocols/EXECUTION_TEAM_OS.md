@@ -99,3 +99,9 @@ Typical:
 - `BLOCKED_EXTERNAL_OR_AUTHORITY`
 - `CAPACITY_CHECKPOINT__RESUMABLE`
 - `NO_FUNCTIONAL_UNLOCK__CAMPAIGN_EXHAUSTED`
+
+## Operating modes and abnormal-agent controls
+
+Execution mode (synchronous, asynchronous, hybrid), collaboration mode (solo/team), and work scope (software, non-code AI, mixed) are independent configuration dimensions, **not new internal role classes or new Planner/I3 campaigns**. They may be combined if and only if the relevant permission/continuity/isolation gates are proven. Asynchronous means there is a real host/scheduler authorized to execute and recover; merely declaring a JSON setting does not create background execution. In mixed operation, I3 retains the same campaign identity across human/agent checkpoints. Team mode must define human/member identities, handoffs, responsibility matrix, single canonical owner per concern, locks/fencing, resource isolation and one integrator.
+
+Watch for erratic or maladapted agents: repetitive tool loops; model hallucination of approvals or paths; fabricated PASS/test evidence; repeated unbounded spending; divergent goals or currentness; stale writers; unauthorized network/data export; contradictory concurrent edits; unbounded delegation; prompt injection from fetched documents; and invalid installed model/plugin configurations. On a material falsifier, stop dependent effects, preserve evidence, classify actual causal owner (configuration, host, I3 logic, policy, model quality, provider or CLIENT authority), recover within the current campaign if in-charter, harden at class level after repeated same-class returns, and independently review. Do not respond with more Planner campaigns, more models or aggressive branch creation.

@@ -1,0 +1,25 @@
+{
+  "schema_version": "agentic-goal-contract-v1",
+  "goal_id": "TO_BE_AUTHORIZED_BY_I2",
+  "campaign_id": "TO_BE_AUTHORIZED_BY_I2",
+  "charter_ref": "contracts/TO_BE_AUTHORIZED.json",
+  "charter_sha256": "TO_BE_COMPUTED_FROM_LIVE_BYTES",
+  "authority_refs": {
+    "contracts/TO_BE_AUTHORIZED.json": "TO_BE_COMPUTED_FROM_LIVE_BYTES"
+  },
+  "definition_of_done": "TO_BE_CONFIRMED",
+  "hard_gates": [
+    "TESTS",
+    "PHYSICAL_EVIDENCE",
+    "INDEPENDENT_REVIEW",
+    "I2_ACCEPTANCE"
+  ],
+  "forbidden_effects": [
+    "UNAUTHORIZED_EXTERNAL_ACTION",
+    "UNAUTHORIZED_COST",
+    "UNAUTHORIZED_PRIVATE_DATA_EXPORT"
+  ],
+  "write_envelope": [
+    "TO_BE_AUTHORIZED"
+  ]
+}
