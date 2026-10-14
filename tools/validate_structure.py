@@ -229,6 +229,7 @@ def validate_structure_only(errors: list[str]) -> None:
         checked = text
         if rel.as_posix() in {
             ".github/workflows/validate-starter.yml",
+            ".github/workflows/publish-version-release.yml",
             "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
         }:
             checked = re.sub(
