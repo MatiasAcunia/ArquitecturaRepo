@@ -1,0 +1,90 @@
+name: Publish approved version tag and release
+
+on:
+  workflow_run:
+    workflows: ["validate-starter"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: true
+          fetch-depth: 1
+      - name: Verify commit is still canonical main and version is allowlisted
+        id: identity
+        shell: bash
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$HEAD_SHA"
+          remote_main="$(git ls-remote origin refs/heads/main | cut -f1)"
+          test "$remote_main" = "$HEAD_SHA" || { echo "Main moved; release held"; exit 1; }
+          version="$(tr -d '\r\n' < VERSION)"
+          case "$version" in
+            1.1.0|1.2.0) ;;
+            *) echo "Version $version is not approved for this release workflow"; exit 1 ;;
+          esac
+          printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+      - name: Validate exact checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check "jsonschema>=4.23,<5"
+          python tools/verify_v1_release.py
+          if [ "${{ steps.identity.outputs.version }}" = "1.2.0" ]; then
+            python tools/selftest_operational_v12.py
+            python tools/selftest_sqlite_currentness.py
+            python tools/selftest_v12_longitudinal.py
+            python tools/selftest_codex_daily_control_adapter.py
+          fi
+      - name: Verify predecessor tag and publish once
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERSION: ${{ steps.identity.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$VERSION" = "1.2.0" ]; then
+            prior="$(git ls-remote origin refs/tags/v1.1.0 | cut -f1)"
+            test -n "$prior" || { echo "v1.1.0 must exist first"; exit 1; }
+          fi
+          tag="v$VERSION"
+          existing="$(git ls-remote origin "refs/tags/$tag" | cut -f1)"
+          if [ -n "$existing" ]; then
+            test "$existing" = "$RELEASE_SHA" || { echo "Existing tag points elsewhere"; exit 1; }
+            gh release view "$tag" --repo "$GH_REPO" >/dev/null
+            echo "Verified existing exact release $tag"
+            exit 0
+          fi
+          case "$VERSION" in
+            1.1.0)
+              cat > /tmp/release-notes.md <<'NOTES'
+          Stable 1.1 baseline with the reproducible starter, proportional profiles, product-baseline controls, privacy-preserving feedback and source-bound local tests.
+          This release is the predecessor baseline for 1.2.0.
+          NOTES
+              ;;
+            1.2.0)
+              cat > /tmp/release-notes.md <<'NOTES'
+          Integrated portable 1.2 source and reproducible local/CI validations.
+          Limits: native Codex Daily Control host/Goal operations, protected MUSIC transfer, external effects, GC noncooperating writer safety and independently authorized physical acceptance are not certified by this release. Do not treat a passing source CI result as validation of these capabilities.
+          NOTES
+              ;;
+          esac
+          gh release create "$tag" --repo "$GH_REPO" --target "$RELEASE_SHA" --title "$tag" --notes-file /tmp/release-notes.md --verify-tag=false
+          echo "Published $tag at $RELEASE_SHA"
