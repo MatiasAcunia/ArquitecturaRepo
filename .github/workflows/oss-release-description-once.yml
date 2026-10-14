@@ -1,0 +1,31 @@
+name: One-time correction of v1.2.0 public release description
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/oss-release-description-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  correct-release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Correct existing release metadata without retagging
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          test "$(gh release view v1.2.0 --repo "$GH_REPO" --json tagName --jq .tagName)" = "v1.2.0"
+          cat > "$RUNNER_TEMP/oss-notes.md" <<'NOTES'
+          ArquitecturaRepo v1.2.0 is a general-purpose, open-source starter for agentic software development. It can be installed into a new or existing software repository; it is not tied to any maintainer project.
+
+          Features include proportional project profiles and scaffolding, Goal/Plan integrity diagnostics, source and SQLite WAL currentness checks, resumable development workflows, transaction recovery, reviewed artifact lifecycle and garbage collection, and portable verification tools.
+
+          The optional adapter for external coding-agent hosts is configured separately by each adopter. No private maintainer project, specific Goal names, external provider, Windows controller or internal acceptance scenario is required to use the portable core. For installation and supported behavior, follow the repository README.
+          NOTES
+          gh release edit v1.2.0 --repo "$GH_REPO" --notes-file "$RUNNER_TEMP/oss-notes.md"
+          gh release view v1.2.0 --repo "$GH_REPO" --json body --jq .body | grep -Fq 'No private maintainer project'
