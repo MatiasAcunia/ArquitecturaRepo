@@ -1,10 +1,10 @@
 {
   "schema_version": "agentic-v12-candidate-criteria-v1",
   "target_release": "1.2.0",
-  "branch_status": "IMPLEMENTATION_IN_PROGRESS__NOT_RELEASED",
+  "branch_status": "PORTABLE_SOURCE_RELEASED__MAINTAINER_HOST_INTEGRATION_CHECKS_OPEN",
   "baseline_stable_version": "1.1.0",
   "codex_daily_control_reference": "2.1.0-capability-rework-rc",
-  "principle": "No code/test/policy may replace a verified physical host, provider, external-delivery or product gate.",
+  "principle": "This is a contributor-only integration-test matrix. It is not a scaffold, an end-user installation contract, or a dependency on any maintainer's private projects.",
   "gates": [
     {
       "id": "V11_BACKWARD_COMPATIBILITY",
@@ -58,19 +58,19 @@
       "id": "INDEPENDENT_TRANSFER_AND_RELEASE",
       "required": true,
       "proof": "one independent unrelated adoption, exact-head CI and separate host/human gates",
-      "status": "L3_TRANSFER_HOLD__LIVE_MUSIC_CURRENTNESS_STALE"
+      "status": "L3_TRANSFER_HOLD__LIVE_EXTERNAL_REFERENCE_PROJECT_CURRENTNESS_STALE"
     },
     {
       "id": "EXISTING_GOVERNED_ATTACHMENT",
       "required": true,
-      "proof": "L3 must attach to a governed existing project without duplicating CURRENT owners, authority, or active I3; read-only map preflight is insufficient; exact private report and source-bound independent transfer evidence",
-      "status": "DISPOSABLE_GOVERNED_ATTACHMENT_PASS__LIVE_MUSIC_ATTACH_HOLD"
+      "proof": "L3 must attach to a governed existing project without duplicating CURRENT owners, authority, or active I3; read-only map preflight is insufficient; independently reviewed test evidence and source-bound independent transfer evidence",
+      "status": "DISPOSABLE_GOVERNED_ATTACHMENT_PASS__LIVE_EXTERNAL_REFERENCE_PROJECT_ATTACH_HOLD"
     },
     {
       "id": "SQLITE_WAL_CURRENTNESS",
       "required": true,
       "proof": "Canonical DB currentness includes committed WAL via a transactionally consistent pinned snapshot; test stale WAL and restore on authorized disposable DB plus independent reviewer",
-      "status": "DISPOSABLE_WAL_PHYSICAL_PASS__LIVE_MUSIC_DB_HOLD"
+      "status": "DISPOSABLE_WAL_PHYSICAL_PASS__LIVE_EXTERNAL_REFERENCE_PROJECT_DB_HOLD"
     },
     {
       "id": "LOCAL_CANDIDATE_EXACT_CI",

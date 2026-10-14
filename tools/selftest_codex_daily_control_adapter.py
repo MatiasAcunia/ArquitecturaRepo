@@ -11,15 +11,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from codex_daily_control_adapter import ZipSource, inspect, Hold
 
 ROOT = 'Codex_Daily_Control_2_0/'
+DEFAULT_SLOTS = ['PROJECT_ALPHA', 'PROJECT_BETA']
 
 
-def package(tmp_path, *, tamper=False, version='2.0.2-hardening-candidate', slots=None):
+def package(tmp_path, *, tamper=False, version='2.0.2-hardening-candidate', slots=None, release_slots=None):
     root = tmp_path/'candidate.zip'
     files = {
         'VERSION.txt': version.encode(),
-        'release.json': json.dumps({'version': version,'goal_slots': ['ROBLOX','MUSIC','TRO','CTR5'],
+        'release.json': json.dumps({'version': version,'goal_slots': release_slots if release_slots is not None else DEFAULT_SLOTS,
                      'native_windows_execution':'NOT_PERFORMED_IN_THIS_ENVIRONMENT'}).encode(),
-        'config/slots.json': json.dumps({'slots': [{'key': k} for k in (slots or ['ROBLOX','MUSIC','TRO','CTR5'])]}).encode(),
+        'config/slots.json': json.dumps({'slots': [{'key': k} for k in (slots if slots is not None else DEFAULT_SLOTS)]}).encode(),
         'bin/codex-daily-control.ps1':b'safe sample',
         'bin/install.ps1':b'install fixture',
         'src/CodexDailyControl/CodexDailyControl.psd1':b'psd1',
@@ -67,9 +68,22 @@ def test_expected_full_archive_identity(tmp_path):
     assert 'PACKAGE_SHA256_EXPECTATION_MISMATCH' not in read(z,expected=digest)['failure_codes']
 
 
-def test_reject_wrong_slot_set(tmp_path):
-    z=package(tmp_path,slots=['ROBLOX','MUSIC','TRO','OTHER'])
-    assert 'CONFIGURED_GOAL_SLOTS_NOT_EXPECTED_FOUR' in read(z)['failure_codes']
+def test_reject_mismatched_slot_metadata(tmp_path):
+    z=package(tmp_path,slots=['PROJECT_ALPHA','PROJECT_GAMMA'])
+    assert 'PACKAGE_GOAL_SLOTS_INCONSISTENT' in read(z)['failure_codes']
+
+
+def test_arbitrary_project_slots_are_not_hardcoded(tmp_path):
+    r=read(package(tmp_path, slots=['CUSTOM_BACKEND'], release_slots=['CUSTOM_BACKEND']))
+    assert r['configured_goal_slots']==['CUSTOM_BACKEND']
+    assert 'PACKAGE_GOAL_SLOTS_INCONSISTENT' not in r['failure_codes']
+
+
+def test_reject_duplicate_or_unsafe_slot_names(tmp_path):
+    r=read(package(tmp_path, slots=['CUSTOM','custom']))
+    assert 'CONFIGURED_GOAL_SLOTS_INVALID' in r['failure_codes']
+    r=read(package(tmp_path, slots=['../other']))
+    assert 'CONFIGURED_GOAL_SLOTS_INVALID' in r['failure_codes']
 
 
 def test_reject_new_or_old_version(tmp_path):

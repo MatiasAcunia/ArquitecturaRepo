@@ -19,35 +19,35 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
 
-## Governed existing projects / SQLite WAL (v1.2 candidate)
+## Existing projects and SQLite WAL (v1.2)
 
 - [Read-only existing-governance attachment preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md) checks pinned source owners without installing a second Product State or I3; **it does not authorize material attachment**.
-- SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. Real DB currentness and native host gates still require physical verification.
+- SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. The adopter supplies its own database and currentness reference; this starter never connects to a third-party project without authorization.
 
-## Stabilization and release planning
+## Advanced capabilities and maintainer resources
 
-- [Engineering-first route, L3 ownership and bounded real test budget](docs/35_ENGINEERING_FIRST_EXECUTION_MASTER_ROUTE.md). This is a proposed execution plan, not a released host guarantee.
+- [Maintainer engineering and verification plan](docs/35_ENGINEERING_FIRST_EXECUTION_MASTER_ROUTE.md) — background for contributors, not installation prerequisites.
 
 - L3-managed `/cleangarbage` workflow: [the cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). It accepts this as a natural-language instruction; a native slash-menu entry is not claimed until host verification.
 
 - [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
 
-- [CLIENT capability-truth inventory and post-release integration design](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — proposals and falsifiers, not current execution or release authority.
+- [Future integration design notes](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — maintainer research, not end-user configuration.
 
-- [Two-pass hardening plan and physical stopping gates](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
-- [L3 local evidence intake and independent review template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
+- [Maintainer hardening history](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
+- [Contributor test evidence template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
 
-Version 1.2 forbids destructive scaffold `--force`; use a new isolated target or explicit reviewed migrations. Editable gate JSON and passing CI do not authorize product release.
+The scaffold refuses destructive overwrites. Install into a fresh directory or follow a reviewed migration procedure for an existing control layer.
 
-## v1.2 operational candidate (not a released version)
+## v1.2.0 — released portable features
 
-The isolated 1.2 development branch adds fail-closed Goal/invocation and tactical-plan controls, ambiguous external-effect receipts, bounded Gemini I4 consultation plumbing and optional five-task OWNER mutual-recovery policy. A physical Codex Goal host adapter, scheduler readback, collector delivery and independent release gates are still **NOT YET PROVEN**. Stable releases remain on 1.1 until those gates pass.
+Release v1.2.0 extends the reusable software-development starter with Goal/Plan integrity diagnostics, crash-aware artifact inventory and cleanup, SQLite WAL currentness, recovery controls and optional adapters. It can be installed in a new or existing project using the documented profile and adoption workflow. Project-specific tests, maintainer acceptance scenarios and third-party host controllers are **not required to install or use the portable core**. Optional host integrations must be configured by each adopter.
 
 - [Operational implementation and exact limits](docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md)
 - [Resumen y privacidad en español](docs/24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md)
-- [Machine-readable 1.2 acceptance blockers](state/V1_2_ACCEPTANCE_CRITERIA.json)
+- [Maintainer-only integration test matrix](state/V1_2_ACCEPTANCE_CRITERIA.json) — not part of the generated project or an adopter prerequisite
 
-## v1.2 operating-mode and technology selection (draft)
+## v1.2 optional operating modes and technology selection
 
 - [Execution / team / non-code AI modes and 14 project types](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md) — configurable dimensions and verified-gate HOLDs, not additional controllers
 - [Longitudinal isolated L3 pilot plan](docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md) — synthetic CRUD, repeated sessions, failures, critique and rollback
@@ -387,4 +387,4 @@ The original source code and documentation in this repository are licensed under
 
 ## v1.2.0 release scope
 
-The v1.2 portable code integrates persistent Goal/Plan diagnostics, SQLite WAL currentness checks, reviewed artifact lifecycle and an optional read-only Codex Daily Control 2.1 capability-rework RC adapter. Native Windows Goal/session mutation, controller dispatch, external provider delivery, noncooperating GC writers and protected external-project transfer are **not certified** by portable CI. The separate fifteen physical-acceptance requirements remain tracked with their actual statuses; published source code is not a claim of physical host support.
+The MIT-licensed v1.2.0 source is a general-purpose starter. Its scaffolder installs project-local configuration and tools for the adopter's own codebase; no maintainer test project, private automation, third-party service or specific repository is a prerequisite. The optional Daily Control adapter inspects a user-provided package without executing it. As with any extension, enabling native host actions or external services requires separate setup and authorization.

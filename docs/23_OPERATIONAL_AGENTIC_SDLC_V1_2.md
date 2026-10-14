@@ -1,6 +1,6 @@
-# Agentic SDLC v1.2 — operational candidate and acceptance boundary
+# Agentic SDLC v1.2 — reusable portable capabilities and optional integrations
 
-Status: IMPLEMENTATION IN PROGRESS, not a 1.2.0 release. The stable public starter remains 1.1.0 until the physical gates listed in state/V1_2_ACCEPTANCE_CRITERIA.json pass.
+Status: v1.2.0 portable core released. Separate maintainer integration tests do not determine whether another developer can install and use this starter in an unrelated repository.
 
 ## Purpose
 
@@ -36,7 +36,7 @@ The currently shipped core campaignctl, transaction engine, scaffolder, validato
 
 ## Host continuity / Codex Daily Control
 
-The relevant Windows reference is Codex Daily Control **2.0.2-hardening-candidate**, not 2.0.1. Its reported Windows installation successfully validated native CLI/app-server, Goals/threads/history, per-account quota, staging, checksum/ZIP, and project binding. This source repository does not ship its Windows package, claim to manage private native Codex SQLite or assume undocumented Resume methods.
+An optional read-only adapter can inspect package versions 2.0.2 and 2.1.0 supplied by an adopter. The starter does not bundle a Windows controller, hard-code anyone's Goal slots, manage private native Codex state or assume undocumented host operations.
 
 Before any v1.2 Codex support label becomes SUPPORTED, a separate, non-destructive Windows test must verify:
 - app-server/Goal lifecycle compatibility with the actual installed build;
@@ -77,7 +77,7 @@ Run:
 
 The last command intentionally returns nonzero until physical and external gates are proved. Never change this behavior simply to paint CI green.
 
-All six existing profiles, older scaffolds, schema migrations and v1.1 release tests must remain compatible. No forced rewrite of installed control layers; new contracts remain absent until explicitly authorized. A production 1.2.0 release additionally needs Windows and Gemini real-host proof, independent adoption, effective scheduler review, privacy audit, validated external effects, exact HEAD CI and honest feature-support reporting.
+All six existing profiles, older scaffolds, schema migrations and v1.1 release tests must remain compatible. No forced rewrite of installed control layers; new contracts remain absent until explicitly authorized. Optional vendor-specific adapters require their own verified host support before users enable them. These are contributor integration checks, not prerequisites for using v1.2.0's generic scaffolding or portable tools.
 
 ## Known unproven capabilities
 

@@ -6,12 +6,12 @@
   "ship_scope": "PORTABLE_CORE_WITH_DECLARED_UNVERIFIED_NATIVE_CAPABILITIES",
   "full_physical_release_accepted": false,
   "physical_release_gates_overridden": false,
-  "note": "Client requested v1.1.0 and v1.2.0 GitHub releases after integration despite the remaining physical acceptance gates. This authorizes publication of portable code, not false host/provider acceptance.",
+  "note": "The product is a general-purpose, open-source portable SDLC starter for unrelated codebases. Maintainer tests using external projects, vendor-specific native hosts or protected state are not adopter installation prerequisites. The release does not bundle or automatically control any private host.",
   "excluded_claims": [
-    "authenticated native Codex Goal and 2.1 runtime control",
-    "protected MUSIC governed attachment/currentness",
-    "independent external effects and provider delivery",
-    "noncooperating concurrent filesystem writer safety",
-    "independent physical host and perception acceptance"
+    "native third-party host/session actions without explicit adapter support",
+    "writes to existing unrelated governed projects without their owners' authorization",
+    "independently verified delivery of external effects or provider responses",
+    "concurrent deletion in roots with uncontrolled writers",
+    "host-specific automation beyond the portable SDK and its tests"
   ]
 }

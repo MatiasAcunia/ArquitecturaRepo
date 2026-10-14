@@ -19,7 +19,6 @@ from pathlib import Path, PurePosixPath
 from typing import Protocol
 
 SCHEMA = 'codex-daily-control-package-preflight-v1'
-EXPECTED_SLOTS = ('ROBLOX', 'MUSIC', 'TRO', 'CTR5')
 MANIFEST = 'SOURCE_SHA256SUMS.txt'
 REQUIRED = (
     'VERSION.txt', 'release.json', 'config/slots.json', MANIFEST,
@@ -208,17 +207,28 @@ def inspect(source: Source, *, physical_package_sha256: str | None = None,
             failures.append('PACKAGE_RELEASE_VERSION_INCONSISTENT')
         if not (v.startswith('2.0.2') or v.startswith('2.1.0')):
             failures.append('CODEX_DAILY_CONTROL_VERSION_UNSUPPORTED')
-        if (not isinstance(slots, list) or len(slots) != len(EXPECTED_SLOTS)
-                or set(x.get('key') for x in slots if isinstance(x, dict)) != set(EXPECTED_SLOTS)):
-            failures.append('CONFIGURED_GOAL_SLOTS_NOT_EXPECTED_FOUR')
-        if sorted(release.get('goal_slots', [])) != sorted(EXPECTED_SLOTS):
-            failures.append('RELEASE_GOAL_SLOTS_NOT_EXPECTED_FOUR')
+        # Package-scoped project slots are not a property of this open-source
+        # starter. Validate declared metadata, not the maintainer's own Goals.
+        declared = release.get('goal_slots')
+        def valid_keys(items):
+            return (isinstance(items, list) and 1 <= len(items) <= 256 and
+                    all(isinstance(v, str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,79}', v)
+                        for v in items) and len({v.casefold() for v in items}) == len(items))
+        configured = ([x.get('key') for x in slots]
+                      if isinstance(slots, list) and all(isinstance(x, dict) for x in slots)
+                      else None)
+        if not valid_keys(configured):
+            failures.append('CONFIGURED_GOAL_SLOTS_INVALID')
+        if not valid_keys(declared):
+            failures.append('RELEASE_GOAL_SLOTS_INVALID')
+        if valid_keys(configured) and valid_keys(declared) and set(configured) != set(declared):
+            failures.append('PACKAGE_GOAL_SLOTS_INCONSISTENT')
         if release.get('native_windows_execution') != 'PERFORMED_AND_ATTESTED':
             failures.append('NATIVE_WINDOWS_ACCEPTANCE_NOT_ATTESTED')
         evidence.update({'version': v, 'release_state': release.get('release_state'),
             'manifest_checked': len(paths), 'manifest_mismatch_count': len(mismatches),
             'mismatched_paths': sorted(mismatches),
-            'configured_goal_slots': list(EXPECTED_SLOTS) if 'CONFIGURED_GOAL_SLOTS_NOT_EXPECTED_FOUR' not in failures else [],
+            'configured_goal_slots': configured if valid_keys(configured) else [],
             'native_windows_declared': release.get('native_windows_execution')})
     except (Hold, UnicodeError, KeyError, TypeError) as exc:
         failures.append('PACKAGE_INSPECTION_FAILED_' + type(exc).__name__)

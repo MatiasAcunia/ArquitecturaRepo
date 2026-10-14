@@ -82,8 +82,7 @@ jobs:
               ;;
             1.2.0)
               cat > /tmp/release-notes.md <<'NOTES'
-          Integrated portable 1.2 source and reproducible local/CI validations.
-          Limits: native Codex Daily Control host/Goal operations, protected MUSIC transfer, external effects, GC noncooperating writer safety and independently authorized physical acceptance are not certified by this release. Do not treat a passing source CI result as validation of these capabilities.
+          General-purpose agentic SDLC starter for new or existing software repositories. v1.2.0 provides proportional scaffolding, Goal/Plan integrity diagnostics, source-currentness checks including SQLite WAL, controlled artifact lifecycle/GC, resumable workflows and portable validation tools. Optional host integrations are configured separately by adopters. Maintainer test projects and their acceptance scenarios are not installation dependencies.
           NOTES
               ;;
           esac

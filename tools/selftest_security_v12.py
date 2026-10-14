@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Security invariants for the unreleased v1.2 branch.
+"""Security invariants for v1.2's portable source and optional host adapters.
 
 Tests trusted upstream action pins, strict scope, no misleading release claim,
 no host-permit shortcut, disabled external effects by default, and no private
