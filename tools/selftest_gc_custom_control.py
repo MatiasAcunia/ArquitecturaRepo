@@ -37,7 +37,7 @@ def run() -> int:
             return p.returncode, d
         git('init', '-b', 'main')
         git('config','user.name','Audit Fixture')
-        git('config','user.email','audit@example.invalid')
+        git('config','user.email','synthetic-no-email')
         (project/'.gitignore').write_text('.customctl/\n.agentic-sdlc-scratch/\n')
         (project/'review.txt').write_text('Synthetic review evidence only.\n')
         git('add','.gitignore','review.txt');git('commit','-m','fixture')

@@ -383,3 +383,8 @@ v1.1 adds a pre-campaign product-discovery baseline plus privacy-preserving recu
 ## License
 
 The original source code and documentation in this repository are licensed under the [MIT License](LICENSE). You may use, adapt and redistribute them under its terms, including retention of the copyright and permission notice. Third-party assets or materials, if any, retain their own terms; this license does not grant rights to material not owned by the copyright holder.
+
+
+## v1.2.0 release scope
+
+The v1.2 portable code integrates persistent Goal/Plan diagnostics, SQLite WAL currentness checks, reviewed artifact lifecycle and an optional read-only Codex Daily Control 2.1 capability-rework RC adapter. Native Windows Goal/session mutation, controller dispatch, external provider delivery, noncooperating GC writers and protected external-project transfer are **not certified** by portable CI. The separate fifteen physical-acceptance requirements remain tracked with their actual statuses; published source code is not a claim of physical host support.
