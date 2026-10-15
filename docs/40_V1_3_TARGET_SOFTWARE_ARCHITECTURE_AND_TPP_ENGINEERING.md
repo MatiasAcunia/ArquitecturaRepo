@@ -1,6 +1,6 @@
 # ArquitecturaRepo 1.3 — Target Software Architecture and Engineering Design
 
-Status: **DESIGN BASELINE / PROPOSED**, not built or accepted. Date: 2026-10-14.
+Status: **DESIGN REFERENCE / NOT IMPLEMENTATION PROOF**. Created 2026-10-14; interpretation corrected by explicit CLIENT authority on 2026-10-15. The live M0–M6 acceptance definition is in doc 41; doc 38 owns evaluation detail. External model/task quality is outside ArquitecturaRepo's guaranteed capabilities.
 Authority: CLIENT's request for an integral v1.3 design grounded in Software Engineering, the entire span of *The Practice of Programming* (Kernighan and Pike), cumulative academic Agentic SDLC research, and two independently measured test families.
 Main product: a portable, open-source agentic software-development starter that a third party can install in **their own** project. Maintainer applications, internal test Goals, proprietary machinery and the four historical portfolio workstreams are NOT end-user dependencies.
 
@@ -19,7 +19,7 @@ Existing source owners (do NOT fork them):
 - `tools/external_effects.py`, `schemas/external-effect.schema.json`: ambiguous/at-most-once recovery modeling; no generic exactly-once guarantee for arbitrary remote providers.
 - `tools/scaffold_project.py`, `tools/apply_adoption.py`, `tools/reconstruct_context.py`, `tools/validate_project.py`, profile/templates/migrations: portable project installation, currentness and schema/adoption paths.
 - `tools/codex_daily_control_adapter.py`: **read-only** package/installed-byte preflight, not a verified native runner. Latest main has no maintainer project names in its expected slots; the historical 1.2.0 tag still does. The controller is a separate optional package, not an architecture-core prerequisite.
-- Many real selftest/CI tools, SQLite/WAL tests and six install profiles. These are **component proof**, not proof that a real agent delivered a complete software feature to an unrelated user.
+- Many real selftest/CI tools, SQLite/WAL tests and six install profiles. These are **component proof**, not independent end-to-end proof of ArquitecturaRepo's installed lifecycle, actual owners, effects, invalidation and recovery. Correctly handling model failure may satisfy a framework contract; model task success is not a framework acceptance criterion.
 
 First v1.3 action is to reconstruct the executable source/host/adopter truth, not to rewrite v1.2 code on assumptions.
 
@@ -30,7 +30,7 @@ An ordinary software developer should be able to:
 2. Describe the product objective and constraints, select a proportional profile, approve required risky choices.
 3. See a single comprehensible source-bound current status and the next action.
 4. Select an **installed, detected, expressly authorized compatible agent host** (the portable core remains usable without one).
-5. Submit a feature request; see actual code edited in an isolated managed working surface, real build/tests run, defects repaired by the same I3, review consumed, and a source-bound candidate delivered.
+5. Submit a feature/workflow request and see the framework accurately authorize, dispatch and observe actions that the selected available host supports; record actual edits/build/tests or unsupported/error outcomes, keep in-scope I3 rework and review source-bound, and never guarantee external model coding success.
 6. Interrupt, safely resume, inspect cost, read independent test results, accept/reject and upgrade/remove without losing user-owned files.
 
 Support tiers must be explicit and machine-checkable:
@@ -85,7 +85,7 @@ Schemas should be added **only when their first consuming tool and test are incl
 
 2026 upstream evidence: public Codex Python SDK documentation includes `Codex.thread_start`, `thread_resume`, streaming, `Sandbox.read_only` / `workspace_write` and published interpreter/runtime version matching. TypeScript SDK similarly supports `startThread`, `resumeThread` and JSONL event streaming. See https://github.com/openai/codex/blob/main/sdk/python/docs/getting-started.md and https://github.com/openai/codex/blob/main/sdk/typescript/README.md.
 
-**Preferred first experiment:** a clearly optional, version-pinned Python Codex SDK `HostPort` adapter on disposable worktrees. Verify SDK on real supported Linux/Windows before labelling `HOST_VERIFIED`, including login, thread start/continuation, sandbox, permission readback, crash/resume, source diff and rejection of unauthorized effects. If SDK cannot expose enforced scope or receipts, narrow the supported claim and keep a manual/fake-adapter path rather than hack undocumented native state. Windows Codex Daily Control 2.1 remains a **separate optional host-continuity integration**, not a default or required dependency; resolve actual API compatibility before writing its native bridge. Do NOT claim the read-only 2.1 package preflight is agent execution.
+**Historical candidate, not a mandated or preferred provider:** a clearly optional, version-pinned Python Codex SDK `HostPort` adapter on disposable worktrees. Verify SDK on real supported Linux/Windows before labelling `HOST_VERIFIED`, including login, thread start/continuation, sandbox, permission readback, crash/resume, source diff and rejection of unauthorized effects. If SDK cannot expose enforced scope or receipts, narrow the supported claim and keep a manual/fake-adapter path rather than hack undocumented native state. Windows Codex Daily Control 2.1 remains a **separate optional host-continuity integration**, not a default or required dependency; resolve actual API compatibility before writing its native bridge. Do NOT claim the read-only 2.1 package preflight is agent execution.
 
 Longer term another adapter may be implemented through a documented local CLI, TypeScript SDK or independent vendor. Host-independent policy and QA tests must still pass unchanged. No universal raw token or account credential collection.
 
@@ -154,10 +154,10 @@ Research maturity/status and exact primary-source caveats remain in doc 39 and i
 
 ## 8. Architecture acceptance and refactoring discipline
 
-A design is not accepted by creating more code, JSON files, commits or roles. Its first proof is an unrelated adopter getting a real requested feature running with fewer human interventions and acceptable cost relative to v1.2, while currentness, safety, privacy, test independence and existing code behavior remain intact.
+A design is not accepted by creating more code, JSON files, commits or roles. Its proof is independent, repeatable end-to-end verification that the installed ArquitecturaRepo framework delivers its declared lifecycle and invariants under actual and adversarial conditions, with reasonable adoption/resource cost, currentness, safety, privacy and compatibility. A model's ability to implement a runnable external feature is outside framework acceptance.
 
 Every implementation must have an owner, existing impacted surfaces, seam/interface contract, migration and compatibility plan, exact test oracle, crash and concurrency failure modes, independent reviewer and rollback. Prefer additive changes with reversible migration; zero dangerous upgrades in users' repositories. Experimental optional adapter work may live in isolated fixtures while the portable core remains usable.
 
-**Decisions fixed for the proposed v1.3 architecture:** generic open source; Python-first modular core; one canonical state owner per concern; simple SOLO baseline; two genuinely independent test families; no compulsory third-party framework, native controller, global bus, extra role or private test project; authenticated write/effect boundary; persistent same-campaign I3 debugging; risk-proportionate artifacts and actual user software outcomes.
+**Decisions fixed for the proposed v1.3 architecture:** generic open source; Python-first modular core; one canonical state owner per concern; simple SOLO baseline; two genuinely independent test families; no compulsory third-party framework, native controller, global bus, extra role or private test project; authenticated write/effect boundary; persistent same-campaign I3 debugging; risk-proportionate artifacts and truthful reporting of external user software outcomes, whether success, failure or unavailable.
 
 **Decisions not yet fixed without measurements:** which specific host adapter reaches HOST_VERIFIED; whether events improve async operation; new schemas beyond first consumer; exact task difficulty/cost thresholds; additional agents; which performance optimizations warrant complexity. Doc 41 defines empirical gates to decide these.
