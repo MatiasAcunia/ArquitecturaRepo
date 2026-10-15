@@ -20,7 +20,7 @@ def main():
     assert gates["target_release"] == "1.2.0" and gates["gates"]
 
     contains("README.md", ("v1.2.0", "docs/README.md", "--force"))
-    contains("docs/README.md", ("ordinary adopter", "PRIVATE", "M0", "M7"))
+    contains("docs/README.md", ("ordinary adopter", "Private historical maintainer records", "M0", "M7"))
     contains("docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md", ("v1.2.0", "portable"))
     contains("docs/24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md", ("v1.2.0", "Proveedores y agentes"))
     contains("docs/25_V1_2_SECURITY_HARDENING_AUDIT.md", ("refuses --force",))
