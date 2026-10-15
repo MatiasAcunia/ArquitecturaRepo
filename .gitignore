@@ -1,0 +1,34 @@
+# ArquitecturaRepo public-starter workspace hygiene.
+# Ignore rules do not remove already committed bytes or replace privacy review.
+
+# Explicit maintainer-private material; retain outside the public repository.
+/private/
+/docs/private/
+/docs/_private/
+/maintainer-private/
+/local_artifacts/
+/daypacks/
+/handoffs/
+/_local_artifacts/
+/.local/
+
+# Per-machine credentials and host configuration.
+/.env
+/.env.*
+!/.env.example
+/.codex/
+/.secrets/
+*.pem
+*.p12
+*.pfx
+
+# Ephemeral testing/build outputs, not canonical evidence.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
