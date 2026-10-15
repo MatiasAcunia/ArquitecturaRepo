@@ -1,27 +1,25 @@
-# Agentic SDLC 1.2 — Estado e instalación
+# Agentic SDLC v1.2.0 — Estado, instalación y límites
 
-Estado: candidato en desarrollo, NO release v1.2.0.
+**Estado:** v1.2.0 es la última release pública publicada. Este documento sustituye el resumen previo de candidatura, que afirmaba incorrectamente que v1.1 era la última versión estable. No constituye un nuevo gate de aceptación ni prueba de ejecución nativa de agentes.
 
-La versión estable sigue siendo 1.1.0. La rama de desarrollo incorpora controles para Goals, planificación táctica I3, efectos externos ambiguos, consultas I4 opcionales y recuperación mutua de cinco tareas multiproyecto. Estas funciones necesitan integrarse y verificarse físicamente antes de presentarlas como automatización operativa completa.
+La versión portátil incluye mecanismos de Goal/Plan y campañas, validación y currentness, recuperación de estado, registro de artefactos y controles de privacidad. Las operaciones realmente disponibles se verifican mediante el código y la matriz de soporte de la versión instalada.
 
-## Feedback automático mínimo, activado por defecto
+## Privacidad y feedback opcional
 
-En proyectos nuevos se genera **una vez al mes** un informe de metadatos y se conserva como artifact en GitHub Actions del mismo proyecto. Sirve para mejorar la estructura del starter, ordenar categorías de fallos y simplificar instalación y recuperación.
+En proyectos nuevos, el scaffold puede generar un informe mensual de **metadatos limitados**, almacenado en artifacts de GitHub Actions del propio proyecto. El informe no debe incluir código, contenido de requisitos, conversaciones, identificadores privados ni credenciales. La generación local está habilitada de forma predeterminada, salvo que el usuario desactive el workflow.
 
-Incluye versión y perfil, estados de validación, datos agregados de uso del mecanismo, cantidades de errores, reintentos, recuperaciones y bloqueos. No recopila código, contenido del proyecto, conversaciones, nombres de repositorios, rutas, identificadores persistentes, SHA ni credenciales.
+El envío a un receptor externo sólo puede ocurrir cuando se configura expresamente un endpoint compatible; la preferencia implementada es opt-out, que debe mostrarse al usuario. No hay un colector mantenedor predeterminado empaquetado. Verificar la configuración real antes de afirmar que no salió información.
 
-**El envío externo queda preparado como opt-out, pero no existe receptor configurado en esta candidata.** Por lo tanto, ahora no llega automáticamente al creador. Si se configura un receptor HTTPS verificable, la preferencia predeterminada será enviar un resumen mínimo, anunciado al instalar, con desactivación inmediata mediante external_submission_enabled=false. No se envían datos privados. Nunca se inventa que llegó.
+Para desactivar el workflow al instalar: `--no-feedback-workflow`. Después, desactivar la configuración local o retirar el workflow generado. Consultar [privacidad y feedback](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
-Para desactivarlo: cambiar enabled a false en .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, borrar .github/workflows/agentic-sdlc-feedback.yml o generar el proyecto con --no-feedback-workflow. No afecta al funcionamiento del proyecto.
+## Proveedores y agentes
 
-## Qué falta probar en Windows
+ArquitecturaRepo no requiere OpenAI, Codex, Gemini, Claude ni otra plataforma. Las integraciones de host son módulos opcionales. Un preflight de Codex Daily Control es una verificación de paquete/configuración, no un ejecutor nativo. No corresponde afirmar soporte físico del host sin pruebas reales en la versión concreta.
 
-El paquete de referencia correcto es **Codex Daily Control 2.0.2-hardening-candidate**. Antes de declarar soporte real se comprobarán en tu PC las operaciones Goal/Plan, reinicio, cuota, cierre diario, readback Drive, limpieza, entrega Gemini y rollback sin afectar proyectos ni conversaciones productivas.
+El framework garantiza únicamente los contratos y las capacidades que puede demostrar; no garantiza que un modelo programe correctamente una aplicación.
 
-Toda aceptación requiere código, tests y evidencia física. La prueba en esta rama es independiente de cualquier aceptación que hubiera tenido tu controlador Windows anterior.
+## Nuevos y existentes
 
-Guía técnica completa: docs/23_OPERATIONAL_AGENTIC_SDLC_V1_2.md.
+Usar el [README](../README.md) y la [guía de instalación](../prompts/INSTALL_THIS_SDLC.md). Para repositorios con gobierno existente, primero realizar un preflight no destructivo; no crear un segundo Product State ni asumir autorización de escritura.
 
-## Límite de adopción de proyectos existentes
-
-La adopción liga por SHA-256 las referencias de currentness y los artefactos existentes declarados; la validación vuelve a comprobar esos bytes. Si ya existe un Product State canónico externo para el mismo proyecto, la promoción se detiene para evitar un segundo owner. La candidata sigue en HOLD hasta que exista un protocolo explícito de attachment sin Product State paralelo.
+Referencias: [capacidades v1.2](23_OPERATIONAL_AGENTIC_SDLC_V1_2.md) y [índice documental](README.md).

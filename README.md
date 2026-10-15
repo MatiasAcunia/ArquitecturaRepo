@@ -24,20 +24,16 @@ This repository is not a prompt collection. It is an operating architecture for 
 - [Read-only existing-governance attachment preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md) checks pinned source owners without installing a second Product State or I3; **it does not authorize material attachment**.
 - SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. The adopter supplies its own database and currentness reference; this starter never connects to a third-party project without authorization.
 
-## Advanced capabilities and maintainer resources
+## Documentation for adopters and contributors
 
-- [Maintainer engineering and verification plan](docs/35_ENGINEERING_FIRST_EXECUTION_MASTER_ROUTE.md) — background for contributors, not installation prerequisites.
+[Documentation index](docs/README.md) distinguishes **adopter guidance**, supported technical reference, and contributor-only QA/research material. Historical maintainer execution logs and private pilot materials are **not** installation instructions, runtime authority, or distributed starter files.
 
-- L3-managed `/cleangarbage` workflow: [the cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). It accepts this as a natural-language instruction; a native slash-menu entry is not claimed until host verification.
+- [Install/adapt the SDLC](prompts/INSTALL_THIS_SDLC.md) and [FAQ](docs/FAQ_ES.md).
+- [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
+- [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
+- [Current contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). This is engineering work in progress, **not** the public release or proof of native agent execution.
 
-- [Persistent per-file artifact inventory, controlled capture and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md) — local JSON, safe by default, no global DB.
-
-- [Future integration design notes](docs/33_V12_CAPABILITY_TRUTH_AND_PORTFOLIO_ADOPTION_DESIGN.md) — maintainer research, not end-user configuration.
-
-- [Maintainer hardening history](docs/30_V1_2_STABILIZATION_MASTER_PLAN.md)
-- [Contributor test evidence template](docs/31_V1_2_L3_TERMINAL_INTAKE.md)
-
-The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or follow a reviewed migration procedure for an existing control layer.
+The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or use the reviewed migration/adoption path when a governed control layer already exists.
 
 ## v1.2.0 — released portable features
 
@@ -50,11 +46,10 @@ Release v1.2.0 extends the reusable software-development starter with Goal/Plan 
 ## v1.2 optional operating modes and technology selection
 
 - [Execution / team / non-code AI modes and 14 project types](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md) — configurable dimensions and verified-gate HOLDs, not additional controllers
-- [Longitudinal isolated L3 pilot plan](docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md) — synthetic CRUD, repeated sessions, failures, critique and rollback
 - `tools/project_setup.py` — read-only stack/model/plugin suggestions; canonical technology decisions remain I2-owned
 - `tools/theory_guard.py` — read-only check of existing CLIENT requirements, Product State, domain overlay and bootstrap; not a parallel theory DB
 
-Project selection remains independent of the six existing profiles. OpenAI models are useful defaults when task fit, privacy and cost justify them; other providers and tools remain supported. No plugin or LLM subscription is installed automatically.
+Project selection remains independent of the six existing profiles. ArquitecturaRepo is vendor- and model-agnostic. Optional platform adapters declare their own verified support; model programming success is not guaranteed by the framework. No plugin or LLM subscription is installed automatically.
 
 ## What you get
 
@@ -372,13 +367,13 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - not a substitute for product-specific tests/runtime/security/perceptual evidence;
 - not a project snapshot or historical data export.
 
-This repository contains only reusable structure, generic mechanisms and synthetic examples. It intentionally excludes project-specific names, repositories, branches, identifiers, providers, costs, quantities, artifacts and historical state.
+The **installable starter** contains reusable structure, generic mechanisms and synthetic examples. Maintainer-oriented public research and release history are not installed as adopter-specific state. Older public Git commits may still contain historical maintainer material; a working-tree deletion is not Git-history erasure. Do not put private logs, tokens, local paths, private project names or client data in public issues, commits, packages or examples.
 
 ## Status
 
-`v1.1.0 — PUBLIC STARTER STABLE`
+`v1.2.0 — LATEST PUBLISHED STABLE RELEASE`
 
-v1.1 adds a pre-campaign product-discovery baseline plus privacy-preserving recurring architecture feedback: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking, project-local operating-review evidence and opt-out metadata-only feedback artifacts.
+v1.1 added a pre-campaign product-discovery baseline plus privacy-preserving recurring architecture feedback: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking, project-local operating-review evidence and opt-out metadata-only feedback artifacts.
 
 ## License
 
