@@ -1,17 +1,17 @@
 # ArquitecturaRepo v1.3 — Engineering Execution Route, Gates and Milestones
 
-Status: COMPLETE PROPOSED ROUTE, **NOT EXECUTED**. 2026-10-14. Ownership: CLIENT owns the product; I2/Planner owns strategic capability charters, persistent I3 owns actual engineering and ordinary repairs, scoped I4 supports and independent QA validates.
+Status: CURRENT PRODUCT ACCEPTANCE ROUTE, **NOT PROOF OF EXECUTION OR RELEASE**. Revised per explicit CLIENT scope correction 2026-10-15. Ownership: CLIENT owns the product; I2/Planner owns strategic capability charters, persistent I3 owns actual engineering and ordinary repairs, scoped I4 supports and independent QA validates.
 This route operationalizes [the target software architecture and TPP engineering design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [the independent A/B testing program](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md) and [the academic/framework analysis](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md). It is the single canonical v1.3 sequence. Academic readings are tracked in research issue #2; issue #4 indexes the plan, rather than duplicating a second mutable plan.
 
 ## 1. Product destination and invariant boundaries
 
-An unrelated developer should be able to install the open-source starter in a new or existing repository, give a software feature request, verify constraints and status, choose an installed supported optional coding-agent host, then obtain real edited code, application build, actual tests, same-campaign defect correction, independent review, continuation after interruption and a runnable source-bound change.
+An unrelated developer should be able to install the starter in a new or existing repository and exercise each advertised ArquitecturaRepo capability correctly: intake and authority, Goal/charter/Plan and campaign state, optional supported execution transport, traceable actual tool/host effects, bounded I3 rework, independent review receipt and invalidation, continuation after interruption, currentness, rollback and honest terminal/reporting. The framework controls and observes engineering workflows; it does not guarantee that a chosen model can solve an arbitrary programming task or that model-authored code is correct.
 
 The generic portable core must work without maintainer-owned products, a particular vendor, a private controller, a second global database, heavyweight agents or a paid subscription. The real agent execution path requires a compatible, expressly authorized host; absent such a host, the product must say so and offer a usable manual/portable path, never fake code execution. Full agent effectiveness is a separate product-support claim, not a condition that every general user install our QA benchmarks.
 
 The predecessor v1.2.0 tag stays immutable. Current main includes later integration/docs and must be compared against that exact tag before implementation. A shipped version is not implicitly equal to a newer main commit. Every proposed feature must be compatible with this upgrade boundary or have an explicit safe migration and truthful breaking-change decision.
 
-Two *independent* releases gates: A = internal Python/contract/transaction correctness, B = an agent installed in an unrelated real software project delivered independently working software. Neither substitutes for the other. A can succeed with fake HostPort adapters for deterministic testing; B cannot be accepted on fake execution.
+Two *independent* evidence families: A = internal Python/contract/transaction correctness; B = end-to-end correctness of the installed ArquitecturaRepo lifecycle and each advertised integration/capability in a representative real or disposable repository. Neither substitutes for the other. B may use deterministic fault-injectable adapters for the portable lifecycle, but native-host support requires an independently observed real host operation. Failure by an underlying AI model to solve an application task is recorded separately from framework defects; incorrect authorization, state, execution receipt, gates or reporting is a framework failure.
 
 ## 2. Ownership, controls and one integration branch
 
@@ -23,23 +23,21 @@ I3 is the continuous execution owner: architecture within approved interfaces, c
 
 ## 3. Dependency route
 
-M0 Source/benchmark truth --> M1 Trustworthy code tests + M2 True agent-host operation --> M3 One full real software feature --> M4 Different apps and longitudinal recovery --> M5 Evidence-gated research patterns --> M6 Exact release qualification.
+M0 Framework capability inventory and independent baseline --> M1 Trustworthy internal code tests + M2 Verified optional host integration --> M3 Complete ArquitecturaRepo lifecycle vertical --> M4 Installation/platform and recovery variability --> M5 Evidence-gated mechanism improvements --> M6 Exact framework release qualification. M7, explicitly reserved by CLIENT for subsequent optional package/plugin absorption and privacy-safe distribution, starts only after M0–M6 acceptance and separate scope authorization.
 
-M1 and M2 can proceed concurrently only under a documented noninterference split and exact source integration ownership. M3 requires M2 real host write/readback, not just an SDK import or package preflight. M5 depends on the failure evidence collected in M3/M4. M6 evaluates one exact candidate code tree and one declared supported host envelope. A partial gate cannot silently satisfy an unrelated release promise.
+M1 and M2 can proceed concurrently under a documented noninterference split and exact source integration ownership. M3 validates both the portable full lifecycle and the separate optional enabled host branch; the native-host branch requires M2 physical write/readback, never SDK imports or simulated flags. M5 depends on causal evidence from M3/M4. M6 evaluates one exact candidate tree and a declared supported capability/host matrix. No gate is replaced by another and external model task success is not silently promoted into framework acceptance.
 
 No artificial fixed duration, agent count or percentage target: independently measure the v1.2 baseline, set thresholds proportionate to risk and test sample size, then pre-register them before accepting improvements. Report unsuccessful attempts and environmental drift.
 
-## 4. M0 — Evidence, risk and reproducible external baseline
+## 4. M0 — Evidence, risk and reproducible framework baseline
 
 Owned by I2/QA with I3 reconstruction.
 
-Reconstruct exact tagged v1.2 and current main: tools/campaignctl.py, state_tx.py, goal_guard.py, goal_plan.py, artifact_ledger.py, scaffold_project.py, apply_adoption.py, existing native-adapter preflight, schemas, migrations, generated profile packages and all current selftests. Produce a single capability/owner/authority/evidence matrix with columns: capability, actual source owner, writable state, current implementation, advertised support, missing mechanism, risk severity, positive/negative A tests, external B behavior, dependent host, recovery, rollback, cost and adoption friction.
+Reconstruct the exact tagged v1.2, current main, registered campaign and runtime state and each advertised module: installation/adoption, profile selection, Product State, Goal/charter/Plan, actor/lease, campaign DAG and next-action, I4 handoff, review, currentness/invalidation, journal/DB/GC, CLI, optional host ports and packaging. Produce a single capability-to-owner-to-interface-to-consumer-to-falsifier matrix with observed current implementation and support category.
 
-Create external QA applications, pinned and runnable without an agent: disposable Python HTTP CRUD with persistence and restart, preexisting Spring Boot+PostgreSQL API with migration/transaction constraints, and a preexisting JS/TS web+API app with independent build and end-user behavior. Include one clean installation, one existing/governed installation, one late change and one seeded bug. These ecosystems are benchmark fixtures, not dependencies of the open-source installer.
+QA independently prepares pinned disposable fresh and existing repositories, controlled file/DB state, adversarial inputs, expected source/currentness effects and protected surfaces. A small program or HTTP service may provide realistic tool output, but its AI-generated feature quality is NOT a milestone prerequisite. Baselines distinguish observed real host behavior, deterministic simulated lifecycle tests, unavailable host capability and model-dependent task outcomes. No benchmark depends on maintainer private repositories.
 
-For each real task QA pre-commits initial Git SHA, human requirements, external acceptance oracle (FAIL_TO_PASS plus PASS_TO_PASS), security/privacy scope, allowed commands and budget. The agent cannot read/modify withheld tests. Record supported host/model/build/platform versions and exact baseline; if tagged v1.2 cannot run a native agent, compare it honestly with its portable/manual or a matched single-agent reference rather than invent native baseline performance.
-
-M0 PASS: independently runnable external apps and oracles; current tag/main/source distinction; documented actual user first-run flow and support matrix; each critical capability traced to owner and QA. M0 FAIL: hidden oracle writable by builder; source based on remembered chat rather than physical Git; fixture cannot start independently.
+M0 PASS: independently runnable harness/fixtures and oracles for ArquitecturaRepo's own claims, verifiable v1.2/main/source distinction, documented first-use flow and exact capability/host support matrix. M0 FAIL: inaccessible/private-only fixtures, unverifiable source, circular evaluator ownership, or a test plan that confuses model coding competence with framework correctness.
 
 ## 5. M1 — Family A: systematic Python and contract tests
 
@@ -65,29 +63,27 @@ Real smoke sequence: user approves disposable workspace; supported host starts a
 
 M2 PASS: genuine host interaction and independently observed source mutation/test execution/restart on a supported environment, no write-envelope bypass, safe permission model and clean rollback. M2 FAIL: mock or JSON flags treated as a native host, uncontrolled model shell/effect permissions, duplicate effect on resume, blanket full-access needed for trivial operations.
 
-## 7. M3 — First complete software-engineering vertical slice
+## 7. M3 — Complete ArquitecturaRepo lifecycle vertical
 
-Owner I3; independent QA controls hidden app-level acceptance.
+Owner I3; independent QA controls framework-level acceptance and immutable expectations.
 
-Execute ONE Python CRUD/API task end-to-end from a pinned external repo: installation -> CLIENT requirements -> proportionate baseline/plan -> currentness and authenticated host -> actual code edits -> real interpreter/app startup and HTTP/DB tests -> bounded error feedback -> same-I3 fix -> independent source-bound reviewer -> hidden acceptance and PASS_TO_PASS regression -> restart/recovery -> exact PR/commit/diff -> user-readable result.
+Exercise ONE end-to-end installed ArquitecturaRepo workflow on a disposable repository: setup and project discovery -> CLIENT intent and technical baseline -> authority and capability-level charter -> persistent I3 tactical Plan and a chosen authorized action -> physical actor/currentness/lease check -> command delivery to a deterministic test adapter AND, separately where advertised, verified native HostPort -> truthful execution/effect receipt and state readback -> injected tool/reviewer failure -> same-campaign diagnosis and in-envelope correction -> independent source-bound review -> post-review invalidation where relevant -> interruption/resume -> current terminal or honest HOLD/report. Observe exact state, events, files, Git identity, permissions and recovery, not agent-written summaries.
 
-Require one deliberate failing test or build error to exercise causal debugging; I3 must not turn this into microcharters or a fixed three-retry ritual. Require at least one interruption after a mutable state change; verify that no stale or duplicate authority/effect is replayed. Verify actual HTTP response and persistent DB content after server restart, not merely tests written by agent.
+A model may attempt an actual tiny code modification to exercise the native seam, but successful application implementation, hidden app acceptance and app quality are NOT required to prove framework lifecycle semantics. A host invocation is not required for a portable-only configuration that explicitly does not advertise agent execution. For any host claim, real authorized physical host readback is mandatory.
 
-M3 PASS: externally runnable working feature passes QA's prior hidden oracle, preserves old functions and user files, corrected failure stays within the same campaign, review corresponds to final source, state and artifacts recover, cost/privacy/permissions are recorded. M3 FAIL: app never starts, hidden tests edited by worker, fake HTTP mock as product output, reviewer validates stale SHA, success based on an agent-written summary.
+M3 PASS: all advertised framework transitions and effects follow the contract, retries and reviewer rework stay in the same charter, protected state survives, stale/duplicate actions are rejected, receipts match observed source and execution, and the end status is truthful. M3 FAIL: fictitious host operation, unlawful effect, stale lease accepted, missing effect/review lineage, uncontrolled replay, false PASS, broken recovery, or a fixture that never exercised the promised capability. A model's inability to solve a programming challenge is separately measured, not automatically a framework FAIL.
 
-This is the first true vertical v1.3 capability unlock. Do not introduce a central event bus or more organizational roles before it works.
+## 8. M4 — Portability, variability and longitudinal recovery
 
-## 8. M4 — Industrial variability and longitudinal recovery
+Broaden the framework-level M3 lifecycle across fresh and existing/governed installations, advertised supported OS/host combinations, different codebase layouts and realistic events: late CLIENT requirement, same-campaign bug return, missing capability, permitted parallel work under HOLD, DB WAL/migration, overlapping writers, lost receipts, source changes after review freeze, untrusted tool text, permission denial and resource exhaustion. Distinct programming-language repositories can detect adoption and path-assumption defects, but the model is not required to implement a feature correctly in each language.
 
-Broaden only from a successful M3 to the other independent app contexts: Java/Spring+PostgreSQL with actual migration/compatibility, TS frontend+API with cross-file behavior and build, and a preexisting governed repository where an installation must not create a duplicate Product State/owner. Exercise meaningful variations: late user requirement, different supported host mode, crash after code edit, DB WAL/migration, two overlapping writers, lost receipt, source changing after reviewer freeze, bad permission, untrusted model/tool text and exhausted resources. Use a risk-based subset per task and publish an accurate support matrix; never silently advertise every configuration.
+Longitudinal trials must span independent processes/sessions with exact candidate SHA, canonical state and transaction readback. Measure lost authority/effects, false acceptance, needless client relays, planner churn, recovery, installation friction, disk resources and supported-scope honesty. Record model outcomes separately.
 
-Longitudinal run must extend through distinct processes/sessions, preserving exact candidate SHA and transaction readback. Compare setup effort, accepted features, escaped defects, repeated causal failure class, latency/cost/tokens when measurable, user interventions, review churn, accidental worktrees, disk cost and cleanup, rollback and recoverability. Preserve failure trajectories, not curated screenshots.
-
-M4 PASS: meaningful generality across declared supported app/host/OS combinations, independent working software, no unapproved mutations, repeatable crash/upgrade/recovery and observable supported-scope limits. M4 FAIL: only one toy app, recompiled mocks, hidden benchmark contamination or use of maintainer private projects as user prerequisites.
+M4 PASS: framework behavior generalizes across the actually advertised combinations, adopts existing state without duplicate owners, avoids unapproved changes, reliably recovers and accurately reports unsupported branches. M4 FAIL: hidden dependence on private repos, unrecoverable accepted state, false host claims, replayed effects or hard-coded environmental assumptions.
 
 ## 9. M5 — Conditional admission of research-inspired patterns
 
-I2/CLIENT strategic decisions informed by I3 experiments and independent QA. Every new mechanism must compete against a simpler v1.2/M3/M4 reference with matched task, model version, host, budget, permissions, sample distribution and oracle.
+I2/CLIENT strategic decisions informed by I3 experiments and independent QA. Every new framework mechanism must compete against a simpler v1.2/M3/M4 reference with matched framework task, host, permissions, version, budget and state oracle; hold model conditions comparable where relevant, but evaluate framework-controlled behavior separately from external model programming quality.
 
 Potential candidates in priority order:
 - Typed commands, source-bound scoped context and useful role interfaces, rather than strict prompt-only permissions or giant chat histories.
@@ -106,7 +102,7 @@ M5 PASS: only causally useful mechanisms are included; SOLO remains efficient; n
 One exact committed release candidate. No averaging thousands of A tests with a failed B scenario.
 
 GATE A: all relevant Python/component/contract/schema/source/transaction properties and regression, selected mutation quality and fault injection pass; supported Windows/Linux portability and 1.2 backward compatibility documented.
-GATE B: on a declared actually supported host, unrelated developer repo and independent oracle, real feature request -> agent-coded diff -> executable app -> test/fix -> review -> resume -> acceptance, with all failures reported and reproducible source identity.
+GATE B: independently installed ArquitecturaRepo, on a disposable fresh/existing repository, correctly performs the full advertised Goal/charter/Plan/actor/lease/campaign/dispatch/receipt/rework/review/currentness/resume/reporting lifecycle. For declared native-host capabilities, the actual host performs an authorized bounded operation with physical effect/readback. The model's task-solving quality and resulting app correctness are reported separately, not acceptance gates for ArquitecturaRepo.
 GATE C: unauthorized protected writes, secret exfiltration, unsafe GC, forged approvals, false independent review or duplicate remote side effects fail closed. Risk-reviewed exceptions are clearly unsupported, never silently accepted.
 GATE D: actor/lease/Goal/currentness owner graph, durable WAL/journal/recovery, I3/I4 feedback lineage and post-review invalidation are real and independently verified for the enabled capabilities.
 GATE E: ordinary adopter workflow is understandable, proportionate in CPU/RAM/disk/model cost, privacy conscious, incremental upgrade/removal safe, no compulsory proprietary controller or maintainer QA application.
@@ -138,8 +134,8 @@ Evidence per capability: ID, owner, source SHA, requirement/oracle ref, A and B 
 
 ## 13. First authorized charter and full route ownership
 
-After CLIENT/I2 design approval, the first connected charter can cover M0-M3 as a true capability-level slice, with architecture interfaces and independent A+B release candidate. I3 is given latitude to use real projects, select supported host interfaces, repair tests, refactor safely, and iterate until M3 has a real terminal. Another charter is justified only for a genuinely material authority boundary, a different host permission model, or measured optional async/multiagent scope—not every internal code repair.
+After CLIENT/I2 design approval, the first connected charter can cover M0-M3 as a capability-level framework slice, with architecture interfaces and independent A+B framework evidence. I3 may use disposable real-world repositories, select supported host interfaces, repair tests, refactor safely, and iterate until M3 has a genuine framework lifecycle terminal. Another charter is justified only for a genuinely material authority boundary, a different host permission model, or measured optional async/multiagent scope—not every internal code repair.
 
-The first real engineering handoff is therefore: reconstruct v1.2/main exact source, run independent QA fixture baseline, implement one supported HostPort+ToolPort with permissions and real readback, and deliver one independently accepted CRUD feature in the same persistent I3 campaign. M4/M5/M6 follow evidence, not speculative additional infrastructure.
+The engineering handoff is therefore: reconstruct exact source/campaign authority, run an independent framework fixture baseline, implement and test actual advertised lifecycle consumers and a supported optional HostPort+ToolPort with permissions and readback, then demonstrate one independently accepted full ArquitecturaRepo lifecycle in the same persistent I3 campaign. M4/M5/M6 follow framework evidence, not external app feature success or speculative extra infrastructure.
 
 **This document is a complete engineering route, not proof of implementation or authorization of external services.** It never retags or reopens the historical 1.2 line.
