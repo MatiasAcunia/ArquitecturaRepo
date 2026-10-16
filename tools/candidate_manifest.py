@@ -16,7 +16,7 @@ from state_tx import sha256_file
 
 SCHEMA = "agentic-candidate-source-manifest-v1"
 ALGORITHM = "sha256(path-nul-bytes-nul-file-sha256-newline)"
-EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv", "venv", "node_modules"}
+EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".hypothesis", ".mypy_cache", ".ruff_cache", ".venv", "venv", "node_modules"}
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -48,16 +48,29 @@ def canonical_tree_digest(entries: list[dict[str, Any]]) -> str:
     return digest.hexdigest()
 
 
-def build_manifest(root: Path) -> dict[str, Any]:
+def build_manifest(root: Path, *, exclude_paths: tuple[str, ...] = ()) -> dict[str, Any]:
     root = root.resolve()
     if not root.is_dir():
         raise ManifestError(f"candidate root is not a directory: {root}")
+    for excluded in exclude_paths:
+        if (not isinstance(excluded, str) or not excluded or "\\" in excluded
+            or Path(excluded).is_absolute()
+            or any(part in {"", ".", ".."} for part in excluded.split("/"))):
+            raise ManifestError(f"unsafe excluded path: {excluded!r}")
+    excluded_paths = tuple(exclude_paths)
+
+    def excluded(relative: str) -> bool:
+        return any(relative == item or relative.startswith(item + "/") for item in excluded_paths)
+
     entries: list[dict[str, Any]] = []
     for current, directories, files in os.walk(root, topdown=True, followlinks=False):
         current_path = Path(current)
         kept: list[str] = []
         for name in sorted(directories):
             directory = current_path / name
+            relative_directory = directory.relative_to(root).as_posix()
+            if excluded(relative_directory):
+                continue
             if name.casefold() in EXCLUDED_DIRS:
                 continue
             if directory.is_symlink():
@@ -67,6 +80,8 @@ def build_manifest(root: Path) -> dict[str, Any]:
         for name in sorted(files):
             path = current_path / name
             relative = path.relative_to(root).as_posix()
+            if excluded(relative):
+                continue
             if relative.casefold() == ".git":
                 # Worktrees store a location-specific gitdir pointer as a file;
                 # it is checkout metadata, not candidate source.

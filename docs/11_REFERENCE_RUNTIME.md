@@ -199,10 +199,11 @@ If the project uses identity/execution-authority surfaces:
 ```bash
 python tools/campaignctl.py --control-root "../my-project/.agentic-sdlc" authority-acquire \
   --actor CAMPAIGN_LEAD_001 \
-  --run RUN_I3_001
+  --run RUN_I3_001 \
+  --lease-minutes 120
 ```
 
-The actor must exist, be ACTIVE, be an I3 Campaign Lead and bind the same run.
+The actor must exist, be ACTIVE, be an I3 Campaign Lead and bind the same run. Acquisition writes a finite UTC lease (1–120 minutes); expired, missing or timezone-naive ACTIVE leases must be released before reacquisition.
 
 Release:
 
@@ -213,6 +214,27 @@ python tools/campaignctl.py --control-root "../my-project/.agentic-sdlc" authori
 ```
 
 When an execution-authority surface exists but is not ACTIVE, mutation commands fail closed.
+
+## Optional host dispatch
+
+The host seam is opt-in. Probe the installed Codex CLI without starting an agent turn:
+
+```bash
+python tools/campaignctl.py --control-root "../my-project/.agentic-sdlc" host-probe
+```
+
+The dispatcher requires an ACTIVE campaign, matching current Product State and charter, the current I3 actor/run lease, an ACTIVE work unit, an exact source-tree digest, and a write-scope intersection. A concrete host must also report observed effective write roots equal to the command roots, a bound write-enforcement witness, and a bound per-command cost-cap witness. The dispatcher snapshots all workspace files before and after the turn; any changed path outside the command scope is recorded as `UNKNOWN`, since post-hoc detection cannot undo or prevent the effect.
+
+The `campaignctl host-dispatch` route checks the existing Goal Guard before dispatch. The local Goal Guard remains `HOLD` because no authenticated native invocation permit is connected. The dispatcher also requires an explicit trusted capability verifier; HostPort-supplied booleans and hash-shaped strings alone are not evidence. The CLI has no registered verifier and is wired only to the advisory Codex adapter, so it cannot start a model turn. It does not load a custom HostPort plugin. Do not label a custom/test HostPort as `HOST_VERIFIED` without independently verified OS enforcement and provider-side cost limiting.
+
+For a compatible verified HostPort, `host-dispatch` accepts an `EngineeringCommand` JSON file with the exact fields `campaign_id`, `actor_id`, `run_id`, `work_unit_id`, `source_tree_sha256`, `runtime_revision`, `allowed_write_surfaces` (array), `idempotency_key`, `max_cost_usd`, and `prompt`:
+
+```bash
+python tools/campaignctl.py --control-root "../my-project/.agentic-sdlc" host-dispatch \
+  --workspace "../my-project" --command "../my-project/.agentic-sdlc/commands/engineering-command.json"
+```
+
+Before a host call, the dispatcher persists a dispatch receipt in the campaign-hash namespace under `campaigns/_host_dispatch_receipts/`. This receipt supports recovery if the mutable current runtime is replaced during a turn. Completion reconciliation prefers a durable terminal receipt over synthesizing an ambiguous result; archived idempotency keys remain consumed even if event history is reset. After interruption, `host-recover --dispatch-id <dispatch-id>` marks an unresolved turn `UNKNOWN` without replay. A known archived result is reconciled into the same campaign runtime when it is still current; receipts for a replaced campaign remain isolated from the replacement runtime.
 
 ## Review freeze
 

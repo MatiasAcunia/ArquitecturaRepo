@@ -247,7 +247,7 @@ def main() -> int:
             raise AssertionError("runtime-enabled scaffold did not record runtime_enabled=true")
         for item in ("goal_guard.py", "goal_plan.py", "cognitive_i4.py",
                      "cognitive_ledger.py", "external_effects.py", "fenced_mutator.py",
-                     "evidence_decision.py"):
+                     "evidence_decision.py", "host_dispatch.py", "tool_port.py", "candidate_manifest.py"):
             if not (runtime_control / "tools" / item).is_file():
                 raise AssertionError("v1.2 optional runtime tool missing: " + item)
         for item in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
@@ -256,6 +256,14 @@ def main() -> int:
                 raise AssertionError("v1.2 opt-in runtime template missing: " + item)
         if not (runtime_control / "tools" / "campaignctl.py").exists():
             raise AssertionError("runtime-enabled scaffold missing campaignctl.py")
+        tool_help = run(str(runtime_control / "tools" / "campaignctl.py"), "tool-dispatch", "--help")
+        if tool_help.returncode != 0 or "JSON ToolCommand file" not in tool_help.stdout:
+            raise AssertionError("installed campaignctl does not expose the portable ToolPort consumer\n"
+                + tool_help.stdout + "\n" + tool_help.stderr)
+        host_help = run(str(runtime_control / "tools" / "campaignctl.py"), "host-dispatch", "--help")
+        if host_help.returncode != 0 or "JSON EngineeringCommand file" not in host_help.stdout:
+            raise AssertionError("installed campaignctl does not expose the optional HostPort consumer\n"
+                + host_help.stdout + "\n" + host_help.stderr)
         copied_validation = run(
             str(runtime_control / "tools" / "validate_project.py"),
             "--root",

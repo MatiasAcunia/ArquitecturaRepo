@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install validation dependency
-        run: python -m pip install --disable-pip-version-check "jsonschema>=4.23,<5"
+        run: python -m pip install --disable-pip-version-check -r requirements-validation.txt
       - name: Validate repository structure
         run: python tools/validate_structure.py
       - name: Validate starter manifest contract
@@ -92,6 +92,16 @@ jobs:
         run: python tools/selftest_v12_install_staging.py
       - name: Check v1.2 candidate evidence without claiming physical host acceptance
         run: python tools/verify_v12_candidate.py
+      - name: Property-test host scope and path conflict boundaries
+        run: python tools/selftest_v13_properties.py
+      - name: Rank I3 actions by open dependency critical path
+        run: python tools/selftest_campaign_planning.py
+      - name: Exercise source-bound host dispatch and recovery holds
+        run: python tools/selftest_host_dispatch.py
+      - name: Exercise portable ToolPort dispatch and recovery
+        run: python tools/selftest_tool_port.py
+      - name: Reject stale independent review evidence and invalid campaign actors
+        run: python tools/selftest_v13_control_plane_closeout.py
 
   windows-compatibility-smoke:
     name: Windows portable-core smoke (not Codex Desktop acceptance)
@@ -109,7 +119,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install portable core validation dependencies
-        run: python -m pip install --disable-pip-version-check "jsonschema>=4.23,<5"
+        run: python -m pip install --disable-pip-version-check -r requirements-validation.txt
       - name: Scaffold all profiles on Windows filesystem
         run: python tools/selftest_scaffold.py
       - name: Recover and reject tampered journals on Windows
@@ -118,6 +128,16 @@ jobs:
         run: python tools/selftest_v12_install_staging.py
       - name: Verify local operating modes and frozen theory
         run: python tools/selftest_v12_setup.py
+      - name: Property-test host scope and path conflict boundaries
+        run: python tools/selftest_v13_properties.py
+      - name: Rank I3 actions by open dependency critical path
+        run: python tools/selftest_campaign_planning.py
+      - name: Exercise source-bound host dispatch and recovery holds
+        run: python tools/selftest_host_dispatch.py
+      - name: Exercise portable ToolPort dispatch and recovery
+        run: python tools/selftest_tool_port.py
+      - name: Reject stale independent review evidence and invalid campaign actors
+        run: python tools/selftest_v13_control_plane_closeout.py
       - name: Verify cross-process plan and external-effect restart
         run: python tools/selftest_v12_longitudinal.py
       - name: Verify SQLite WAL logical currentness under Windows file locks

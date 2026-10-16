@@ -241,7 +241,7 @@ See `docs/10_EXECUTABLE_VALIDATION.md`.
 
 ## Optional reference runtime
 
-`tools/campaignctl.py` is a durable local Campaign Lead control-plane reference. It supports tactical DAG mutation, dependency-aware work, execution authority, checkpoints, exact review freeze, strategic terminals, exclusive mutation locking and fail-closed multi-file recovery.
+`tools/campaignctl.py` is a durable local Campaign Lead control-plane reference. It supports tactical DAG mutation, dependency-aware work, finite execution-authority leases, checkpoints, exact review freeze, strategic terminals, exclusive mutation locking, fail-closed multi-file recovery and an optional source-bound host-dispatch seam. Host capability claims require an explicit trusted verifier; the current Codex CLI adapter has none and reports no enforceable OS write boundary or per-command cost cap, so it refuses agent execution.
 
 Critical currentness transitions are staged and journaled before canonical files are replaced. A crash leaves `runtime/transactions/CURRENT_TRANSACTION.json`; normal inspection/mutation fails closed until explicit `campaignctl recover` succeeds. External hash conflicts are preserved as `CONFLICT` rather than overwritten.
 

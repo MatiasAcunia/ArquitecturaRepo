@@ -15,5 +15,6 @@
   "protected_surfaces": [
     "CLIENT requirements"
   ],
-  "expires_at": null
+  "expires_at": "2030-02-01T14:00:00Z",
+  "lease_duration_minutes": 120
 }

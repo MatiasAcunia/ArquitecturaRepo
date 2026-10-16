@@ -79,6 +79,8 @@ REQUIRED_PATHS = [
     "tools/scaffold_project.py",
     "tools/selftest_scaffold.py",
     "tools/campaignctl.py",
+    "tools/tool_port.py",
+    "tools/selftest_tool_port.py",
     "tools/selftest_runtime.py",
     "tools/migrate_state.py",
     "tools/selftest_migrations.py",

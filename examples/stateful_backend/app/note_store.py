@@ -185,17 +185,21 @@ class NoteStore:
     def get_note(self, note_id: int) -> Note | None:
         if type(note_id) is not int or note_id < 1:
             raise ValueError("note_id must be a positive integer")
-        with self._connect() as connection:
+        connection = self._connect()
+        try:
             row = connection.execute(
                 "SELECT note_id, body, created_at_utc FROM notes WHERE note_id = ?",
                 (note_id,),
             ).fetchone()
+        finally:
+            connection.close()
         if row is None:
             return None
         return Note(note_id=int(row[0]), body=str(row[1]), created_at_utc=str(row[2]))
 
     def stats(self) -> dict[str, int]:
-        with self._connect() as connection:
+        connection = self._connect()
+        try:
             note_count = int(connection.execute("SELECT COUNT(*) FROM notes").fetchone()[0])
             request_count = int(
                 connection.execute("SELECT COUNT(*) FROM idempotency_requests").fetchone()[0]
@@ -205,6 +209,8 @@ class NoteStore:
                     "SELECT schema_version FROM schema_meta WHERE singleton = 1"
                 ).fetchone()[0]
             )
+        finally:
+            connection.close()
         return {
             "schema_version": schema_version,
             "notes": note_count,
