@@ -41,3 +41,5 @@ Six superseded v1.2 internal documents were moved into a separately held private
 The generic installer should carry only the selected public runtime, schemas, profiles, needed protocols, prompts and templates. It must not package maintainer test logs, private identity maps, private project names, raw controller ZIPs, user environments, agent conversations, evaluator secrets or old private handoffs. Optional integrations declare explicitly what they support and what evidence is synthetic versus physical. Independently verify actual release bytes before publication.
 
 This index is navigation, not a second Product State, campaign charter or independent release authority.
+
+- [Outcome-first execution and bounded work orders](44_OUTCOME_FIRST_AGENT_EXECUTION.md) — source-pinned operator instructions, physical progress receipts, stop budgets and closure boundaries.

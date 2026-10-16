@@ -102,6 +102,8 @@ jobs:
         run: python tools/selftest_host_dispatch.py
       - name: Exercise portable ToolPort dispatch and recovery
         run: python tools/selftest_tool_port.py
+      - name: Reject unbounded and vague I3 work orders
+        run: python tools/selftest_work_order_guard.py
       - name: Reject stale independent review evidence and invalid campaign actors
         run: python tools/selftest_v13_control_plane_closeout.py
       - name: Independent installed portable framework lifecycle
@@ -144,6 +146,8 @@ jobs:
         run: python tools/selftest_host_dispatch.py
       - name: Exercise portable ToolPort dispatch and recovery
         run: python tools/selftest_tool_port.py
+      - name: Reject unbounded and vague I3 work orders
+        run: python tools/selftest_work_order_guard.py
       - name: Reject stale independent review evidence and invalid campaign actors
         run: python tools/selftest_v13_control_plane_closeout.py
       - name: Independent installed portable framework lifecycle on Windows

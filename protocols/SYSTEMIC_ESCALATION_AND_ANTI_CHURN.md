@@ -69,3 +69,7 @@ A new permanent mechanism must identify:
 - rollback/supersession path.
 
 Otherwise absorb the correction into an existing owner.
+
+## Zero-delivery override
+
+Repeated elapsed runtime with no user-visible physical deliverable is a systemic execution defect even if checkpoint/test activity increases. I1/I2 must reconcile the exact original acceptance scope, disallow unrequired evaluators, force a bounded deterministic batch method where possible and separate collection delivery from downstream publication/rights. Repeated invocation of the same failed method is not progress.

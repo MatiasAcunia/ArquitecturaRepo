@@ -1,0 +1,29 @@
+{
+  "schema": "agentic-execution-work-order-v1",
+  "work_order_id": "EXAMPLE-BULK-ASSETS-001",
+  "campaign_id": "SAME-CAMPAIGN-OWNER",
+  "planner_actor": "REGISTERED-I2-ACTOR",
+  "executor_actor": "REGISTERED-I3-ACTOR",
+  "goal_outcome": "Deliver a physically verified bulk collection of 300 background videos and 120 music files, independently acknowledged by CLIENT",
+  "source_revision": "PINNED-CURRENT-REVISION",
+  "deliverable": {
+    "identity": "420-file selected bulk collection, NOT production licensing/GOOD state",
+    "acceptance_owner": "CLIENT",
+    "acceptance_evidence": "evidence/bulk-client-acceptance.json",
+    "required_outputs": [
+      {"path": "artifacts/collection-index.csv", "proof": "sha256_manifest"},
+      {"path": "artifacts/collection-root", "proof": "exists"}
+    ]
+  },
+  "progress_metric": {"name": "manifest_verified_and_delivered_files", "baseline": 0, "target": 420},
+  "budget": {"max_minutes": 90, "max_paid_calls": 0, "max_no_progress_cycles": 2},
+  "steps": [
+    {"id": "inventory", "operation": "Read the existing 420-item catalog before downloading; reuse physically existing files.", "tool_route": "local filesystem and hash manifest", "physical_output": "one sorted source/identity index", "verification": "unique source identity and SHA-256 match, no copied duplicates", "failure_route": "bounded missing-file list; no new archive scan", "max_attempts": 2, "max_minutes": 15},
+    {"id": "recover", "operation": "Only for missing or invalid items: download source by existing canonical URL in batches.", "tool_route": "yt-dlp with bounded ffprobe profile", "physical_output": "recovered files and manifest updates", "verification": "file exists, decodable media metadata, SHA-256 recorded", "failure_route": "mark only affected source IDs unavailable, never block entire verified set", "max_attempts": 2, "max_minutes": 35},
+    {"id": "deliver", "operation": "Emit one collection manifest and acceptance-ready receipt; do not run per-item paid multimodal model grading.", "tool_route": "local Python and manifests", "physical_output": "420-file collection and machine-verifiable receipt", "verification": "all present, hashes verified, acceptance verified independently", "failure_route": "report exact missing IDs and leave unaffected files delivered", "max_attempts": 2, "max_minutes": 20}
+  ],
+  "authorized_completion_scope": ["collection_selection_and_delivery"],
+  "nonblocking_advisory_gates": ["provider_aesthetic_scores", "G007_selector_currentness_for_other_operations", "non-required_per-item_engine_GOOD"],
+  "forbidden_work": ["repeat all-file downloads when hashes match", "require individual paid-model judgments for bulk collection", "retry exhausted provider quota", "claim publishing rights from CLIENT quality approval"],
+  "exit_when_blocked": "Stop at the first bounded nonrecoverable missing-source set; preserve delivered files and produce exact unresolved IDs. A rights uncertainty may block public reuse, not delivery of the locally accepted collection."
+}
