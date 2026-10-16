@@ -90,3 +90,51 @@ jobs:
             exit 0
           fi
           gh release create "$tag" --repo "$GH_REPO" --target "$EXPECTED_SHA" --title "ArquitecturaRepo v1.3.0" --notes-file docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md --verify-tag=false
+
+      - name: Retire superseded branches only after exact v1.3.0 release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ inputs.exact_commit_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin refs/tags/v1.3.0 | cut -f1)" = "$EXPECTED_SHA"
+          gh release view "v1.3.0" --repo "$GH_REPO" >/dev/null
+
+          # Scope deletion to the three explicitly retired branch names.
+          # Fail closed if someone created a different branch while the
+          # release was being reviewed.
+          mapfile -t branches < <(gh api --paginate "repos/$GH_REPO/branches?per_page=100" --jq '.[].name')
+          for branch in "${branches[@]}"; do
+            case "$branch" in
+              main|feat/agent-continuity-bridge-offline-021|feature/project-baseline-1-1|integration/codex-daily-control-202-readonly-preflight) ;;
+              *) echo "Unexpected branch $branch; branch retirement held"; exit 1 ;;
+            esac
+          done
+
+          # Record exact historic branch tips as a tiny immutable release
+          # artifact before retiring refs. This is evidence, not another
+          # branch or a duplicate source checkout.
+          tips="$RUNNER_TEMP/v1.3.0-retired-branch-refs.txt"
+          printf 'Released v1.3.0 at %s\n' "$EXPECTED_SHA" > "$tips"
+          for branch in "${branches[@]}"; do
+            [ "$branch" = "main" ] && continue
+            tip="$(gh api "repos/$GH_REPO/git/ref/heads/$branch" --jq .object.sha)"
+            printf '%s %s\n' "$tip" "$branch" >> "$tips"
+          done
+          gh release upload "v1.3.0" "$tips" --repo "$GH_REPO" --clobber
+
+          for branch in "${branches[@]}"; do
+            [ "$branch" = "main" ] && continue
+            gh api -X DELETE "repos/$GH_REPO/git/refs/heads/$branch" >/dev/null
+            echo "Retired $branch"
+          done
+
+          mapfile -t remaining < <(gh api --paginate "repos/$GH_REPO/branches?per_page=100" --jq '.[].name')
+          test "${#remaining[@]}" -eq 1 && test "${remaining[0]}" = "main" || {
+            printf 'Branch cleanup incomplete: %s\n' "${remaining[*]}"
+            exit 1
+          }
+          echo "Branch retirement passed: only main remains"
