@@ -35,6 +35,10 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or use the reviewed migration/adoption path when a governed control layer already exists.
 
+## v1.3.0 — candidate portable framework (not yet published)
+
+v1.3 strengthens the portable Goal/Plan/campaign lifecycle, physically revalidates frozen independent review evidence, binds controlled work-unit starts to the active actor/run/lease, and refuses shadow Product State creation in already governed projects. A deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **An untagged branch is only a candidate:** published v1.3.0 is identified by a separately authorized tag on the exact accepted commit. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Release notes, supported scope and upgrade/rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
+
 ## v1.2.0 — released portable features
 
 Release v1.2.0 extends the reusable software-development starter with Goal/Plan integrity diagnostics, crash-aware artifact inventory and cleanup, SQLite WAL currentness, recovery controls and optional adapters. It can be installed in a new or existing project using the documented profile and adoption workflow. Project-specific tests, maintainer acceptance scenarios and third-party host controllers are **not required to install or use the portable core**. Optional host integrations must be configured by each adopter.
@@ -241,7 +245,7 @@ See `docs/10_EXECUTABLE_VALIDATION.md`.
 
 ## Optional reference runtime
 
-`tools/campaignctl.py` is a durable local Campaign Lead control-plane reference. It supports tactical DAG mutation, dependency-aware work, execution authority, checkpoints, exact review freeze, strategic terminals, exclusive mutation locking and fail-closed multi-file recovery.
+`tools/campaignctl.py` is a durable local Campaign Lead control-plane reference. It supports tactical DAG mutation, dependency-aware work, finite execution-authority leases, checkpoints, exact review freeze, strategic terminals, exclusive mutation locking, fail-closed multi-file recovery and an optional source-bound host-dispatch seam. Host capability claims require an explicit trusted verifier; the current Codex CLI adapter has none and reports no enforceable OS write boundary or per-command cost cap, so it refuses agent execution.
 
 Critical currentness transitions are staged and journaled before canonical files are replaced. A crash leaves `runtime/transactions/CURRENT_TRANSACTION.json`; normal inspection/mutation fails closed until explicit `campaignctl recover` succeeds. External hash conflicts are preserved as `CONFLICT` rather than overwritten.
 

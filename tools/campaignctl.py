@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -100,9 +100,9 @@ def resolve(control: Path, value: str) -> Path:
 
 def relative_to_control(control: Path, path: Path) -> str:
     try:
-        return str(path.resolve().relative_to(control.resolve()))
-    except ValueError:
-        return str(path.resolve())
+        return path.resolve().relative_to(control.resolve()).as_posix()
+    except ValueError as exc:
+        raise CampaignError("canonical campaign reference must be inside the control root") from exc
 
 
 def evidence_file(control: Path, value: str) -> Path:
@@ -202,6 +202,43 @@ def recompute_ready(state: dict[str, Any]) -> None:
                 changed = True
 
 
+def rank_ready_work_units(state: dict[str, Any]) -> list[tuple[dict[str, Any], int]]:
+    """Rank ready units by the longest still-open dependency path, then priority.
+
+    This is an advisory next-action projection over the canonical campaign
+    runtime. It does not mutate the tactical plan or grant execution authority.
+    """
+    units = work_map(state)
+    terminal = TERMINAL_WORK_STATUSES
+    dependents: dict[str, list[str]] = {unit_id: [] for unit_id in units}
+    for unit_id, unit in units.items():
+        for dependency in unit["dependencies"]:
+            if dependency not in units:
+                raise CampaignError(f"{unit_id}: dependency does not exist: {dependency}")
+            dependents[dependency].append(unit_id)
+
+    memo: dict[str, int] = {}
+    visiting: set[str] = set()
+
+    def remaining_path(unit_id: str) -> int:
+        if unit_id in terminal or units[unit_id]["status"] in terminal:
+            return 0
+        if unit_id in memo:
+            return memo[unit_id]
+        if unit_id in visiting:
+            raise CampaignError(f"dependency cycle detected at {unit_id}")
+        visiting.add(unit_id)
+        children = [child for child in dependents[unit_id] if units[child]["status"] not in terminal]
+        score = 1 + max((remaining_path(child) for child in children), default=0)
+        visiting.remove(unit_id)
+        memo[unit_id] = score
+        return score
+
+    ready = [unit for unit in state["work_units"] if unit["status"] == "READY"]
+    ranked = [(unit, remaining_path(unit["id"])) for unit in ready]
+    return sorted(ranked, key=lambda item: (-item[1], -item[0]["priority"], item[0]["id"]))
+
+
 def assert_acyclic(state: dict[str, Any]) -> None:
     units = work_map(state)
     visiting: set[str] = set()
@@ -234,22 +271,48 @@ def pathish_conflict(a: str, b: str) -> bool:
     return False
 
 
-def assert_no_active_conflict(state: dict[str, Any], candidate: dict[str, Any]) -> None:
+def active_conflicts(state: dict[str, Any], candidate: dict[str, Any]) -> list[dict[str, Any]]:
+    """Describe active work that currently prevents a candidate from starting."""
+    conflicts: list[dict[str, Any]] = []
     for unit in state["work_units"]:
         if unit["id"] == candidate["id"] or unit["status"] != "ACTIVE":
             continue
         shared = set(unit["shared_resources"]) & set(candidate["shared_resources"])
         if shared:
-            raise CampaignError(
-                f"{candidate['id']}: shared-resource conflict with {unit['id']}: {sorted(shared)}"
-            )
+            conflicts.append({"work_unit_id": unit["id"], "kind": "shared_resource",
+                              "surfaces": sorted(shared)})
+        write_conflicts: set[str] = set()
         for left in unit["allowed_write_surfaces"]:
             for right in candidate["allowed_write_surfaces"]:
                 if pathish_conflict(left, right):
-                    raise CampaignError(
-                        f"{candidate['id']}: write-surface conflict with {unit['id']}: "
-                        f"{right!r} vs {left!r}"
-                    )
+                    write_conflicts.add(right)
+        if write_conflicts:
+            conflicts.append({"work_unit_id": unit["id"], "kind": "write_surface",
+                              "surfaces": sorted(write_conflicts)})
+    return conflicts
+
+
+def assert_no_active_conflict(state: dict[str, Any], candidate: dict[str, Any]) -> None:
+    conflicts = active_conflicts(state, candidate)
+    if not conflicts:
+        return
+    first = conflicts[0]
+    if first["kind"] == "shared_resource":
+        raise CampaignError(
+            f"{candidate['id']}: shared-resource conflict with {first['work_unit_id']}: "
+            f"{first['surfaces']}"
+        )
+    active = next(unit for unit in state["work_units"] if unit["id"] == first["work_unit_id"])
+    overlapping = [
+        (candidate_surface, active_surface)
+        for candidate_surface in first["surfaces"]
+        for active_surface in active["allowed_write_surfaces"]
+        if pathish_conflict(candidate_surface, active_surface)
+    ]
+    raise CampaignError(
+        f"{candidate['id']}: write-surface conflict with {first['work_unit_id']}: "
+        f"{[(left, right) for left, right in overlapping]}"
+    )
 
 
 def require_campaign_active(state: dict[str, Any]) -> None:
@@ -306,11 +369,20 @@ def require_product_state_matches_runtime(control: Path, state: dict[str, Any]) 
         )
 
 
-def require_authority_if_present(control: Path, state: dict[str, Any]) -> None:
+def require_authority_if_present(
+    control: Path, state: dict[str, Any], *, actor: str | None = None,
+    run: str | None = None,
+) -> None:
+    """Check the local authority owner, finite lease and registered current I3 run.
+
+    The control-plane CLI cannot authenticate an operating-system caller; the
+    actor/run supplied here are claims checked against the canonical registry.
+    This is not proof of native provider identity or a host execution permit.
+    """
     require_product_state_matches_runtime(control, state)
     path = authority_path(control)
     if not path.exists():
-        return
+        return  # Legacy portable campaigns without execution authority.
     authority = load_json(path)
     if authority.get("authority_status") != "ACTIVE":
         raise CampaignError(
@@ -321,6 +393,61 @@ def require_authority_if_present(control: Path, state: dict[str, Any]) -> None:
             f"execution authority campaign {authority.get('campaign_id')!r} "
             f"!= runtime campaign {state['campaign_id']!r}"
         )
+    expires = authority.get("expires_at")
+    try:
+        expiry = datetime.fromisoformat(expires.replace("Z", "+00:00"))
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise CampaignError("ACTIVE_AUTHORITY_LEASE_MISSING_OR_INVALID") from exc
+    if expiry.tzinfo is None or expiry.utcoffset() is None:
+        raise CampaignError("ACTIVE_AUTHORITY_LEASE_MISSING_OR_INVALID")
+    if expiry <= datetime.now(timezone.utc):
+        raise CampaignError("ACTIVE_AUTHORITY_LEASE_EXPIRED")
+    leader = authority.get("campaign_lead_actor_id")
+    live_run = authority.get("current_run_id")
+    if not isinstance(leader, str) or not leader or not isinstance(live_run, str) or not live_run:
+        raise CampaignError("ACTIVE_AUTHORITY_ACTOR_OR_RUN_MISSING")
+    if not identity_path(control).is_file():
+        raise CampaignError("ACTIVE_AUTHORITY_IDENTITY_REGISTRY_MISSING")
+    registry = load_json(identity_path(control))
+    lead = next((r for r in registry.get("actors", []) if isinstance(r, dict) and r.get("actor_id") == leader), None)
+    if not lead or lead.get("status") != "ACTIVE" or lead.get("current_run_id") != live_run or lead.get("role_class") != "I3_ENGINEERING_CAMPAIGN_LEAD":
+        raise CampaignError("ACTIVE_AUTHORITY_LEADER_IDENTITY_STALE")
+    if actor is not None or run is not None:
+        if actor != leader or run != live_run:
+            raise CampaignError("ACTIVE_AUTHORITY_ACTOR_RUN_MISMATCH")
+
+
+def require_work_unit_owner(control: Path, state: dict[str, Any], unit: dict[str, Any]) -> None:
+    """A work unit's recorded producer may not silently outlive the current I3 run.
+
+    Explicit I4 delegation requires a separately enforced charter/lease path;
+    self-written actor strings are not a delegated capability.
+    """
+    if authority_path(control).is_file() and unit.get("actor_id"):
+        require_authority_if_present(
+            control, state, actor=unit.get("actor_id"), run=unit.get("run_id")
+        )
+
+
+def require_current_review_evidence(control: Path, freeze: dict[str, Any]) -> None:
+    refs = freeze.get("evidence_refs")
+    bindings = freeze.get("evidence_bindings")
+    if not isinstance(refs, list) or not refs or not isinstance(bindings, list) or len(refs) != len(bindings):
+        raise CampaignError("REVIEW_EVIDENCE_BINDINGS_MISSING_OR_MISMATCHED")
+    if len(refs) != len(set(refs)):
+        raise CampaignError("REVIEW_EVIDENCE_DUPLICATE_REFS")
+    for ref, binding in zip(refs, bindings):
+        if not isinstance(ref, str) or not isinstance(binding, dict) or binding.get("ref") != ref:
+            raise CampaignError("REVIEW_EVIDENCE_BINDINGS_MISSING_OR_MISMATCHED")
+        expected = binding.get("sha256")
+        if not isinstance(expected, str) or len(expected) != 64:
+            raise CampaignError("REVIEW_EVIDENCE_BINDINGS_MISSING_OR_MISMATCHED")
+        try:
+            actual = sha256_file(evidence_file(control, ref))
+        except CampaignError as exc:
+            raise CampaignError(f"REVIEW_EVIDENCE_MISSING_OR_UNSAFE: {ref}") from exc
+        if actual != expected:
+            raise CampaignError(f"REVIEW_EVIDENCE_STALE: {ref}")
 
 
 def read_charter(control: Path, state: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
@@ -568,7 +695,7 @@ def cmd_start(args: argparse.Namespace) -> None:
     control = control_root(args)
     state = load_runtime(control)
     require_campaign_active(state)
-    require_authority_if_present(control, state)
+    require_authority_if_present(control, state, actor=args.actor, run=args.run)
     invalidate_freeze(state, "producer work resumed after review freeze")
     unit = find_unit(state, args.id)
     if unit["status"] != "READY":
@@ -597,6 +724,7 @@ def cmd_verify(args: argparse.Namespace) -> None:
     require_authority_if_present(control, state)
     invalidate_freeze(state, "producer verification changed after review freeze")
     unit = find_unit(state, args.id)
+    require_work_unit_owner(control, state, unit)
     if unit["status"] != "ACTIVE":
         raise CampaignError(f"{args.id}: expected ACTIVE, found {unit['status']}")
     unit["status"] = "VERIFY"
@@ -619,6 +747,7 @@ def cmd_done(args: argparse.Namespace) -> None:
     require_authority_if_present(control, state)
     invalidate_freeze(state, "producer completion changed after review freeze")
     unit = find_unit(state, args.id)
+    require_work_unit_owner(control, state, unit)
     if unit["status"] != "VERIFY":
         raise CampaignError(f"{args.id}: expected VERIFY, found {unit['status']}")
     unit["status"] = "DONE"
@@ -643,6 +772,7 @@ def cmd_fail(args: argparse.Namespace) -> None:
     require_authority_if_present(control, state)
     invalidate_freeze(state, "producer failure changed after review freeze")
     unit = find_unit(state, args.id)
+    require_work_unit_owner(control, state, unit)
     if unit["status"] not in {"ACTIVE", "VERIFY"}:
         raise CampaignError(f"{args.id}: cannot fail from {unit['status']}")
     unit["status"] = "FAILED"
@@ -953,6 +1083,19 @@ def cmd_terminal(args: argparse.Namespace) -> None:
             raise CampaignError("readiness terminal requires bound reviewer identity and run")
         if not freeze.get("evidence_refs"):
             raise CampaignError("readiness terminal requires independent review evidence refs")
+        # A PASS is not transferable: the same reviewed bytes must still exist.
+        require_current_review_evidence(control, freeze)
+        registry_path = identity_path(control)
+        if registry_path.is_file():
+            actors = {item.get("actor_id"): item for item in load_json(registry_path).get("actors", []) if isinstance(item, dict)}
+            reviewer = actors.get(freeze["reviewer_actor_id"])
+            if not reviewer or reviewer.get("status") != "ACTIVE" or reviewer.get("current_run_id") != freeze["reviewer_run_id"]:
+                raise CampaignError("REVIEWER_IDENTITY_OR_RUN_STALE_AT_TERMINAL")
+        _, charter = read_charter(control, state)
+        if charter.get("independent_review_required") is True and not registry_path.is_file():
+            raise CampaignError("INDEPENDENT_REVIEW_REGISTRY_MISSING_AT_TERMINAL")
+        if any(unit.get("actor_id") == freeze["reviewer_actor_id"] for unit in state["work_units"]):
+            raise CampaignError("REVIEWER_BECAME_PRODUCER_AFTER_REVIEW")
         unfinished = [
             u["id"] for u in state["work_units"] if u["status"] not in TERMINAL_WORK_STATUSES
         ]
@@ -990,6 +1133,9 @@ def cmd_terminal(args: argparse.Namespace) -> None:
 
 def cmd_authority_acquire(args: argparse.Namespace) -> None:
     control = control_root(args)
+    lease_minutes = args.lease_minutes
+    if type(lease_minutes) is not int or not 1 <= lease_minutes <= 120:
+        raise CampaignError("authority lease must be an integer from 1 to 120 minutes")
     state = load_runtime(control)
     require_product_state_matches_runtime(control, state)
     _, charter = read_charter(control, state)
@@ -1016,14 +1162,22 @@ def cmd_authority_acquire(args: argparse.Namespace) -> None:
                 and existing.get("campaign_lead_actor_id") == args.actor
                 and existing.get("current_run_id") == args.run
             ):
+                expires_at = existing.get("expires_at")
+                try:
+                    expiry = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
+                except (AttributeError, TypeError, ValueError):
+                    raise CampaignError("active execution authority has no valid finite lease; release before reacquiring")
+                if expiry.tzinfo is None or expiry.utcoffset() is None or expiry <= datetime.now(timezone.utc):
+                    raise CampaignError("active execution authority lease is expired or timezone-naive; release before reacquiring")
                 print("AUTHORITY ALREADY ACTIVE")
                 return
             raise CampaignError("another ACTIVE execution authority already exists")
 
+    acquired_at = datetime.now(timezone.utc)
     envelope = charter.get("resource_envelope", {})
     authority = {
         "schema_version": "execution-authority-0.1",
-        "updated_at": now(),
+        "updated_at": acquired_at.isoformat().replace("+00:00", "Z"),
         "authority_status": "ACTIVE",
         "campaign_id": state["campaign_id"],
         "campaign_lead_actor_id": args.actor,
@@ -1032,7 +1186,8 @@ def cmd_authority_acquire(args: argparse.Namespace) -> None:
         "checkpoint_ref": state.get("current_checkpoint_id"),
         "allowed_write_surfaces": list(envelope.get("allowed_write_surfaces", [])),
         "protected_surfaces": list(envelope.get("protected_surfaces", [])),
-        "expires_at": None,
+        "expires_at": (acquired_at + timedelta(minutes=lease_minutes)).isoformat().replace("+00:00", "Z"),
+        "lease_duration_minutes": lease_minutes,
     }
     event(
         state,
@@ -1079,6 +1234,87 @@ def cmd_authority_release(args: argparse.Namespace) -> None:
     print("AUTHORITY SUPERSEDED")
 
 
+def cmd_host_probe(args: argparse.Namespace) -> None:
+    from dataclasses import asdict
+    from host_dispatch import CodexCliHost
+
+    print(json.dumps(asdict(CodexCliHost().observe()), indent=2))
+
+
+def cmd_host_dispatch(args: argparse.Namespace) -> None:
+    from host_dispatch import CodexCliHost, DispatchHold, EngineeringCommand, prepare_dispatch
+    from goal_guard import assess as assess_goal_guard
+
+    goal_assessment = assess_goal_guard(control_root(args))
+    if goal_assessment.get("may_execute_material_goal") is not True:
+        print(json.dumps({"phase": "HOLD", "reason": "GOAL_GUARD_DENIED_OR_UNAVAILABLE",
+                          "goal_guard": goal_assessment}, sort_keys=True), file=sys.stderr)
+        raise CampaignError("Goal Guard did not issue a native material-execution permit")
+
+    command_path = Path(args.command)
+    if command_path.is_symlink() or not command_path.is_file() or command_path.stat().st_size > 64 * 1024:
+        raise CampaignError("host command must be a regular non-symlink JSON file under 64 KiB")
+    try:
+        payload = json.loads(command_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict) or set(payload) != set(EngineeringCommand.__dataclass_fields__):
+            raise CampaignError("host command JSON fields do not match EngineeringCommand")
+        if not isinstance(payload.get("allowed_write_surfaces"), list):
+            raise CampaignError("host command allowed_write_surfaces must be an array")
+        payload["allowed_write_surfaces"] = tuple(payload["allowed_write_surfaces"])
+        command = EngineeringCommand(**payload)
+        result = prepare_dispatch(control_root(args), Path(args.workspace), command, CodexCliHost())
+    except (OSError, ValueError, TypeError, json.JSONDecodeError, DispatchHold) as exc:
+        print(f"HOST DISPATCH HOLD: {exc}", file=sys.stderr)
+        raise CampaignError("host dispatch did not complete") from exc
+    print(json.dumps(result, indent=2))
+
+
+def cmd_host_recover(args: argparse.Namespace) -> None:
+    from host_dispatch import DispatchHold, recover_interrupted_dispatch
+
+    try:
+        result = recover_interrupted_dispatch(control_root(args), args.dispatch_id)
+    except DispatchHold as exc:
+        print(f"HOST RECOVERY HOLD: {exc}", file=sys.stderr)
+        raise CampaignError("host dispatch recovery did not complete") from exc
+    print(json.dumps(result, indent=2))
+
+
+def cmd_tool_dispatch(args: argparse.Namespace) -> None:
+    from dataclasses import fields
+    from tool_port import PortableTestAdapter, ToolCommand, ToolDispatchHold, dispatch_tool
+
+    command_path = Path(args.command_file)
+    if command_path.is_symlink() or not command_path.is_file() or command_path.stat().st_size > 3 * 1024 * 1024:
+        raise CampaignError("tool command must be a regular non-symlink JSON file under 3 MiB")
+    try:
+        payload = json.loads(command_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict) or set(payload) != {field.name for field in fields(ToolCommand)}:
+            raise CampaignError("tool command JSON fields do not match ToolCommand")
+        if not isinstance(payload.get("allowed_write_surfaces"), list):
+            raise CampaignError("tool command allowed_write_surfaces must be an array")
+        payload["allowed_write_surfaces"] = tuple(payload["allowed_write_surfaces"])
+        command = ToolCommand(**payload)
+        if args.adapter != PortableTestAdapter.adapter_id:
+            raise CampaignError("unknown adapter; only the fixed portable-test-v1 adapter is registered")
+        result = dispatch_tool(control_root(args), Path(args.workspace), command)
+    except (OSError, ValueError, TypeError, json.JSONDecodeError, ToolDispatchHold) as exc:
+        print(f"TOOL DISPATCH HOLD: {exc}", file=sys.stderr)
+        raise CampaignError("tool dispatch did not complete") from exc
+    print(json.dumps(result, indent=2))
+
+
+def cmd_tool_recover(args: argparse.Namespace) -> None:
+    from tool_port import ToolDispatchHold, recover_tool_dispatch
+
+    try:
+        result = recover_tool_dispatch(control_root(args), args.dispatch_id)
+    except ToolDispatchHold as exc:
+        print(f"TOOL RECOVERY HOLD: {exc}", file=sys.stderr)
+        raise CampaignError("tool recovery did not complete") from exc
+    print(json.dumps(result, indent=2))
+
+
 def cmd_recover(args: argparse.Namespace) -> None:
     control = control_root(args)
     txid = recover_pending_transaction(control)
@@ -1092,10 +1328,19 @@ def cmd_next(args: argparse.Namespace) -> None:
     require_no_pending_transaction(control)
     state = load_runtime(control)
     recompute_ready(state)
-    ready = sorted(
-        (u for u in state["work_units"] if u["status"] == "READY"),
-        key=lambda u: (-u["priority"], u["id"]),
-    )
+    ready = rank_ready_work_units(state)
+    campaign_status = state.get("campaign_status", "UNKNOWN")
+    projected = []
+    for unit, critical_path_remaining in ready:
+        conflicts = active_conflicts(state, unit)
+        status_blocked = campaign_status != "ACTIVE"
+        projected.append((unit, critical_path_remaining, conflicts, status_blocked))
+    # Do not direct I3 toward READY work whose lease cannot currently be
+    # acquired. Keep blocked candidates visible with their exact conflict so
+    # the controller can choose independent work or plan a safe handoff.
+    projected.sort(key=lambda item: (
+        bool(item[2]) or item[3], -item[1], -item[0]["priority"], item[0]["id"]
+    ))
     print(
         json.dumps(
             [
@@ -1103,10 +1348,14 @@ def cmd_next(args: argparse.Namespace) -> None:
                     "id": u["id"],
                     "title": u["title"],
                     "priority": u["priority"],
+                    "critical_path_remaining": critical_path_remaining,
                     "writes": u["allowed_write_surfaces"],
                     "resources": u["shared_resources"],
+                    "available_now": not conflicts and not status_blocked,
+                    "active_conflicts": conflicts,
+                    "blocked_by_campaign_status": campaign_status if status_blocked else None,
                 }
-                for u in ready
+                for u, critical_path_remaining, conflicts, status_blocked in projected
             ],
             indent=2,
         )
@@ -1242,12 +1491,36 @@ def main() -> int:
     p = sub.add_parser("authority-acquire")
     p.add_argument("--actor", required=True)
     p.add_argument("--run", required=True)
+    p.add_argument("--lease-minutes", type=int, default=120,
+                   help="Bounded authority lease duration (1-120 minutes; default 120).")
     p.set_defaults(func=cmd_authority_acquire)
 
     p = sub.add_parser("authority-release")
     p.add_argument("--actor", required=True)
     p.add_argument("--run", required=True)
     p.set_defaults(func=cmd_authority_release)
+
+    p = sub.add_parser("host-probe", help="observe optional Codex CLI capabilities without dispatch")
+    p.set_defaults(func=cmd_host_probe)
+
+    p = sub.add_parser("host-dispatch", help="attempt source-bound dispatch through the installed Codex adapter; holds without enforced scope and cost cap")
+    p.add_argument("--workspace", required=True)
+    p.add_argument("--command", required=True, help="JSON EngineeringCommand file")
+    p.set_defaults(func=cmd_host_dispatch)
+
+    p = sub.add_parser("host-recover", help="mark an interrupted host dispatch UNKNOWN without replay")
+    p.add_argument("--dispatch-id", required=True)
+    p.set_defaults(func=cmd_host_recover)
+
+    p = sub.add_parser("tool-dispatch", help="execute a typed local operation through the fixed portable ToolPort")
+    p.add_argument("--workspace", required=True)
+    p.add_argument("--command", dest="command_file", required=True, help="JSON ToolCommand file")
+    p.add_argument("--adapter", default="portable-test-v1", help="registered deterministic adapter ID")
+    p.set_defaults(func=cmd_tool_dispatch)
+
+    p = sub.add_parser("tool-recover", help="mark an interrupted tool dispatch UNKNOWN without replay")
+    p.add_argument("--dispatch-id", required=True)
+    p.set_defaults(func=cmd_tool_recover)
 
     p = sub.add_parser("recover")
     p.set_defaults(func=cmd_recover)
@@ -1260,7 +1533,7 @@ def main() -> int:
 
     args = parser.parse_args()
     try:
-        if args.command in {"next", "show"}:
+        if args.command in {"next", "show", "host-probe", "host-dispatch", "host-recover", "tool-dispatch", "tool-recover"}:
             args.func(args)
         else:
             control = control_root(args)

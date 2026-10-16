@@ -56,6 +56,14 @@
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
     },
+    "reviewed_runtime_revision": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "reviewed_runtime_event_seq": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
     "active_progress_minutes_since_review": {
       "type": ["integer", "null"],
       "minimum": 0

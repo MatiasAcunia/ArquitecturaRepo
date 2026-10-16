@@ -9,6 +9,8 @@
   "active_progress_minutes_since_review": null,
   "review_evidence_ref": "TO_BE_VERIFIED",
   "review_evidence_sha256": "TO_BE_VERIFIED",
+  "reviewed_runtime_revision": null,
+  "reviewed_runtime_event_seq": null,
   "progress_clock": "HOST_UNVERIFIED_ADVISORY",
   "invocation_permit_issued": false,
   "plan_mode": "UNVERIFIED",
