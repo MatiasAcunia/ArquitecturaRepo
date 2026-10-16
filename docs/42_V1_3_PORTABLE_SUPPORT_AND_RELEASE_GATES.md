@@ -1,6 +1,6 @@
 # v1.3 portable core — support boundary and release gates
 
-This is the source-bound engineering support matrix for the v1.3 candidate. It does **not** authorize a v1.3 release. Until acceptance and publication, `VERSION` and the published v1.2 tag remain unchanged.
+This is the source-bound engineering support matrix for the v1.3 candidate. It does **not** authorize a v1.3 release. In a draft v1.3.0 release-candidate branch, `VERSION`/starter manifest may say 1.3.0; this is **not** a published release. The historical v1.2 tag stays immutable.
 
 | Capability | Current status | Meaning / required evidence |
 | --- | --- | --- |
@@ -23,3 +23,5 @@ This is the source-bound engineering support matrix for the v1.3 candidate. It d
 4. Treat M5 research proposals as **DEFER** absent measured comparative benefit, not as grounds for adding unproven infrastructure. M7 is a separate decision, not a prerequisite to honest portable-core support.
 
 Only the designated release authority may accept the verified release candidate. Local tests, recorded actor strings and draft PR CI alone are not independent sign-off.
+
+For release-package adoption, safe side-by-side handling of governed v1.2 projects, and the explicitly manual publication gate, see `docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md`.
