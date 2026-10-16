@@ -18,6 +18,10 @@ This index separates the **public installable product** from **maintainer engine
 
 The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference layout/runtime, executable validation, transactions, schemas, canonical ownership, stateful examples, migration, release history and repository hygiene. Select them by task rather than reading the entire library for every operation. Executable source, release tags, schemas and current adopter state outrank historical proposals.
 
+## Optional plugins
+
+- [Agent Continuity Bridge 0.2.1](../plugins/agent-continuity-bridge/README.md) — opt-in offline bridge, installer and eight language guides. It inspects/records an independently supplied controller package but does not install or control Codex Desktop, Goals, quotas, or cloud usage. Native actions remain unverified and out of portable-core release scope; the plugin can be upgraded independently after compatibility evidence.
+
 ## Contributor / maintainer engineering — NOT adopter prerequisites
 
 - [v1.2 security audit](25_V1_2_SECURITY_HARDENING_AUDIT.md), [Windows physical acceptance scenario](26_L3_WINDOWS_PHYSICAL_ACCEPTANCE.md), [longitudinal fixture protocol](28_LONGITUDINAL_L3_TEST_PROTOCOL.md), [existing-governance transfer pilot](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md).
