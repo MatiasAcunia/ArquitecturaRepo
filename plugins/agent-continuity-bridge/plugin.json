@@ -1,0 +1,49 @@
+{
+  "schema": "arquitecturarepo.optional-bridge.v1",
+  "id": "agent-continuity-bridge",
+  "name": "Agent Continuity Bridge",
+  "version": "0.2.1",
+  "designed_for": "ArquitecturaRepo v1.3 engineering candidate (not released)",
+  "vendor_neutral_core": true,
+  "core_required": false,
+  "native_effects_enabled_by_default": false,
+  "supported_adapters": [
+    {
+      "id": "codex-daily-control",
+      "version_range": "3.1.0-*",
+      "proof_level": "offline package verification only",
+      "native_host_acceptance": "UNVERIFIED"
+    }
+  ],
+  "functions": [
+    "inspect",
+    "install",
+    "status",
+    "uninstall",
+    "doctor"
+  ],
+  "native_host_actions": "NOT_IMPLEMENTED_DISABLED",
+  "requirements": {
+    "bridge": [
+      "Python 3.10+",
+      "ArquitecturaRepo control layer (.agentic-sdlc) for registration"
+    ],
+    "optional_external_controller": [
+      "Codex Daily Control 3.1 package supplied separately",
+      "Windows and Windows PowerShell 5.1 for controller native runtime",
+      "Supported installed Codex Desktop and separately approved permissions",
+      "Configured optional Drive/rclone only if external controller uses them"
+    ]
+  },
+  "data_policy": "No controller files, project slots, credentials, personal paths, Goal IDs, conversation archives or configuration are distributed. Registration stores only pinned package digest and generic metadata.",
+  "locales": [
+    "en",
+    "es",
+    "pt",
+    "fr",
+    "de",
+    "it",
+    "ja",
+    "zh"
+  ]
+}

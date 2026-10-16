@@ -18,6 +18,10 @@ This index separates the **public installable product** from **maintainer engine
 
 The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference layout/runtime, executable validation, transactions, schemas, canonical ownership, stateful examples, migration, release history and repository hygiene. Select them by task rather than reading the entire library for every operation. Executable source, release tags, schemas and current adopter state outrank historical proposals.
 
+## Optional integrations (engineering previews, not release dependencies)
+
+- [Agent Continuity Bridge](../plugins/agent-continuity-bridge/README.md): opt-in, generic offline package inspection and source-bound registration, with eight localized guides. The Codex Daily Control 3.1 compatibility adapter does **not** launch or control Codex Desktop, Goals, quotas, or paid services. Native Windows operation remains unverified. This preview is not part of the released v1.2.0 portable core or acceptance of v1.3 M0–M6/M7.
+
 ## Contributor / maintainer engineering — NOT adopter prerequisites
 
 - [v1.2 security audit](25_V1_2_SECURITY_HARDENING_AUDIT.md), [Windows physical acceptance scenario](26_L3_WINDOWS_PHYSICAL_ACCEPTANCE.md), [longitudinal fixture protocol](28_LONGITUDINAL_L3_TEST_PROTOCOL.md), [existing-governance transfer pilot](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md).
