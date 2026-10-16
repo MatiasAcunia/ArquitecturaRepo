@@ -78,6 +78,33 @@ def main() -> int:
         if (len(gates) != 15 or not all(g.get("required") is True for g in gates)
             or any(g.get("status") == "PHYSICALLY_VERIFIED_EXACT" for g in gates)):
             raise AssertionError("physical acceptance criteria silently altered for source release")
+    elif release_version == "1.3.0":
+        # Backward-compatibility gate: never reinterpret v1.2 CLIENT authority
+        # as an authorization to publish v1.3.0. A staged version is legal
+        # only when it cannot be released by the legacy automatic publisher.
+        legacy_scope = json.loads((ROOT / "state" / "V1_2_RELEASE_SCOPE_DECISION.json").read_text(encoding="utf-8"))
+        if (legacy_scope.get("version") != "1.2.0"
+            or legacy_scope.get("full_physical_release_accepted") is not False
+            or legacy_scope.get("physical_release_gates_overridden") is not False):
+            raise AssertionError("v1.3 staging rewrote v1.2 CLIENT/release history")
+        manual_path = ROOT / ".github" / "workflows" / "publish-v1-3-manual.yml"
+        old_path = ROOT / ".github" / "workflows" / "publish-version-release.yml"
+        if not manual_path.is_file():
+            raise AssertionError("v1.3 draft has no explicit release publisher")
+        manual = manual_path.read_text(encoding="utf-8")
+        old_auto = old_path.read_text(encoding="utf-8")
+        if ("workflow_dispatch:" not in manual
+            or "workflow_run:" in manual
+            or "push:" in manual
+            or "exact_commit_sha" not in manual
+            or "RELEASE_V1_3_0" not in manual
+            or "github.ref == 'refs/heads/main'" not in manual
+            or "github.actor == 'MatiasAcunia'" not in manual
+            or "git ls-remote origin refs/heads/main" not in manual
+            or "1.3.0)" not in old_auto
+            or "skip=true" not in old_auto
+            or old_auto.count("steps.identity.outputs.skip != 'true'") != 2):
+            raise AssertionError("v1.3 staging weakened exact-source/manual publication boundary")
     elif release_version != "1.1.0":
         raise AssertionError("release version unauthorized or no scoped CLIENT decision")
     verifier = subprocess.run(

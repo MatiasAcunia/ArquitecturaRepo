@@ -79,6 +79,8 @@ REQUIRED_PATHS = [
     "tools/scaffold_project.py",
     "tools/selftest_scaffold.py",
     "tools/campaignctl.py",
+    "tools/tool_port.py",
+    "tools/selftest_tool_port.py",
     "tools/selftest_runtime.py",
     "tools/migrate_state.py",
     "tools/selftest_migrations.py",
@@ -230,6 +232,7 @@ def validate_structure_only(errors: list[str]) -> None:
         if rel.as_posix() in {
             ".github/workflows/validate-starter.yml",
             ".github/workflows/publish-version-release.yml",
+            ".github/workflows/publish-v1-3-manual.yml",
             "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
         }:
             checked = re.sub(

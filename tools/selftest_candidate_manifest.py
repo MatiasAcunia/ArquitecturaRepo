@@ -34,11 +34,16 @@ def main() -> int:
         (candidate / ".git" / "ignored").write_text("not source\n", encoding="utf-8")
         (candidate / "__pycache__").mkdir()
         (candidate / "__pycache__" / "ignored.pyc").write_bytes(b"generated")
+        (candidate / ".hypothesis").mkdir()
+        (candidate / ".hypothesis" / "examples").write_text("generated state A\n", encoding="utf-8")
 
         first = build_manifest(candidate)
         second = build_manifest(candidate)
         if first != second or first["file_count"] != 2:
             raise AssertionError("canonical candidate manifest is not deterministic")
+        (candidate / ".hypothesis" / "examples").write_text("generated state B\n", encoding="utf-8")
+        if build_manifest(candidate)["source_tree_sha256"] != first["source_tree_sha256"]:
+            raise AssertionError("Hypothesis cache state changed candidate source identity")
 
         portable_candidate = base / "portable-candidate"
         portable_candidate.mkdir()
@@ -101,6 +106,20 @@ def main() -> int:
     print("- deterministic SHA-256 source-tree manifest verified")
     print("- generated directories excluded and source files bound by exact bytes")
     print("- worktree .git pointer excluded from portable source identity")
+    # Framework-owned local state is excluded from a product-source binding
+    # when explicitly named by the controller.
+    with tempfile.TemporaryDirectory() as temp:
+        root = Path(temp)
+        (root / "src").mkdir()
+        (root / "src" / "app.py").write_text("x = 1\n", encoding="utf-8")
+        (root / ".agentic-sdlc").mkdir()
+        (root / ".agentic-sdlc" / "runtime.json").write_text("state A", encoding="utf-8")
+        first = build_manifest(root, exclude_paths=(".agentic-sdlc",))["source_tree_sha256"]
+        (root / ".agentic-sdlc" / "runtime.json").write_text("state B", encoding="utf-8")
+        second = build_manifest(root, exclude_paths=(".agentic-sdlc",))["source_tree_sha256"]
+        if first != second:
+            raise AssertionError("excluded control-state changes altered product-source digest")
+    print("- explicit control-root exclusion keeps source digest stable across runtime writes")
     print("- candidate manifest creation refuses receipt overwrite")
     print("- source-file hash is shared by discovery, Goal guard and transaction code")
     print("- installed/root tool parity passes and detects byte drift")

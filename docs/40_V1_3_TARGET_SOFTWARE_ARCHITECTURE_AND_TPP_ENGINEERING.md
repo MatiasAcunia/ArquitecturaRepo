@@ -50,7 +50,7 @@ Preserve authority: CLIENT is product owner and authorizes consequential effects
 2. **Product policy / authority / commands** — existing Goal guard, protected/client theory, charter, currentness, leases, CAS and authority validation. New command validation must bind actor identity, scope, source revision, tool/effect permissions, budget, expiry and user approvals to physical evidence, not a prompt.
 3. **Orchestration / campaign domain** — existing `campaignctl` and its revisioned runtime state. Default sync path directly executes the next authorized work unit. Bounded optional worker/event dispatch extends the same state machine only when demonstrated useful for real WAIT/RESUME and I4 delivery.
 4. **State/persistence** — existing Git source, Product State and currentness references, `state_tx`, workspace/artifact ledger and provider effect receipts. No second current Product State, global event database, ad hoc truth in chat, or case-insensitive collision with user files.
-5. **External ports** — `HostPort` (actual agent host), `ToolPort` (bounded shell/test/build commands), `ReviewPort` (source-bound independent reviewer), `EffectPort` (provider idempotency/reconciliation) and optional `SchedulerPort` (observed capacity/recurrence). Ports are testable without real accounts via fake adapters, but release claims require actual host checks.
+5. **External ports** — `HostPort` (actual agent host), `ToolPort` (typed, bounded workspace operations and fixed test/build commands), `ReviewPort` (source-bound independent reviewer), `EffectPort` (provider idempotency/reconciliation) and optional `SchedulerPort` (observed capacity/recurrence). Ports are testable without real accounts via deterministic adapters, but each adapter's support class and effects must remain explicit.
 6. **Evaluation/quality** — independent A-level Python component tests, B-level black-box repo/task runner and independent acceptance oracle, exact run/effect readbacks and comparative performance/cost measurements.
 
 Suggested dependency direction:
@@ -59,7 +59,16 @@ Suggested dependency direction:
 
 Implementations depend on domain interfaces, not domain logic on Codex/Windows APIs. No worker may write protected surfaces just because it produced an accepted-looking Markdown file.
 
-### 3.1 Port/DTO contract candidates — NOT implemented today
+### 3.1 Port/DTO contracts and current support
+
+The public portable ToolPort consumer is `campaignctl tool-dispatch` / `tool-recover` (`tools/campaignctl.py`), implemented in `tools/tool_port.py` and exercised by `tools/selftest_tool_port.py`. The first registered adapter is intentionally narrow and test-only: `portable-test-v1` supports only `write_text`, requires a charter flag `portable_test_adapter_only=true`, and refuses dispatch/recovery unless both control and workspace roots are strict descendants of the operating-system temporary root. It verifies a campaign/actor/run/work-unit lease, explicit charter operation and write-surface intersection, exact Goal/Plan/review-evidence digests, source-tree and workspace-path currentness, idempotency and physical target readback. This is a disposable synthetic adapter and does not grant material Goal permission; Goal Guard, human authority, and a native host invocation hook remain unproven. Intent is persisted before the write; interrupted starts recover as `UNKNOWN` and never replay. Receipts classify it as `PORTABLE_TEST_ADAPTER`, state that actor identity is local campaign state rather than human authentication, report cancellation as unsupported, and provider cost as `NOT_APPLICABLE_NOT_MEASURED`. It is not an OS sandbox or general shell. The optional Codex CLI adapter remains advisory and dispatch remains held without independently enforced host scope and cost evidence.
+
+| Port / adapter | Consumer | Current support class | Executable operations | Boundary |
+|---|---|---|---|---|
+| Portable ToolPort `portable-test-v1` | `campaignctl tool-dispatch`, `tool-recover` | `PORTABLE_TEST_ADAPTER` | UTF-8 file replacement only in explicit synthetic campaigns with control and workspace roots under the OS temporary root | Local campaign state and cooperating lock; no material Goal permission, OS sandbox, shell, provider, or human identity authentication |
+| Codex CLI HostPort | `campaignctl host-probe`, `host-dispatch`, `host-recover` | `HOST_ADVISORY` | Probe only; dispatch fail-closed | No proven write confinement, per-turn cost cap, native invocation hook, or remote currentness |
+
+The portable ToolPort is evidence for the declared local test-adapter capability only. The broader interface candidates below remain unsupported until a public consumer and independent tests are added.
 
 **HostCapabilities (read-only):**
 `adapter_id, host_product, adapter_version, host_build, platform, authentication_state, permission_enforcement, sandbox_modes, thread_start, thread_resume, turn_stream, cancel, external_effects, supported_working_roots, quotas_observable, observed_at, expiry, evidence_digest`.

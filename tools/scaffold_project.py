@@ -275,7 +275,7 @@ def _populate_staging_project(
             ROOT / "tools" / "campaignctl.py",
             control / "tools" / "campaignctl.py",
         )
-        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py"):
+        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py", "host_dispatch.py", "tool_port.py", "candidate_manifest.py"):
             copy_file(ROOT / "tools" / tool, control / "tools" / tool)
     if with_runtime:
         for filename in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
@@ -1067,6 +1067,27 @@ Do not claim installation success until the fresh-context probe has been exercis
     return control
 
 
+def assert_no_existing_governance(target: Path) -> None:
+    """Refuse accidental second Product State, without following symlinked folders.
+
+    Generic scaffold is only an entry point for an ungoverned repository.
+    Existing governed repos must use the explicit read-only attachment workflow.
+    """
+    if not target.exists():
+        return
+    # Canonical root and direct-child control/state layouts (incl. custom control dir).
+    candidates = [target / "PRODUCT_STATE_CURRENT.json", target / "state" / "PRODUCT_STATE_CURRENT.json"]
+    for child in target.iterdir():
+        if child.is_symlink():
+            if child.name in {"state", ".agentic-sdlc", "control"}:
+                raise ValueError("EXISTING_GOVERNANCE_BOUNDARY_SYMLINK_HOLD")
+            continue
+        if child.is_dir() and child.name not in {".git", "node_modules", ".venv", "venv", "dist", "build"}:
+            candidates.extend((child / "PRODUCT_STATE_CURRENT.json", child / "state" / "PRODUCT_STATE_CURRENT.json"))
+    if any(path.exists() or path.is_symlink() for path in candidates):
+        raise ValueError("EXISTING_CANONICAL_PRODUCT_STATE_HOLD: use read-only attachment, not generic scaffold")
+
+
 def create_scaffold(
     target: Path,
     control_dir_name: str,
@@ -1110,6 +1131,9 @@ def create_scaffold(
             raise FileExistsError(
                 "EXISTING_CONTROL_PRESERVED: explicit migration required"
             )
+        # After preserving the previous install's collision semantics, reject
+        # *other* canonical Product State owners before staging any new bytes.
+        assert_no_existing_governance(target)
         final_workflow = target / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
         if (final_workflow.is_symlink()
             or (target / ".github").is_symlink()
@@ -1262,8 +1286,19 @@ def main() -> int:
     print(f"SCAFFOLD CREATED: {control}")
     print("STATUS: HOLD / UNTRUSTED_CONTEXT")
     print("NEXT: read-only discovery -> currentness reconstruction -> fresh-context probe")
-    print("FEEDBACK NOTICE: monthly strict metadata artifact ON in your own GitHub Actions; outbound preference ON only if a collector endpoint is configured; no collector is bundled.")
-    print("FEEDBACK OPT-OUT: set enabled=false in feedback config, set external_submission_enabled=false for outbound only, or remove managed workflow.")
+    workflow = Path(args.target).absolute() / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
+    scheduler = "EXISTING_PRESERVED" if args.no_feedback_workflow and workflow.exists() else (
+        "DISABLED_BY_INSTALL_OPTION" if args.no_feedback_workflow else (
+            "PRESENT" if workflow.is_file() else "NOT_INSTALLED"
+        )
+    )
+    feedback_config = control / "feedback" / "ARCHITECTURE_FEEDBACK_CONFIG.json"
+    feedback = json.loads(feedback_config.read_text(encoding="utf-8")) if feedback_config.is_file() else {}
+    print(f"FEEDBACK: local_generator_enabled={str(feedback.get('enabled', False)).lower()}; "
+          f"scheduled_workflow={scheduler}; "
+          f"outbound_preference={str(feedback.get('external_submission_enabled', False)).lower()}; "
+          "collector_endpoint=NOT_CONFIGURED_BY_STARTER; external_delivery=NOT_OBSERVED")
+    print("FEEDBACK OPT-OUT: change enabled=false to disable local reports; external_submission_enabled=false to disable outbound; --no-feedback-workflow suppresses only installation of scheduler.")
     return 0
 
 

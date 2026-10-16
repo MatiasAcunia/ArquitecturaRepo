@@ -157,6 +157,12 @@ def main() -> int:
             "--charter",
             "CAMPAIGN_API_001_CHARTER.json",
         )
+        initialized_runtime = load(control / "runtime" / "CAMPAIGN_RUNTIME_CURRENT.json")
+        if initialized_runtime.get("charter_ref") != "CAMPAIGN_API_001_CHARTER.json":
+            raise AssertionError(
+                "campaignctl init did not persist the charter as a canonical POSIX control reference: "
+                + repr(initialized_runtime.get("charter_ref"))
+            )
 
         lock_path = control / "runtime" / ".campaignctl.lock"
         lock_handle = open(lock_path, "a+b")
@@ -256,10 +262,30 @@ def main() -> int:
             "--id",
             "W1",
             "--actor",
-            "BUILDER_A",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_001",
+            "RUN_I3_002",
         )
+        lease_projection = json.loads(must_pass(control, "next"))
+        lease_rows = {row["id"]: row for row in lease_projection}
+        if lease_rows["W2"].get("available_now") is not False:
+            raise AssertionError(f"next misrepresented an active write-surface lease: {lease_rows['W2']}")
+        if not any(
+            conflict.get("kind") == "write_surface" and conflict.get("work_unit_id") == "W1"
+            for conflict in lease_rows["W2"].get("active_conflicts", [])
+        ):
+            raise AssertionError(f"next omitted the active write-surface conflict: {lease_rows['W2']}")
+        if lease_rows["W_RESOURCE"].get("available_now") is not False:
+            raise AssertionError(
+                f"next misrepresented an active shared-resource lease: {lease_rows['W_RESOURCE']}"
+            )
+        if not any(
+            conflict.get("kind") == "shared_resource" and conflict.get("work_unit_id") == "W1"
+            for conflict in lease_rows["W_RESOURCE"].get("active_conflicts", [])
+        ):
+            raise AssertionError(
+                f"next omitted the active shared-resource conflict: {lease_rows['W_RESOURCE']}"
+            )
         must_fail(
             control,
             "write-surface conflict",
@@ -267,9 +293,9 @@ def main() -> int:
             "--id",
             "W2",
             "--actor",
-            "BUILDER_B",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_002",
+            "RUN_I3_002",
         )
         must_fail(
             control,
@@ -278,9 +304,9 @@ def main() -> int:
             "--id",
             "W_RESOURCE",
             "--actor",
-            "BUILDER_RESOURCE",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_RESOURCE",
+            "RUN_I3_002",
         )
         must_pass(
             control,
@@ -346,6 +372,24 @@ def main() -> int:
             "--run",
             "RUN_I3_002",
         )
+        acquired_authority = load(control / "state" / "EXECUTION_AUTHORITY_CURRENT.json")
+        if not isinstance(acquired_authority.get("expires_at"), str):
+            raise AssertionError("authority acquisition did not issue a finite lease expiry")
+        if acquired_authority.get("lease_duration_minutes") != 120:
+            raise AssertionError("authority default lease duration is not bounded at 120 minutes")
+        from datetime import datetime, timezone
+        expiry = datetime.fromisoformat(acquired_authority["expires_at"].replace("Z", "+00:00"))
+        if expiry <= datetime.now(timezone.utc):
+            raise AssertionError("new authority lease is already expired")
+        for invalid_lease in ("0", "121"):
+            must_fail(
+                control,
+                "authority lease must be an integer from 1 to 120 minutes",
+                "authority-acquire",
+                "--actor", "CAMPAIGN_LEAD_NOTE_API_001",
+                "--run", "RUN_I3_002",
+                "--lease-minutes", invalid_lease,
+            )
 
         must_pass(
             control,
@@ -359,6 +403,9 @@ def main() -> int:
             "--depends",
             "W2",
         )
+        next_rows = json.loads(must_pass(control, "next"))
+        if not next_rows or next_rows[0]["id"] != "W2" or next_rows[0].get("critical_path_remaining") != 2:
+            raise AssertionError(f"campaignctl next omitted the live dependency critical path: {next_rows}")
         must_fail(
             control,
             "expected READY, found BLOCKED_DEPENDENCY",
@@ -366,12 +413,22 @@ def main() -> int:
             "--id",
             "W3",
             "--actor",
-            "BUILDER_C",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_003",
+            "RUN_I3_002",
         )
 
         must_pass(control, "capacity", "--reason", "synthetic capacity interruption")
+        paused_projection = json.loads(must_pass(control, "next"))
+        paused_rows = {row["id"]: row for row in paused_projection}
+        if paused_rows["W2"].get("available_now") is not False:
+            raise AssertionError(
+                f"next recommended READY work during a capacity checkpoint: {paused_rows['W2']}"
+            )
+        if paused_rows["W2"].get("blocked_by_campaign_status") != "CAPACITY_CHECKPOINT":
+            raise AssertionError(
+                f"next omitted the campaign-status blocker: {paused_rows['W2']}"
+            )
         must_fail(
             control,
             "campaign is not ACTIVE",
@@ -379,11 +436,21 @@ def main() -> int:
             "--id",
             "W2",
             "--actor",
-            "BUILDER_B",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_002",
+            "RUN_I3_002",
         )
         must_pass(control, "resume")
+        resumed_projection = json.loads(must_pass(control, "next"))
+        resumed_rows = {row["id"]: row for row in resumed_projection}
+        if resumed_rows["W2"].get("available_now") is not True:
+            raise AssertionError(
+                f"next did not restore W2 availability after resume: {resumed_rows['W2']}"
+            )
+        if resumed_rows["W2"].get("blocked_by_campaign_status") is not None:
+            raise AssertionError(
+                f"next retained a stale campaign-status blocker after resume: {resumed_rows['W2']}"
+            )
 
         must_pass(
             control,
@@ -391,9 +458,9 @@ def main() -> int:
             "--id",
             "W2",
             "--actor",
-            "BUILDER_B",
+            "CAMPAIGN_LEAD_NOTE_API_001",
             "--run",
-            "RUN_BUILD_002",
+            "RUN_I3_002",
         )
         must_pass(
             control,

@@ -53,6 +53,16 @@
         "allowed_write_surfaces": {"type": "array", "items": {"type": "string"}},
         "protected_surfaces": {"type": "array", "items": {"type": "string"}},
         "shared_resources": {"type": "array", "items": {"type": "string"}},
+        "allowed_tool_operations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["write_text"]},
+          "description": "Explicit allowlist for the portable deterministic ToolPort."
+        },
+        "portable_test_adapter_only": {
+          "type": "boolean",
+          "description": "Must be true only for a disposable synthetic fixture whose control and workspace roots are both under the OS temp root; never grants material Goal or native-host authority."
+        },
         "external_authority_gates": {"type": "array", "items": {"type": "string"}}
       }
     },

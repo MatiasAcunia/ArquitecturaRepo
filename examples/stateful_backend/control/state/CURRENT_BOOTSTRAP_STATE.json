@@ -33,7 +33,7 @@
     "source_bindings": [
       {
         "ref": "../app/note_store.py",
-        "sha256": "eb43f66159865d48259a34b44927325b36894a53b3744113e05f7d1b2c05e50f"
+        "sha256": "b6f5606d19a48e136f09f31d03ec32b91492a3771c557509adf9aa77882418a9"
       },
       {
         "ref": "../evidence/STATEFUL_REFERENCE_EVIDENCE.json",

@@ -18,6 +18,30 @@ class TacticalPlanError(ValueError):
     pass
 
 
+def _runtime_review_snapshot(control: Path) -> tuple[int | None, int | None]:
+    """Bind a Plan review to a structurally consistent campaign event head."""
+    try:
+        path = fixed_control_path(control, "runtime/CAMPAIGN_RUNTIME_CURRENT.json")
+    except GoalGuardError as exc:
+        raise TacticalPlanError("PLAN_RUNTIME_CONTROL_PATH_INVALID:" + str(exc)) from None
+    if not path.exists():
+        return None, None
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 32 * 1024 * 1024:
+        raise TacticalPlanError("PLAN_RUNTIME_SNAPSHOT_UNTRUSTED")
+    try:
+        runtime = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise TacticalPlanError("PLAN_RUNTIME_SNAPSHOT_INVALID:" + type(exc).__name__) from None
+    events = runtime.get("event_log") if isinstance(runtime, dict) else None
+    revision = runtime.get("revision") if isinstance(runtime, dict) else None
+    if (not isinstance(events, list) or type(revision) is not int
+        or revision != len(events)
+        or any(not isinstance(item, dict) or type(item.get("seq")) is not int
+               or item["seq"] != index for index, item in enumerate(events, start=1))):
+        raise TacticalPlanError("PLAN_RUNTIME_SNAPSHOT_CURRENTNESS_INVALID")
+    return revision, (events[-1]["seq"] if events else 0)
+
+
 def update(control: Path, *, expected_revision: int, plan: dict,
            review_evidence_ref: str) -> dict:
     if not isinstance(review_evidence_ref, str) or not review_evidence_ref:
@@ -72,6 +96,7 @@ def update(control: Path, *, expected_revision: int, plan: dict,
                     raise TacticalPlanError("PLAN_CANONICAL_STORE_HOLD:" + ",".join(failures))
         except GoalGuardError as exc:
             raise TacticalPlanError("PLAN_GOAL_INTEGRITY_HOLD:" + str(exc)) from None
+        reviewed_runtime_revision, reviewed_runtime_event_seq = _runtime_review_snapshot(control)
         old = read(current_path) if current_path.is_file() else None
         old_revision = old["revision"] if old else -1
         if old_revision != expected_revision:
@@ -99,6 +124,8 @@ def update(control: Path, *, expected_revision: int, plan: dict,
             "blockers": plan.get("blockers", []),
             "review_evidence_ref": review_evidence_ref,
             "review_evidence_sha256": review_evidence_sha,
+            "reviewed_runtime_revision": reviewed_runtime_revision,
+            "reviewed_runtime_event_seq": reviewed_runtime_event_seq,
             # Local Python callers cannot attest real active time or cause an
             # inseparable native pre-dispatch checkpoint. Unknown must remain
             # unknown so goal_guard keeps the host invocation on HOLD.

@@ -126,6 +126,59 @@ def goal_fingerprint(goal: dict[str, Any]) -> str:
     return digest(goal)
 
 
+def tactical_review_assessment(control: Path, plan: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+    """Project material campaign events since the exact runtime head reviewed by I3."""
+    failures: list[str] = []
+    projection: dict[str, Any] = {
+        "event_triggered": False,
+        "trigger_events": [],
+        "max_verified_active_minutes": MAX_ACTIVE_MINUTES,
+        "active_minutes_since_review": None,
+        "active_time_status": "UNKNOWN_NATIVE_ACTIVE_CLOCK_UNAVAILABLE",
+        # Unknown active time cannot be treated as under the 120-minute limit.
+        "review_required": True,
+    }
+    try:
+        runtime_path = fixed_control_path(control, "runtime/CAMPAIGN_RUNTIME_CURRENT.json")
+        reviewed_revision = plan.get("reviewed_runtime_revision")
+        reviewed_seq = plan.get("reviewed_runtime_event_seq")
+        if reviewed_revision is None or reviewed_seq is None:
+            failures.append("TACTICAL_PLAN_RUNTIME_REVIEW_UNBOUND")
+            return projection, failures
+        if type(reviewed_revision) is not int or reviewed_revision < 0 or type(reviewed_seq) is not int or reviewed_seq < 0:
+            failures.append("TACTICAL_PLAN_RUNTIME_REVIEW_BINDING_INVALID")
+            return projection, failures
+        if runtime_path.is_symlink() or not runtime_path.is_file() or runtime_path.stat().st_size > MAX_AUTHORITY_BYTES:
+            failures.append("TACTICAL_PLAN_RUNTIME_MISSING_OR_UNTRUSTED")
+            return projection, failures
+        runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
+        if not isinstance(runtime, dict):
+            failures.append("TACTICAL_PLAN_RUNTIME_CURRENTNESS_INVALID")
+            return projection, failures
+        events = runtime.get("event_log")
+        revision = runtime.get("revision")
+        if (not isinstance(events, list) or type(revision) is not int
+            or revision != len(events)
+            or any(not isinstance(item, dict) or type(item.get("seq")) is not int
+                   or item["seq"] != index for index, item in enumerate(events, start=1))
+            or reviewed_seq > revision or reviewed_revision != reviewed_seq):
+            failures.append("TACTICAL_PLAN_RUNTIME_CURRENTNESS_INVALID")
+            return projection, failures
+        triggers = [
+            {"seq": item["seq"], "action": item.get("action", "UNKNOWN_EVENT"),
+             "work_unit_id": item.get("work_unit_id")}
+            for item in events[reviewed_seq:]
+            if item.get("action") != "HOST_DISPATCH_COMMAND_OBSERVED"
+        ]
+        projection["event_triggered"] = bool(triggers)
+        projection["trigger_events"] = triggers
+        if triggers:
+            failures.append("TACTICAL_PLAN_EVENT_REVIEW_REQUIRED")
+    except (OSError, ValueError, TypeError, KeyError, GoalGuardError):
+        failures.append("TACTICAL_PLAN_RUNTIME_CURRENTNESS_INVALID")
+    return projection, failures
+
+
 def assess(control: Path) -> dict[str, Any]:
     """Return local integrity evidence; *never* authorize the host."""
     control = control.resolve()
@@ -149,6 +202,14 @@ def assess(control: Path) -> dict[str, Any]:
                 "may_execute_material_goal": False}
     failures: list[str] = []
     current_goal_digest = None
+    tactical_review: dict[str, Any] = {
+        "event_triggered": False,
+        "trigger_events": [],
+        "max_verified_active_minutes": MAX_ACTIVE_MINUTES,
+        "active_minutes_since_review": None,
+        "active_time_status": "UNKNOWN_NATIVE_ACTIVE_CLOCK_UNAVAILABLE",
+        "review_required": True,
+    }
     try:
         goal = read(goal_path)
         current_goal_digest = goal_fingerprint(goal)
@@ -201,6 +262,8 @@ def assess(control: Path) -> dict[str, Any]:
                 or plan.get("invocation_permit_issued") is not False
                 or plan.get("progress_tool") != "NATIVE_HOST_PROGRESS_UNAVAILABLE"):
                 failures.append("TACTICAL_PROGRESS_CLAIM_UNTRUSTED")
+            tactical_review, review_failures = tactical_review_assessment(control, plan)
+            failures.extend(review_failures)
             # The only accepted local state is unknown; unknown active time
             # cannot clear a host-enforced review checkpoint.
             failures.append("TACTICAL_REVIEW_DUE_OR_UNVERIFIED")
@@ -215,6 +278,7 @@ def assess(control: Path) -> dict[str, Any]:
         "local_integrity_passed": not failures,
         "may_execute_material_goal": False,
         "goal_digest": current_goal_digest,
+        "tactical_review": tactical_review,
         "failure_codes": sorted(set(failures + [
             "HOST_INVOCATION_HOOK_NOT_PROVEN",
             "HOST_REMOTE_CURRENTNESS_UNVERIFIED",

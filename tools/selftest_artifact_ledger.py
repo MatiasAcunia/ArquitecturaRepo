@@ -13,7 +13,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from artifact_ledger import digest_json, initial, now, stamp
+from artifact_ledger import digest_json, initial, now, process_alive, stamp
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "tools" / "artifact_ledger.py"
@@ -433,27 +433,49 @@ def main() -> int:
         # owner-bound recovery reconciles the orphan into quarantine.
         crash_file = project / root / "interrupted-output.tmp"
         child_done = temp / "interrupted-producer-done.txt"
+        crashed_owner_pid_file = temp / "crashed-ledger-owner-pid.txt"
         crash_code = ("from pathlib import Path;import time;Path(" + repr(str(crash_file)) +
-                      ").write_text('partial');time.sleep(0.7);Path(" +
+                      ").write_text('partial');time.sleep(5);Path(" +
                       repr(str(child_done)) + ").write_text('producer-finished')")
+        crashed_args = [
+            "artifact_ledger.py", "--project", str(project), "capture", "--root", root,
+            "--category", "DERIVED_REBUILDABLE", "--safe-delete", "--ttl-hours", "-1",
+            "--", sys.executable, "-c", crash_code,
+        ]
+        crashed_command = (
+            "import os,sys\nfrom pathlib import Path\n"
+            "sys.path.insert(0," + repr(str(TOOL.parent)) + ")\n"
+            "Path(" + repr(str(crashed_owner_pid_file)) + ").write_text(str(os.getpid()))\n"
+            "import artifact_ledger as m\n"
+            "sys.argv=" + repr(crashed_args) + "\nraise SystemExit(m.main())\n"
+        )
         crashed = subprocess.Popen(
-            [sys.executable, str(TOOL), "--project", str(project), "capture", "--root", root,
-             "--category", "DERIVED_REBUILDABLE", "--safe-delete", "--ttl-hours", "-1",
-             "--", sys.executable, "-c", crash_code],
+            [sys.executable, "-c", crashed_command],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         deadline = time.monotonic() + 5
         while not crash_file.exists() and time.monotonic() < deadline:
             time.sleep(0.02)
         assert crash_file.exists()
+        assert crashed.poll() is None, "ledger capture completed before interruption"
         crashed.terminate()
         crashed.wait(timeout=5)
         deadline = time.monotonic() + 5
         while not child_done.exists() and time.monotonic() < deadline:
             time.sleep(0.02)
         assert child_done.exists()
+        crashed_owner_pid = int(crashed_owner_pid_file.read_text(encoding="utf-8"))
         lock = ledger.with_name(ledger.name + ".lock")
         lock_data = json.loads(lock.read_text(encoding="utf-8"))
-        assert lock_data["status"] == "active" and lock_data["pid"] == crashed.pid
+        assert (lock_data["status"] == "active"
+                and lock_data["operation"] == "capture"
+                and lock_data["root"] == root
+                and lock_data["pid"] == crashed_owner_pid
+                and process_alive(lock_data["pid"]) is False), (
+            f"interrupted capture lock is not a dead, exact-scope owner record: "
+            f"terminated_process_id={crashed.pid}, owner_pid={crashed_owner_pid}, "
+            f"lock={lock_data!r}, "
+            f"owner_alive={process_alive(lock_data.get('pid'))}"
+        )
         refused_owner = run(project, "recover-lock", "--root", root, "--owner", "I3",
                             "--campaign", "WRONG_CAMPAIGN", "--operator-evidence-ref",
                             "review/evidence.json", code=2)
@@ -489,16 +511,17 @@ def main() -> int:
         # Interrupt a second recovery at reconciliation entry. The persisted
         # recover-lock record must itself be recoverable, and replay is idempotent.
         recovery_started = temp / "recover-lock-reconcile-entered.txt"
+        recovery_owner_pid_file = temp / "recover-lock-owner-pid.txt"
         stale_capture = {
             "schema_version": "artifact-ledger-lock-v1", "status": "active",
-            "pid": crashed.pid, "host": socket.gethostname(),
+            "pid": lock_data["pid"], "host": socket.gethostname(),
             "started_at": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=10))
                 .isoformat().replace("+00:00", "Z"),
             "operation": "capture", "root": root,
         }
         lock.write_text(json.dumps(stale_capture), encoding="utf-8")
         recovery_script = (
-            "import sys,time\nfrom pathlib import Path\n"
+            "import os,sys,time\nfrom pathlib import Path\n"
             "sys.path.insert(0," + repr(str(TOOL.parent)) + ")\n"
             "import artifact_ledger as m\noriginal=m.reconcile\n"
             "def pause(*args,**kwargs):\n"
@@ -506,6 +529,7 @@ def main() -> int:
             "    time.sleep(30)\n"
             "    return original(*args,**kwargs)\n"
             "m.reconcile=pause\n"
+            "Path(" + repr(str(recovery_owner_pid_file)) + ").write_text(str(os.getpid()))\n"
             "sys.argv=['artifact_ledger.py','--project'," + repr(str(project)) +
             ",'recover-lock','--root'," + repr(root) + ",'--owner','I3','--campaign','CAMP_A',"
             "'--operator-evidence-ref','review/evidence.json']\nraise SystemExit(m.main())\n"
@@ -519,10 +543,17 @@ def main() -> int:
         assert recovery_started.exists(), "recovery did not reach reconciliation"
         recovery_process.terminate()
         recovery_process.wait(timeout=5)
+        recovery_owner_pid = int(recovery_owner_pid_file.read_text(encoding="utf-8"))
         interrupted_recovery_lock = json.loads(lock.read_text(encoding="utf-8"))
         assert interrupted_recovery_lock["status"] == "active"
         assert interrupted_recovery_lock["operation"] == "recover-lock"
-        assert interrupted_recovery_lock["pid"] == recovery_process.pid
+        assert (interrupted_recovery_lock["root"] == root
+                and interrupted_recovery_lock["pid"] == recovery_owner_pid
+                and process_alive(interrupted_recovery_lock["pid"]) is False), (
+            f"interrupted recovery lock is not a dead, exact-scope owner record: "
+            f"terminated_process_id={recovery_process.pid}, owner_pid={recovery_owner_pid}, "
+            f"lock={interrupted_recovery_lock!r}"
+        )
         refused_recovery_retry = run(
             project, "recover-lock", "--root", root, "--owner", "I3",
             "--campaign", "CAMP_A", "--operator-evidence-ref", "review/evidence.json", code=2)
