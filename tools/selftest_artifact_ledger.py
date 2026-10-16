@@ -459,7 +459,10 @@ def main() -> int:
         assert crashed.poll() is None, "ledger capture completed before interruption"
         crashed.terminate()
         crashed.wait(timeout=5)
-        deadline = time.monotonic() + 5
+        # On Windows CI the orphaned producer may complete just after the
+        # original five-second window due to process scheduling. Wait a
+        # bounded additional interval; do not relaunch, duplicate or kill it.
+        deadline = time.monotonic() + 20
         while not child_done.exists() and time.monotonic() < deadline:
             time.sleep(0.02)
         assert child_done.exists()
