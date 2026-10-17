@@ -301,7 +301,7 @@ cada proyecto debe comprobar de forma independiente sus secretos, permisos y tra
 Continuar con: Manual 06 para el cierre formal y el tratamiento de gates pendientes.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • protocols/SECURITY_PRIVACY_RIGHTS_AND_EXTERNAL_ACTIONS.md
   • docs/12_TRANSACTION_RECOVERY.md
