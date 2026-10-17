@@ -233,6 +233,8 @@ def validate_structure_only(errors: list[str]) -> None:
             ".github/workflows/validate-starter.yml",
             ".github/workflows/publish-version-release.yml",
             ".github/workflows/publish-v1-3-manual.yml",
+            ".github/workflows/publish-ghcr-package.yml",
+            ".github/workflows/package-v1-3-release-asset.yml",
             "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
         }:
             checked = re.sub(
