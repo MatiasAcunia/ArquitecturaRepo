@@ -1,0 +1,87 @@
+name: Publish installable ArquitecturaRepo package to GHCR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-ghcr-package.yml
+      - packaging/ghcr/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: arquitecturarepo-ghcr-1-3-0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'MatiasAcunia/ArquitecturaRepo'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publishing code from main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ops
+          persist-credentials: false
+      - name: Checkout immutable public v1.3.0
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: v1.3.0
+          path: source
+          persist-credentials: false
+      - name: Validate published source and actual package interface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "9c00e19b74d19c741983987b9359cb5c2ac83c55"
+          test "$(tr -d '\r\n' < source/VERSION)" = "1.3.0"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('source/state/STARTER_MANIFEST.json').read_text())
+          assert m['version']=='1.3.0' and m['status']=='PUBLIC_STARTER_STABLE'
+          assert Path('source/tools/scaffold_project.py').exists()
+          PY
+          python source/tools/scaffold_project.py --help
+      - name: Authenticate with GitHub Container Registry
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Build GHCR package from exact tagged source
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          image="ghcr.io/$owner/arquitecturarepo"
+          docker build --pull \
+            --label org.opencontainers.image.revision=9c00e19b74d19c741983987b9359cb5c2ac83c55 \
+            --label org.opencontainers.image.source=https://github.com/MatiasAcunia/ArquitecturaRepo \
+            -f ops/packaging/ghcr/Dockerfile \
+            -t "$image:1.3.0" source
+          docker run --rm "$image:1.3.0" --help
+          echo "IMAGE=$image" >> "$GITHUB_ENV"
+      - name: Exercise real scaffold in mounted disposable project
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ghcr-test"
+          docker run --rm \
+            -v "$RUNNER_TEMP/ghcr-test:/workspace" \
+            "$IMAGE:1.3.0" \
+            --target /workspace/demo \
+            --profile SMALL \
+            --product-id ghcr-disposable-test \
+            --language en \
+            --no-feedback-workflow
+          test -f "$RUNNER_TEMP/ghcr-test/demo/.agentic-sdlc/state/PRODUCT_STATE_CURRENT.json"
+      - name: Publish package
+        run: docker push "$IMAGE:1.3.0"
+      - name: Verify registry existence with readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker manifest inspect "$IMAGE:1.3.0" > /dev/null
+          echo "GHCR package pushed and registry manifest verified: $IMAGE:1.3.0"
