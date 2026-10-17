@@ -2,7 +2,7 @@
 
 Guía pública para personas que quieren aplicar ArquitecturaRepo a un proyecto propio. Esta edición revisa el texto de la colección original del 22/09/2026 y solo modifica o añade las instrucciones necesarias para reflejar el release **v1.3.0** publicado el 17/10/2026.
 
-**Fuente canónica del software**: [release v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0), commit `9c00e19b74d19c741983987b9359cb5c2ac83c55`. La rama `main` puede contener documentación y procesos posteriores, pero el paquete versionado se construye desde el tag.
+**Fuente canónica del software**: [release v1.3.0](https://github.com/ArquitecturaRepo/releases/tag/v1.3.0), commit `9c00e19b74d1`. La rama `main` puede contener documentación y procesos posteriores, pero el paquete versionado se construye desde el tag.
 
 ## Guías
 
@@ -31,9 +31,9 @@ En Bash:
 docker run --rm -v "$(pwd):/workspace" ghcr.io/matiasacunia/arquitecturarepo:1.3.0 --target /workspace/mi-proyecto --profile SMALL --product-id mi-proyecto --language es --no-feedback-workflow
 ```
 
-La imagen se publica desde [el workflow verificable de GitHub Actions](https://github.com/MatiasAcunia/ArquitecturaRepo/actions/workflows/publish-ghcr-package.yml). **GHCR puede iniciar con visibilidad privada: el propietario debe seleccionar Public en Package settings para garantizar descargas anónimas.** No confundir un push exitoso con confirmación de visibilidad pública.
+La imagen se publica desde [el workflow verificable de GitHub Actions](https://github.com/ArquitecturaRepo/actions/workflows/publish-ghcr-package.yml). **GHCR puede iniciar con visibilidad privada: el propietario debe seleccionar Public en Package settings para garantizar descargas anónimas.** No confundir un push exitoso con confirmación de visibilidad pública.
 
-Otra opción es descargar el [ZIP portable del Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip), descomprimirlo y ejecutar `python tools/scaffold_project.py --help`.
+Otra opción es descargar el [ZIP portable del Release](https://github.com/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip), descomprimirlo y ejecutar `python tools/scaffold_project.py --help`.
 
 ## Advertencias y alcance real
 
