@@ -266,7 +266,7 @@ trabajo que una sesión nueva pueda reconstruir. Que esa continuidad se logre de
 deduce de instalar el starter.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • examples/minimal/README.md
   • docs/01_FORK_AND_BOOTSTRAP.md
