@@ -260,7 +260,7 @@ no superó la prueba de continuidad.
 Continuar con: Manual 07, un ejemplo guiado de principio a fin.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • protocols/REVIEW_FREEZE_AND_TERMINAL_INTEGRITY.md
   • protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md
