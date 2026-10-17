@@ -295,7 +295,7 @@ nueva demuestra continuidad cuando puede recuperar ese estado por su cuenta. En 
 debe confundir la sesión que sigue abierta con un proyecto realmente recuperable.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • protocols/EXECUTION_TEAM_OS.md
   • protocols/CAPABILITY_LIFECYCLE_AND_EVIDENCE.md
