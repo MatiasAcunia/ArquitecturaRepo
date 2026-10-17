@@ -4,7 +4,7 @@
 
 ## Actualización comprobada para v1.3.0
 
-- Versión publicada: `v1.3.0`, commit `9c00e19b74d19c741983987b9359cb5c2ac83c55`, GitHub Release del 17/10/2026; el manual de septiembre se basó en v1.1.
+- Versión publicada: `v1.3.0`, commit `9c00e19b74d1`, GitHub Release del 17/10/2026; el manual de septiembre se basó en v1.1.
 - El starter ofrece instalación y control de ingeniería, no un agente general capaz de construir cualquier aplicación automáticamente. Su núcleo es portable y funciona sin modelos pagados.
 - La capacidad real depende de cada adaptador. `host_dispatch.py` rechaza un host si no puede comprobar límites de escritura y costo; Codex Desktop nativo no está aceptado como integración universal.
 - La entrega requiere evidencia separada de contrato/código (A) y uso real del sistema instalado (B), más los gates de producto pertinentes.
@@ -331,7 +331,7 @@ recuperación, no en la cantidad de pantallas o agentes activos.
 Continuar con: Manual 01, instalación.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • README.md
   • LICENSE
