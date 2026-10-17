@@ -103,7 +103,7 @@ Figura 3. De scaffold a adopción. Esquema explicativo; no acredita un proyecto 
 
 
 
- 1. Abrí MatiasAcunia/ArquitecturaRepo en GitHub y revisá el README y la licencia MIT.
+ 1. Abrí ArquitecturaRepo en GitHub y revisá el README y la licencia MIT.
  2. Hacé un fork a tu cuenta si querés mantener una copia propia del starter. El fork no es tu aplicación.
  3. Creá el repositorio de la aplicación; puede ser privado. Si ya existe un proyecto real, usá ese
     repositorio y no fabriques uno nuevo para “empezar limpio”.
@@ -349,7 +349,7 @@ ambos estados es una de las protecciones centrales del sistema.
 Continuar con: Manual 02, configurar el Planner y adoptar el proyecto.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • README.md
   • prompts/INSTALL_THIS_SDLC.md
