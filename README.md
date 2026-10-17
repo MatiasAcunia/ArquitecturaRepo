@@ -29,15 +29,18 @@ This repository is not a prompt collection. It is an operating architecture for 
 [Documentation index](docs/README.md) distinguishes **adopter guidance**, supported technical reference, and contributor-only QA/research material. Historical maintainer execution logs and private pilot materials are **not** installation instructions, runtime authority, or distributed starter files.
 
 - [Install/adapt the SDLC](prompts/INSTALL_THIS_SDLC.md) and [FAQ](docs/FAQ_ES.md).
+- [Manual completo en español (capítulos 00–07), revisado para v1.3.0](docs/manual/ES/README.md).
 - [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
 - [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
 - [Current contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). This is engineering work in progress, **not** the public release or proof of native agent execution.
 
 The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or use the reviewed migration/adoption path when a governed control layer already exists.
 
-## v1.3.0 — candidate portable framework (not yet published)
+## v1.3.0 — published portable framework
 
-v1.3 strengthens the portable Goal/Plan/campaign lifecycle, physically revalidates frozen independent review evidence, binds controlled work-unit starts to the active actor/run/lease, and refuses shadow Product State creation in already governed projects. A deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **An untagged branch is only a candidate:** published v1.3.0 is identified by a separately authorized tag on the exact accepted commit. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Release notes, supported scope and upgrade/rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
+v1.3 strengthens the portable Goal/Plan/campaign lifecycle, physically revalidates frozen independent review evidence, binds controlled work-unit starts to the active actor/run/lease, and refuses shadow Product State creation in already governed projects. A deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **v1.3.0 is published** at the immutable, manually authorized [tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0); subsequent untagged work on `main` is not automatically part of that release. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Release notes, supported scope and upgrade/rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
+
+The v1.3.0 source is also distributed as a verified [portable ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip). A Docker-based scaffold is published under `ghcr.io/matiasacunia/arquitecturarepo:1.3.0`, with [instructions in the Spanish manual](docs/manual/ES/README.md). GitHub Container Registry package visibility is independently managed and should be confirmed as public before advertising anonymous pulls.
 
 ## v1.2.0 — released portable features
 
