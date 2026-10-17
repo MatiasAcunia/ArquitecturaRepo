@@ -264,7 +264,7 @@ irreversible.
 Continuar con: Manual 05 ante errores o autorizaciones sensibles; Manual 06 para cerrar el ciclo.
 
 Referencias de esta edición
-Fuente: repositorio público MatiasAcunia/ArquitecturaRepo en el commit 56f04267b6a9 . Rutas verificadas:
+Fuente: repositorio público ArquitecturaRepo en el commit 9c00e19b74d1 . Rutas verificadas:
 
   • protocols/CLIENT_BOUNDARY.md
   • protocols/INTERACTION_LEDGER.md
