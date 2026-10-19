@@ -124,6 +124,34 @@ def verify(path: Path) -> dict:
         return {"verified":True,"goal_id":man["goal_id"],
                 "head":man["head_sha"],"files":len(sources)}
 
+def l2_input_preflight(daypack: Path, progress: Path | None) -> dict:
+    """Validate the two L2 inputs, without conflating daypack and Goal truth."""
+    daypack=Path(daypack)
+    if daypack.stat().st_size>256*1024*1024:
+        raise PacketHold("DAYPACK_EXCEEDS_BOUNDED_SIZE")
+    with zipfile.ZipFile(daypack) as z:
+        entries=z.infolist()
+        if not entries or len(entries)>20000 or z.testzip() is not None:
+            raise PacketHold("INVALID_DAYPACK")
+        if any(x.filename.startswith("/") or ".." in Path(x.filename).parts
+               or "\\\\" in x.filename for x in entries):
+            raise PacketHold("DAYPACK_UNSAFE_PATH")
+        day={"path":str(daypack),"sha256":digest(daypack.read_bytes()),
+             "entries":len(entries),"authority":"HISTORICAL_EVIDENCE_ONLY"}
+    if progress is None:
+        return {"daypack":day,"goal_progress":"EXPLICITLY_ABSENT_OR_NOT_YET_RECEIVED",
+                "planner_gate":"RECONCILE_LIVE_STATE_AND_EXPLAIN_ABSENCE"}
+    with zipfile.ZipFile(progress) as z:
+        if z.testzip() is not None: raise PacketHold("GOAL_PROGRESS_CORRUPT")
+        man=json.loads(z.read("SHA256_MANIFEST.json"))
+        actual={n:digest(z.read(n)) for n in z.namelist() if n!="SHA256_MANIFEST.json"}
+        if actual!=man["members"]: raise PacketHold("GOAL_PROGRESS_SHA_MISMATCH")
+        receipt=json.loads(z.read("EXPORT_RECEIPT.json"))
+    return {"daypack":day,"goal_progress":{"goal_id":receipt["goal_id"],
+            "sha256":digest(Path(progress).read_bytes()),
+            "class":receipt["recovery_class"]},
+            "planner_gate":"EXACT_LIVE_SOURCE_AND_PRODUCT_CURRENTNESS_RECONCILIATION_REQUIRED"}
+
 def two_zip_preflight(sip: Path,progress: Path|None) -> dict:
     source=verify(sip)
     if progress is None:
@@ -151,10 +179,14 @@ def main() -> int:
     v=sub.add_parser("verify");v.add_argument("--zip",type=Path,required=True)
     t=sub.add_parser("two-zip-preflight");t.add_argument("--sip",type=Path,required=True)
     t.add_argument("--progress",type=Path)
+    l=sub.add_parser("l2-two-zip-preflight")
+    l.add_argument("--daypack",type=Path,required=True)
+    l.add_argument("--progress",type=Path)
     a=p.parse_args()
     try:
         if a.command=="build": result=build(a.repo,json.loads(a.spec.read_text()),a.output)
         elif a.command=="verify": result=verify(a.zip)
+        elif a.command=="l2-two-zip-preflight": result=l2_input_preflight(a.daypack,a.progress)
         else: result=two_zip_preflight(a.sip,a.progress)
         print(json.dumps(result,indent=2,sort_keys=True))
         return 0
