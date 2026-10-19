@@ -58,12 +58,17 @@ def verify_candidate(root: Path, value: dict, *, engine_id: str, source_paths: l
         raise EngineRegistryError("PRE_RELEASE_VERSION_REQUIRED:" + engine_id)
     if not isinstance(commit, str) or not re.fullmatch("[a-f0-9]{40}", commit):
         raise EngineRegistryError("CANDIDATE_EXACT_COMMIT_REQUIRED")
-    if not isinstance(blobs, dict) or set(blobs) != set(source_paths):
+    # Version history must survive file moves/renames. Validate current
+    # manifest paths separately; candidate source keys belong to its own
+    # historical immutable commit, not necessarily today's file locations.
+    if not isinstance(blobs, dict) or not blobs:
         raise EngineRegistryError("CANDIDATE_CODE_COVERAGE_MISMATCH")
     if value.get("promotable_to_release") is not False:
         raise EngineRegistryError("UNPROVEN_CANDIDATE_CANNOT_PROMOTE")
-    for path in source_paths:
-        _path(root, path)
+    for path in blobs:
+        if (not isinstance(path, str) or not path or "\\" in path
+                or Path(path).is_absolute() or ".." in Path(path).parts):
+            raise EngineRegistryError("BAD_HISTORICAL_SOURCE_PATH")
         result = subprocess.run(["git", "-C", str(root), "show", commit + ":" + path],
                                 capture_output=True, timeout=15, check=False)
         if result.returncode:
