@@ -12,3 +12,10 @@ Engine: `arquitectura.portable-goal-engineering`. Releases accepted: **none**. A
 - This is **not** `RELEASED` or `ADOPTED`; any future release requires exact commit, source/contract hashes, passed gate receipts, compatibility and rollback.
 
 Future candidate/release entries must reference the previous exact version and explain WHAT changed, WHY, HOW, consumer impact, migrations and physical falsifiers. Preserve earlier version receipts; do not rewrite accepted history.
+
+## 0.1.0-candidate.2 — 2026-10-19 (SOURCE-PINNED CANDIDATE)
+
+- Built an offline complete L2 source SIP with two distinct handoff pair preflights: L2 consumes daypack+Goal ZIP; L3 consumes SIP+Goal ZIP.
+- Explicit safe single-key Gemini authentication through local numbered text files; public/synthetic and USD 0 provider gate still independent.
+- Current code-bound source ref, 7 source-file blob SHA-1 identities and 3 relevant test owners in `engine.json`.
+- No local Codex/Windows/Gemini-provider/DB/physical gates accepted. Not released/adopted. Previous immutable candidate: `0.1.0-candidate.1`.
