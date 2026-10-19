@@ -73,14 +73,29 @@ def consult_public_or_synthetic(*, model: str, question: str,
             or not isinstance(proof.get("expires_unix"), (int, float))
             or not time.time() < proof["expires_unix"] <= time.time() + 3600):
         raise CognitiveHold("HOLD_GEMINI_COST_NOT_VERIFIED")
+    # Pin the declared admission to the actually selected authentication
+    # identity when a trustworthy operator supplied its hash. Never log the
+    # raw key, and do not rotate through Desktop files to evade free quotas.
     # Explicit local opt-in is separate from mere presence of a provider key.
     if os.environ.get("AGENTIC_SDLC_GEMINI_ENABLED") != "true":
         raise CognitiveHold("GEMINI_TRANSPORT_NOT_OPTED_IN")
     if not (0 < timeout <= 30):
         raise CognitiveHold("GEMINI_TIMEOUT_OUT_OF_BOUNDS")
-    key = os.environ.get("GEMINI_API_KEY")
-    if not key:
-        raise CognitiveHold("GEMINI_API_KEY_NOT_CONFIGURED")
+    try:
+        try:
+            from .gemini_keyfile import resolve_key, GeminiCredentialHold
+        except ImportError:
+            from gemini_keyfile import resolve_key, GeminiCredentialHold
+        key = resolve_key()
+    except GeminiCredentialHold as exc:
+        # Keep secret material out of exceptions/receipts. Authentication
+        # is NOT evidence of free eligibility or authorized export.
+        raise CognitiveHold(str(exc)) from None
+    expected_hash = proof.get("api_key_sha256")
+    if expected_hash is not None and (
+            not isinstance(expected_hash, str)
+            or expected_hash != hashlib.sha256(key.encode("utf-8")).hexdigest()):
+        raise CognitiveHold("GEMINI_ACCOUNT_BINDING_MISMATCH")
     if transport is None:
         transport = urlopen
     # The model/version and quota are caller-owned and must have been verified.
