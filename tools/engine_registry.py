@@ -102,7 +102,7 @@ def index(root: Path) -> list[dict[str, Any]]:
             raise EngineRegistryError("ENGINE_CODE_REQUIRED:" + engine_id)
         for ref in sources:
             _path(root, ref)
-        for ref_field in ("design_ref", "contract_ref"):
+        for ref_field in ("design_ref", "contract_ref", "changelog_ref"):
             _path(root, row.get(ref_field))
         tests = row.get("test_refs")
         if not isinstance(tests, list) or not tests:
@@ -141,6 +141,7 @@ def index(root: Path) -> list[dict[str, Any]]:
                         "source_paths": sources,
                         "design_ref": row["design_ref"],
                         "contract_ref": row["contract_ref"],
+                        "changelog_ref": row["changelog_ref"],
                         "releases": sorted(released_versions),
                         "candidates": sorted(candidate_versions)})
     return sorted(records, key=lambda x: x["engine_id"])
