@@ -17,6 +17,7 @@ class EngineRegistryTests(unittest.TestCase):
         record = next(row for row in rows if row["engine_id"] == "arquitectura.portable-goal-engineering")
         self.assertIsNone(record["adopted_version"])
         self.assertFalse(record["releases"])
+        self.assertEqual(record["candidates"], ["0.1.0-candidate.1"])
 
     def test_invalid_catalog_file_is_not_authority(self):
         with tempfile.TemporaryDirectory() as name:
