@@ -131,7 +131,11 @@ def l2_input_preflight(daypack: Path, progress: Path | None) -> dict:
         raise PacketHold("DAYPACK_EXCEEDS_BOUNDED_SIZE")
     with zipfile.ZipFile(daypack) as z:
         entries=z.infolist()
-        if not entries or len(entries)>20000 or z.testzip() is not None:
+        if (not entries or len(entries)>20000
+            or sum(i.file_size for i in entries)>1024*1024*1024
+            or any(i.file_size>128*1024*1024 for i in entries)):
+            raise PacketHold("INVALID_OR_OVERSIZED_DAYPACK")
+        if z.testzip() is not None:
             raise PacketHold("INVALID_DAYPACK")
         if any(x.filename.startswith("/") or ".." in Path(x.filename).parts
                or "\\\\" in x.filename for x in entries):
