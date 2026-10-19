@@ -1,0 +1,21 @@
+{
+  "schema": "engine-manifest-v1",
+  "engine_id": "arquitectura.portable-goal-engineering",
+  "name": "Portable Goal Engineering Engine",
+  "owner": "ArquitecturaRepo portable tooling",
+  "lifecycle": "DEFINED",
+  "source_paths": [
+    "tools/goal_plan.py",
+    "tools/host_dispatch.py",
+    "tools/cognitive_i4.py",
+    "tools/cognitive_ledger.py",
+    "tools/engine_registry.py"
+  ],
+  "design_ref": "engines/portable-goal/DESIGN.md",
+  "contract_ref": "engines/portable-goal/CONTRACT.md",
+  "test_refs": [
+    "tools/selftest_operational_v12.py"
+  ],
+  "adopted_version": null,
+  "release_receipts": []
+}
