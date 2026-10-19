@@ -99,3 +99,7 @@ Before material spend, bind:
 - stop condition.
 
 Paid capacity is never implied by internal readiness.
+
+## Explicit zero-spend Gemini auxiliary engineering — 2026-10-19
+
+A local `gemini<number>.txt` API key is authentication only. `tools/gemini_keyfile.py` accepts exactly one explicit local file or an unambiguous opt-in directory, keeps the key off stdout/Git/ZIP and refuses credential rotation to evade quotas. Before any `tools/cognitive_i4.py` network call, independently verify from the real account/project/model and current official pricing that the chosen operation has FREE-tier availability, remaining RPM/TPM/RPD, no billable features, authorized spend exactly USD 0 and safe data export. The caller's zero-cost proof is input that must be substantiated by actual provider/account readback; merely supplying a JSON `billing_enabled=false` attestation does NOT prove the provider account state. Paid project, unavailable/free quota exhausted, premium service, uncertain billing or private source export => HOLD the Gemini call only, never auto-pay or rotate keys. The model's engineering proposals can prepare bounded algorithms/code/tests/synthetic fixtures and independent critique, but never count as live source integration, engine acceptance or real perceptual review. Official price and billing sources: https://ai.google.dev/gemini-api/docs/pricing and https://ai.google.dev/gemini-api/docs/billing. No fixed model SKU or numeric free quota is permanent policy.
