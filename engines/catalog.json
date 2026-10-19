@@ -1,0 +1,7 @@
+{
+  "schema": "engine-catalog-v1",
+  "authority_class": "DISCOVERY_ONLY_NOT_PRODUCT_STATE",
+  "manifests": [
+    "engines/portable-goal/engine.json"
+  ]
+}
