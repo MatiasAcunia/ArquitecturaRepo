@@ -17,5 +17,22 @@
     "tools/selftest_operational_v12.py"
   ],
   "adopted_version": null,
-  "release_receipts": []
+  "release_receipts": [],
+  "candidates": [
+    {
+      "version": "0.1.0-candidate.1",
+      "source_commit_sha": "40479905e4718dfe0034fef01bfe947f9a5a4130",
+      "source_git_blob_sha1": {
+        "tools/goal_plan.py": "e6035f402810cc04bc78cf8124f07fb61bd08cec",
+        "tools/host_dispatch.py": "3fe417ce19181ca09bff23494bb24bffca5d16e8",
+        "tools/cognitive_i4.py": "566024c722827b8f8f77b5f1f1b6645ae940dd74",
+        "tools/cognitive_ledger.py": "4b2850fa914510e6fd46394dfa67debf9b95f243",
+        "tools/engine_registry.py": "5ec819178a644e5d1e7e885d5ecb274346b4c973"
+      },
+      "classification": "CODE_IDENTITY_VERIFIED_TESTS_AND_PRODUCT_GATES_UNRUN",
+      "verified_product_gate_state": "UNKNOWN",
+      "promotable_to_release": false,
+      "reason": "First exact source-identity baseline for code-owned engine; no release accepted"
+    }
+  ]
 }
