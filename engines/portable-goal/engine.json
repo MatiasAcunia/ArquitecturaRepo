@@ -9,12 +9,16 @@
     "tools/host_dispatch.py",
     "tools/cognitive_i4.py",
     "tools/cognitive_ledger.py",
-    "tools/engine_registry.py"
+    "tools/engine_registry.py",
+    "tools/engineering_packet.py",
+    "tools/gemini_keyfile.py"
   ],
   "design_ref": "engines/portable-goal/DESIGN.md",
   "contract_ref": "engines/portable-goal/CONTRACT.md",
   "test_refs": [
-    "tools/selftest_operational_v12.py"
+    "tools/selftest_operational_v12.py",
+    "tools/test_engineering_packet.py",
+    "tools/test_engine_registry.py"
   ],
   "adopted_version": null,
   "release_receipts": [],
@@ -33,6 +37,24 @@
       "verified_product_gate_state": "UNKNOWN",
       "promotable_to_release": false,
       "reason": "First exact source-identity baseline for code-owned engine; no release accepted"
+    },
+    {
+      "version": "0.1.0-candidate.2",
+      "source_commit_sha": "e46b84ef4cc7e9dab381e1f1c5511d17d67503ba",
+      "source_git_blob_sha1": {
+        "tools/goal_plan.py": "e6035f402810cc04bc78cf8124f07fb61bd08cec",
+        "tools/host_dispatch.py": "3fe417ce19181ca09bff23494bb24bffca5d16e8",
+        "tools/cognitive_i4.py": "37a2db24953b8fb9f2d3c06c44749320335d8210",
+        "tools/cognitive_ledger.py": "4b2850fa914510e6fd46394dfa67debf9b95f243",
+        "tools/engine_registry.py": "d60bcaba077115848fc5231870bb418000dd4947",
+        "tools/engineering_packet.py": "1536898f0ffa99bfa05b9cbfa872f02ae8699c51",
+        "tools/gemini_keyfile.py": "7ea8c4190e6f87584511f7369f4a4f97234109b3"
+      },
+      "classification": "PORTABLE_SIP_TWO_ZIP_GEMINI_KEYFILE_AND_ENGINE_HISTORY_SOURCE_PINNED",
+      "verified_product_gate_state": "UNKNOWN",
+      "promotable_to_release": false,
+      "previous_version": "0.1.0-candidate.1",
+      "reason": "Role-neutral L3/L4, offline SIP builder and selected local Gemini keyfile; host and physical acceptance unverified"
     }
   ],
   "changelog_ref": "engines/portable-goal/CHANGELOG.md"
