@@ -140,16 +140,47 @@ def verify_release(root: Path, receipt_ref: str, *, expected_id: str | None = No
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["list", "show", "validate", "verify-release"])
+    parser.add_argument("command", choices=["list", "show", "validate", "verify-release", "history", "diff"])
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--engine-id")
     parser.add_argument("--receipt")
+    parser.add_argument("--from-receipt")
+    parser.add_argument("--to-receipt")
     args = parser.parse_args()
     try:
         if args.command == "verify-release":
             if not args.receipt:
                 parser.error("--receipt is required")
             result: Any = verify_release(args.root, args.receipt)
+        elif args.command == "diff":
+            if not args.from_receipt or not args.to_receipt:
+                parser.error("--from-receipt and --to-receipt are required")
+            before = verify_release(args.root, args.from_receipt)
+            after = verify_release(args.root, args.to_receipt)
+            if before["engine_id"] != after["engine_id"]:
+                raise EngineRegistryError("DIFF_ENGINE_ID_MISMATCH")
+            left = before["source_file_sha256"]
+            right = after["source_file_sha256"]
+            result = {"engine_id": before["engine_id"],
+                      "from": before["version"], "to": after["version"],
+                      "previous_version_declared": after.get("previous_version"),
+                      "contract_changed": before["contract_sha256"] != after["contract_sha256"],
+                      "paths_added": sorted(set(right) - set(left)),
+                      "paths_removed": sorted(set(left) - set(right)),
+                      "paths_changed": sorted(k for k in set(left) & set(right) if left[k] != right[k]),
+                      "source_commits": [before["source_commit_sha"], after["source_commit_sha"]]}
+        elif args.command == "history":
+            if not args.engine_id:
+                parser.error("--engine-id is required")
+            matches = [row for row in index(args.root) if row["engine_id"] == args.engine_id]
+            if not matches:
+                raise EngineRegistryError("ENGINE_NOT_FOUND")
+            manifest = _load(args.root, matches[0]["manifest_ref"])
+            result = [{"version": r["version"], "commit": r["source_commit_sha"],
+                       "previous_version": r.get("previous_version"),
+                       "evidence_ref": r.get("evidence_ref")}
+                      for r in [verify_release(args.root, ref, expected_id=args.engine_id)
+                                for ref in manifest.get("release_receipts", [])]]
         else:
             records = index(args.root)
             if args.command == "list":
