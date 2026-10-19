@@ -167,10 +167,30 @@ def verify_release(root: Path, receipt_ref: str, *, expected_id: str | None = No
                                 capture_output=True, timeout=15, check=False)
         if result.returncode or sha256(result.stdout) != expected:
             raise EngineRegistryError("SOURCE_RELEASE_HASH_MISMATCH:" + path)
-    for field in ("contract_sha256", "evidence_ref", "promoted_by", "previous_version",
-                  "rollback_ref"):
+    for field in ("contract_ref", "contract_sha256", "evidence_ref",
+                  "promoted_by", "previous_version", "rollback_ref", "gate_receipts"):
         if field not in release:
             raise EngineRegistryError("RECEIPT_FIELD_MISSING:" + field)
+    contract_ref = release["contract_ref"]
+    if not isinstance(contract_ref, str) or not contract_ref:
+        raise EngineRegistryError("RELEASE_CONTRACT_REF_REQUIRED")
+    contract = subprocess.run(["git", "-C", str(root), "show",
+                               commit + ":" + contract_ref],
+                              capture_output=True, timeout=15, check=False)
+    if contract.returncode or sha256(contract.stdout) != release["contract_sha256"]:
+        raise EngineRegistryError("RELEASE_CONTRACT_SHA_MISMATCH")
+    if not isinstance(release["promoted_by"], str) or not release["promoted_by"]:
+        raise EngineRegistryError("RELEASE_PROMOTION_AUTHORITY_REQUIRED")
+    gates = release["gate_receipts"]
+    if not isinstance(gates, dict) or not gates:
+        raise EngineRegistryError("RELEASE_PHYSICAL_GATES_REQUIRED")
+    for name, gate in gates.items():
+        if (not isinstance(name, str) or not isinstance(gate, dict)
+                or gate.get("status") != "PASS"
+                or not isinstance(gate.get("evidence_ref"), str)
+                or not gate["evidence_ref"]):
+            raise EngineRegistryError("RELEASE_GATE_EVIDENCE_REQUIRED:" + str(name))
+        _path(root, gate["evidence_ref"])
     if release["evidence_ref"]:
         _path(root, release["evidence_ref"])
     if release["rollback_ref"]:
