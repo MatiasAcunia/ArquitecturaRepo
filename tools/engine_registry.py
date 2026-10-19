@@ -48,6 +48,34 @@ def _load(root: Path, relative: str) -> dict:
     return value
 
 
+def verify_candidate(root: Path, value: dict, *, engine_id: str, source_paths: list[str]) -> dict:
+    """Verify a source-pinned pre-release; never upgrade it to RELEASED."""
+    root = Path(root).resolve(strict=True)
+    version = value.get("version")
+    commit = value.get("source_commit_sha")
+    blobs = value.get("source_git_blob_sha1")
+    if not isinstance(version, str) or not SEMVER.fullmatch(version) or "-" not in version:
+        raise EngineRegistryError("PRE_RELEASE_VERSION_REQUIRED:" + engine_id)
+    if not isinstance(commit, str) or not re.fullmatch("[a-f0-9]{40}", commit):
+        raise EngineRegistryError("CANDIDATE_EXACT_COMMIT_REQUIRED")
+    if not isinstance(blobs, dict) or set(blobs) != set(source_paths):
+        raise EngineRegistryError("CANDIDATE_CODE_COVERAGE_MISMATCH")
+    if value.get("promotable_to_release") is not False:
+        raise EngineRegistryError("UNPROVEN_CANDIDATE_CANNOT_PROMOTE")
+    for path in source_paths:
+        _path(root, path)
+        result = subprocess.run(["git", "-C", str(root), "show", commit + ":" + path],
+                                capture_output=True, timeout=15, check=False)
+        if result.returncode:
+            raise EngineRegistryError("CANDIDATE_HISTORICAL_SOURCE_MISSING:" + path)
+        raw = result.stdout
+        git_sha = hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") +
+                               b"\\0" + raw).hexdigest()
+        if git_sha != blobs[path]:
+            raise EngineRegistryError("CANDIDATE_BLOB_SHA_MISMATCH:" + path)
+    return value
+
+
 def index(root: Path) -> list[dict[str, Any]]:
     root = Path(root).resolve(strict=True)
     catalog = _load(root, "engines/catalog.json")
@@ -81,6 +109,17 @@ def index(root: Path) -> list[dict[str, Any]]:
             raise EngineRegistryError("ENGINE_TEST_OWNER_REQUIRED:" + engine_id)
         for ref in tests:
             _path(root, ref)
+        candidates = row.get("candidates", [])
+        if not isinstance(candidates, list):
+            raise EngineRegistryError("INVALID_CANDIDATE_LIST")
+        candidate_versions = []
+        for c in candidates:
+            if not isinstance(c, dict):
+                raise EngineRegistryError("MALFORMED_ENGINE_CANDIDATE")
+            verified = verify_candidate(root, c, engine_id=engine_id, source_paths=sources)
+            candidate_versions.append(verified["version"])
+        if len(candidate_versions) != len(set(candidate_versions)):
+            raise EngineRegistryError("DUPLICATE_ENGINE_CANDIDATE_VERSION")
         adopted = row.get("adopted_version")
         receipts = row.get("release_receipts", [])
         if not isinstance(receipts, list):
@@ -102,7 +141,8 @@ def index(root: Path) -> list[dict[str, Any]]:
                         "source_paths": sources,
                         "design_ref": row["design_ref"],
                         "contract_ref": row["contract_ref"],
-                        "releases": sorted(released_versions)})
+                        "releases": sorted(released_versions),
+                        "candidates": sorted(candidate_versions)})
     return sorted(records, key=lambda x: x["engine_id"])
 
 
