@@ -34,5 +34,6 @@
       "promotable_to_release": false,
       "reason": "First exact source-identity baseline for code-owned engine; no release accepted"
     }
-  ]
+  ],
+  "changelog_ref": "engines/portable-goal/CHANGELOG.md"
 }
