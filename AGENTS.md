@@ -24,6 +24,8 @@ The CLIENT is external.
 
 I1 is optional as a separately active role for small single-project installations. Reviewers, architects, researchers and specialists are bounded I4 subroles unless the adapted project physically requires another independently planned project/workstream boundary.
 
+**Role/model split (current):** CLIENT selects the L3 model/effort for the whole Goal; I2/L2 may recommend low/medium, not choose. L3 controls an evolving long Goal with N-invocation Cycles and selects a verified available economical high-effort coding model for L4, not a hardcoded codename. L4 is a portfolio resource with one managed writer globally, not an OpenAI model identity. L2 consumes the project daypack + durable L3 Goal ZIP, engineers deeply offline through multiple sessions, and emits a source-complete SIP ZIP via `tools/engineering_packet.py`; L3 consumes SIP + Goal ZIP. Tool `tools/gemini_keyfile.py` reads an explicitly chosen local Gemini text key only where configured; free provider billing/quota and export authority remain independent hard gates. `tools/artifact_ledger.py` is the one file-level L3-generated-artifact JSON/GC owner. Product engines produce high-volume outputs, not LLMs selecting each individual asset.
+
 ## Read order
 
 Before material adaptation or planning:
@@ -139,6 +141,6 @@ Read `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` before recommending async/mi
 
 Read `docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md` for the isolated longitudinal CRUD pilot; never ship a test project's Product State as a user template. Abnormal agent behavior is investigated by causal owner and evidence, not by opening microcampaigns/branches. Repository CLIENT theory must be durable, accurately versioned and internally consistent before any material route.
 
-## 2026-10-19 durable product engines / free Gemini / Sol-Luna
+## 2026-10-19 durable product engines / free Gemini / role-neutral L2-L3-L4
 
-The reusable starter is subordinate to installed product/OWNER authority. `engines/catalog.json` locates code-linked `arquitectura.portable-goal-engineering` design and contract; `tools/engine_registry.py` validates actual source links and release receipts. `tools/cognitive_i4.py` and the existing cognitive ledger support source-bound Gemini engineering proposals (code, tests, design, review), fail-closed without actual USD 0 provider admission and PUBLIC_OR_SYNTHETIC export. OWNER owns shared Luna admission and Goal ZIP lifecycle; this portable repo does not govern or prove native Desktop sessions. Sol directs tactical Cycles and Luna implements code. A manifest in DEFINED state has no accepted product release.
+The reusable starter is subordinate to installed product/OWNER authority. `engines/catalog.json` locates code-linked `arquitectura.portable-goal-engineering` design and contract; `tools/engine_registry.py` validates actual source links and release receipts. `tools/cognitive_i4.py` and the existing cognitive ledger support source-bound Gemini engineering proposals (code, tests, design, review), fail-closed without actual USD 0 provider admission and PUBLIC_OR_SYNTHETIC export. OWNER owns shared L4 admission and Goal ZIP lifecycle; this portable repo does not govern or prove native Desktop sessions. L3 directs tactical Cycles and L4 implements code. A manifest in DEFINED state has no accepted product release.
