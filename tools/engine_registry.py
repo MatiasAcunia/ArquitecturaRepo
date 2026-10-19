@@ -70,7 +70,7 @@ def verify_candidate(root: Path, value: dict, *, engine_id: str, source_paths: l
             raise EngineRegistryError("CANDIDATE_HISTORICAL_SOURCE_MISSING:" + path)
         raw = result.stdout
         git_sha = hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") +
-                               b"\\0" + raw).hexdigest()
+                               bytes([0]) + raw).hexdigest()
         if git_sha != blobs[path]:
             raise EngineRegistryError("CANDIDATE_BLOB_SHA_MISMATCH:" + path)
     return value
