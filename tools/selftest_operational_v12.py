@@ -204,9 +204,19 @@ def test_cognitive() -> None:
         must_fail(lambda: consult_public_or_synthetic(
             model="../evil", question="Review this public synthetic plan.",
             export_classification="PUBLIC_OR_SYNTHETIC"), CognitiveHold)
+        from time import time as _unix_time
+        proof = {"model": "test-model", "tier": "FREE", "billing_enabled": False,
+                 "eligible_for_free_generate_content": True,
+                 "authorized_spend_usd": 0, "project_id": "synthetic-test-project",
+                 "source_ref": "synthetic-offline-only", "remaining_free_requests": 1,
+                 "expires_unix": _unix_time() + 120}
         out = consult_public_or_synthetic(model="test-model", question="Review this public synthetic plan.",
                                          export_classification="PUBLIC_OR_SYNTHETIC",
+                                         engineering_role="code_proposal",
+                                         zero_cost_admission=proof,
                                          transport=lambda request, timeout: Response())
+        assert out["authorized_spend_usd"] == 0
+        assert out["engineering_role"] == "code_proposal"
         assert out["status"] == "DELIVERY_PENDING"
         assert out["consumed_by_i3"] is False
     finally:
