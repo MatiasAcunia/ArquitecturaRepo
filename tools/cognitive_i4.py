@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
+import hashlib
 from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
@@ -40,13 +42,37 @@ def due_check(*, material_entry: bool, evidence_changed: bool,
 
 def consult_public_or_synthetic(*, model: str, question: str,
                                 export_classification: str, timeout: float = 15.0,
-                                transport=None) -> dict[str, Any]:
+                                transport=None, engineering_role: str = "review",
+                                zero_cost_admission: dict[str, Any] | None = None) -> dict[str, Any]:
     if export_classification != "PUBLIC_OR_SYNTHETIC":
         raise CognitiveHold("PRIVATE_DATA_EXPORT_NOT_AUTHORIZED")
     if not isinstance(question, str) or not (10 <= len(question) <= 4000):
         raise CognitiveHold("BOUNDED_QUESTION_REQUIRED")
     if not isinstance(model, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{1,79}", model):
         raise CognitiveHold("INVALID_MODEL")
+    if engineering_role not in {"review", "code_proposal", "test_generation",
+                                "architecture_options", "failure_analysis",
+                                "engine_version_review", "contract_review"}:
+        raise CognitiveHold("UNSUPPORTED_GEMINI_ENGINEERING_ROLE")
+    # The expected provider project/tier/remaining free requests must be
+    # attested by the actual operator/billing owner immediately before use.
+    # Never mistake presence of GEMINI_API_KEY for USD 0 admission.
+    proof = zero_cost_admission
+    if (not isinstance(proof, dict)
+            or proof.get("model") != model
+            or proof.get("tier") != "FREE"
+            or proof.get("billing_enabled") is not False
+            or proof.get("eligible_for_free_generate_content") is not True
+            or proof.get("authorized_spend_usd") != 0
+            or not isinstance(proof.get("project_id"), str)
+            or not proof["project_id"]
+            or not isinstance(proof.get("source_ref"), str)
+            or not proof["source_ref"]
+            or type(proof.get("remaining_free_requests")) is not int
+            or proof["remaining_free_requests"] <= 0
+            or not isinstance(proof.get("expires_unix"), (int, float))
+            or not time.time() < proof["expires_unix"] <= time.time() + 3600):
+        raise CognitiveHold("HOLD_GEMINI_COST_NOT_VERIFIED")
     # Explicit local opt-in is separate from mere presence of a provider key.
     if os.environ.get("AGENTIC_SDLC_GEMINI_ENABLED") != "true":
         raise CognitiveHold("GEMINI_TRANSPORT_NOT_OPTED_IN")
@@ -86,7 +112,13 @@ def consult_public_or_synthetic(*, model: str, question: str,
     if len(raw.encode("utf-8")) > 40000:
         raise CognitiveHold("PROVIDER_PROPOSAL_TOO_LARGE")
     # Provider proposal remains NON_EXECUTABLE and UNCONSUMED.
-    return {"schema_version": "cognitive-i4-proposal-v1", "status": "DELIVERY_PENDING",
+    # A caller-supplied cost proof is a prerequisite, NOT independent billing
+    # verification or a guarantee that a provider charge is impossible.
+    return {"schema_version": "cognitive-i4-proposal-v2", "status": "DELIVERY_PENDING",
+            "engineering_role": engineering_role, "authorized_spend_usd": 0,
+            "request_sha256": hashlib.sha256(body).hexdigest(),
+            "response_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+            "cost_attestation_source_ref": proof["source_ref"],
             "source_classification": export_classification, "model": model,
             "proposal": result, "consumed_by_i3": False,
             "independent_validation": "NOT_PERFORMED"}
