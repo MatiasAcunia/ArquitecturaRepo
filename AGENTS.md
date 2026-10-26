@@ -1,5 +1,10 @@
 # Agentic SDLC Starter — Root Agent Instructions
 
+## CLIENT portfolio LiteLLM integration (2026-10-25)
+
+For this CLIENT's managed portfolio (OWNER + RED/TRO, CTR, ROBLOX, MUSIC), read the CURRENT single OWNER standard `MatiasAcunia/owner@main/state/CLIENT_PORTFOLIO_STRATEGY_CURRENT.md#CPS-010` and `#CPS-011` at relevant I2/I3 model-provider entry. Use **LiteLLM** as the default abstraction for new/materially touched LLM model calls, preferably the SDK in Python, only where actual model/provider compatibility and lawful zero-additional-charge operation are verified on the local host. The existing `tools/cognitive_i4.py` Gemini-only direct transport is NOT evidence of LiteLLM adoption; migration belongs to its current canonical adapter owner with backward-compatible synthetic tests and real guarded host proof. Do not silently change this public starter's semantics for unrelated projects, ship a new proxy/server by default, treat credentials as verified, pass secrets to Git/logs, or relax rights/quota/privacy/billing gates. This is a navigation note to the CLIENT portfolio owner and does not change PUBLIC_STARTER_STABLE release/product acceptance.
+
+
 Status: public starter root policy.
 
 This repository is an architecture template. Do not treat its example state as the truth of the target project.
