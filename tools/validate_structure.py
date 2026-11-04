@@ -198,6 +198,7 @@ def strip_approved_source_pins(text: str, rel: Path) -> str:
             for path, digest in blobs.items():
                 if (isinstance(path, str)
                     and re.fullmatch(r"tools/[a-zA-Z0-9_./-]+\.py", path)
+                    and ".." not in Path(path).parts
                     and isinstance(digest, str)
                     and re.fullmatch(r"[0-9a-f]{40}", digest)):
                     blobs[path] = "<immutable-engine-blob>"

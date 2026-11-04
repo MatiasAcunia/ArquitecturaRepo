@@ -54,6 +54,10 @@ class StructurePolicyTests(unittest.TestCase):
             ("engines/portable-goal/CHANGELOG.md", f"- Arbitrary source: `{commit}`"),
             ("engines/portable-goal/engine.json", json.dumps({**manifest, "private": commit})),
             ("engines/portable-goal/engine.json", json.dumps({**manifest, "unrelated": {"source_commit_sha": commit}})),
+            ("engines/portable-goal/engine.json", json.dumps({"candidates": [{
+                "source_commit_sha": commit,
+                "source_git_blob_sha1": {"tools/../private.py": blob},
+            }]})),
             ("engines/portable-goal/engine.json", '{"candidates": ' + commit),
         ):
             with self.subTest(relative=relative):
