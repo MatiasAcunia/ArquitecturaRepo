@@ -157,6 +157,10 @@ def main() -> int:
                 raise AssertionError("discovery overwrote an external target through symlinked output")
             if outside.read_text(encoding="utf-8") != "private-source-must-not-be-inventoried":
                 raise AssertionError("discovery changed an external file")
+            # The deliberate bad .json link is a test probe, not valid
+            # installed control state. Remove it before independent context
+            # reconstruction/JSON schema validation.
+            link.unlink()
 
         reconstructed = run(
             str(control / "tools" / "reconstruct_context.py"),
