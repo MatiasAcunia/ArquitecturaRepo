@@ -220,7 +220,7 @@ Post-1.0 rule:
 - future changes are driven by reproducible defects, compatibility/security issues or demonstrated generic adoption failures;
 - do not add roles, policies or examples merely to continue version iteration.
 
-Formal open-source licensing remains a separate repository-owner decision.
+The current repository source is distributed under the [MIT License](../LICENSE). Third-party assets or services can carry independent terms.
 
 
 ## v1.0.1 — Repository efficiency and local hygiene defect patch
@@ -267,12 +267,12 @@ This is an evidence-driven capability addition, not a restart of open-ended arch
 
 ## v1.2.0 — Published portable engineering controls
 
-Published and tagged, with exact source-bound tests. Includes Goal/Plan diagnostics, improved source/SQLite WAL currentness, optional read-only host-package preflight, reviewed artifact lifecycle with durable GC intent, recovery and generalizable scaffolding. Host-specific coding-agent execution remains a separate opt-in supported-capability question; maintainer QA projects are not adopter prerequisites. The historical v1.2 tag is immutable.
+Published and tagged, with exact source-bound tests. Includes Goal/Plan diagnostics, improved source/SQLite WAL currentness, optional read-only host-package preflight, reviewed artifact lifecycle with durable GC intent, recovery and generalizable scaffolding. Host-specific coding-agent execution remains a separate opt-in supported-capability question; maintainer QA projects are not adopter prerequisites. The versioned v1.2 release remains a historical reference.
 
 ## v1.3.0 — Published portable starter (2026-10-17)
 
-**Published and tagged**, with a portable release asset. The released tag is an immutable historical boundary; subsequent work on `main` is not retroactively part of that release. The original design and milestone proposals in [doc 40](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [doc 41](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md), [doc 39](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md) and [doc 38](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md) remain historical planning/evidence, not a statement that current `main` is green or proof of universal native-host execution. Refer to the tagged artifacts and their gate receipts for exact v1.3 claims.
+**Published and tagged**, with a portable release asset. The versioned release identifies a historical source boundary; subsequent work on `main` is not retroactively part of that release. The original design and milestone proposals in [doc 40](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [doc 41](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md), [doc 39](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md) and [doc 38](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md) remain historical planning/evidence, not a statement that current `main` is green or proof of universal native-host execution. Refer to the tagged artifacts and their gate receipts for exact v1.3 claims.
 
 ## v1.4.0 — Source-bound consolidation and release
 
-The v1.4 engineering route is recorded in [the E0 charter and review](45_V1_4_E0_STRATEGY_AND_PROPOSED_CHARTER.md). The work concentrates on truthful Git-anchored continuity, reproducible and proportional installation, public policy hygiene, maintainable Python, compatibility, and measured cross-platform release readiness. The immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), when present, is the publication boundary; an E1 fix or green targeted test alone is not release acceptance. No model provider, native host or managed portfolio is a compulsory public dependency.
+**Published on 2026-11-04**. The v1.4 engineering route is recorded in [the historical E0 charter and review](45_V1_4_E0_STRATEGY_AND_PROPOSED_CHARTER.md). The completed public work concentrates on truthful Git-anchored continuity, reproducible and proportional installation, public policy hygiene, maintainable Python, compatibility, and measured cross-platform release readiness. The versioned [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) with its downloadable ZIP and checksum is the publication boundary; later edits on `main` do not modify those released bytes. An E1 fix or green targeted test alone would not have constituted release acceptance. No model provider, native host or managed portfolio is a compulsory public dependency.

@@ -2,6 +2,8 @@
 
 [Miniguía v1.4](MINI_GUIDE_es.md) · [FAQ](FAQ_es.md)
 
+El [manual completo de ocho capítulos](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) está disponible **en el repositorio fuente**, en español, como **edición histórica v1.3**; no se copia al control instalado. Esta guía y la miniguía son versiones breves de inicio para v1.4, no sustituyen el texto largo. Para comandos vigentes consultá la [guía de instalación v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md).
+
 Arquitectura reutilizable, basada en el repositorio, para desarrollar software con agentes. Incluye roles, estado durable, planificación, recuperación y verificación. No construye automáticamente cualquier aplicación ni elimina las decisiones del dueño del producto.
 
 ## Instalar en un proyecto existente
@@ -24,7 +26,7 @@ Para desactivar todos los reportes, poné enabled=false en .agentic-sdlc/feedbac
 
 ## Seguridad y versión
 
-Este árbol de código corresponde a la versión 1.4.0. **Solo está publicada cuando existen la [release inmutable v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), su ZIP y su checksum verificados**. La release anterior v1.3.0 sigue disponible. Para proyectos nuevos o sin gobierno previo, seguí la [guía de primera instalación v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); para proyectos ya gobernados, usá el [preflight de solo lectura](../32_EXISTING_GOVERNED_ATTACHMENT.md), sin sobrescribir su estado. La CI portátil no certifica ejecución nativa de Codex Desktop, proveedores externos de IA ni efectos reales.
+**v1.4.0 ya está publicada** como [release versionada con ZIP portátil y checksum SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Verificá los archivos descargados antes de instalar; `main` puede tener cambios posteriores de documentación y no es el artefacto publicado. La release anterior v1.3.0 sigue disponible. Para proyectos nuevos o sin gobierno previo, seguí la [guía de primera instalación v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); para proyectos ya gobernados, usá el [preflight de solo lectura](../32_EXISTING_GOVERNED_ATTACHMENT.md), sin sobrescribir su estado. La CI portátil no certifica ejecución nativa de Codex Desktop, proveedores externos de IA ni efectos reales.
 
 ## Idiomas
 

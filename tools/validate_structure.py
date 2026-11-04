@@ -158,6 +158,9 @@ PUBLIC_REPOSITORY_LINKS = (
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/32_EXISTING_GOVERNED_ATTACHMENT.md",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md",
+    # The complete historical manual lives in the first-party source tree,
+    # outside the smaller installed offline documentation bundle.
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md",
 )
 PUBLIC_REPOSITORY_LINK_RE = re.compile(
     "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"

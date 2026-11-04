@@ -2,6 +2,8 @@
 
 [Mini guida v1.4](MINI_GUIDE_it.md) · [FAQ](FAQ_it.md)
 
+Il [manuale completo in otto capitoli](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) è disponibile **nel repository sorgente, solo in spagnolo**, come **edizione storica v1.3**; non viene copiato nel progetto installato. Questa pagina è un'introduzione breve alla v1.4, non una traduzione completa; per i comandi aggiornati consulta la [guida all'installazione v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md).
+
 Architettura riutilizzabile basata sul repository per sviluppare software con agenti. Offre ruoli, stato persistente, pianificazione, ripristino e verifiche. Non costruisce automaticamente ogni applicazione né sostituisce le decisioni del responsabile del prodotto.
 
 ## Installare in un progetto
@@ -24,7 +26,7 @@ Per fermare tutti i report, imposta enabled=false in .agentic-sdlc/feedback/ARCH
 
 ## Sicurezza e versioni
 
-Questo codice sorgente è alla versione 1.4.0. **La pubblicazione è effettiva solo quando esistono la [release immutabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), lo ZIP e il checksum verificati**. La release precedente v1.3.0 rimane disponibile. Per progetti nuovi o non ancora governati, segui la [guida al primo utilizzo v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); per progetti già governati è necessaria una [verifica in sola lettura](../32_EXISTING_GOVERNED_ATTACHMENT.md), senza sovrascrivere lo stato. La CI portabile non certifica l'esecuzione nativa di Codex Desktop, provider IA esterni o effetti reali.
+**La v1.4.0 è stata pubblicata** come [release con versione definita, ZIP portabile e checksum SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Verifica i file scaricati prima dell'installazione; il ramo `main` può contenere modifiche successive alla documentazione e non è l'artefatto pubblicato. La release precedente v1.3.0 rimane disponibile. Per progetti nuovi o non ancora governati, segui la [guida al primo utilizzo v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); per progetti già governati è necessaria una [verifica in sola lettura](../32_EXISTING_GOVERNED_ATTACHMENT.md), senza sovrascrivere lo stato. La CI portabile non certifica l'esecuzione nativa di Codex Desktop, provider IA esterni o effetti reali.
 
 ## Lingue
 

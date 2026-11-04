@@ -89,7 +89,12 @@ def main() -> int:
               "mini_guide": str(paths["mini_guide"]),
               # Backward-compatible key for consumers of the existing v1.4 CLI.
               # This is a mini guide, NOT the eight-chapter long-form manual.
-              "manual": str(paths["mini_guide"])}
+              "manual": str(paths["mini_guide"]),
+              "manual_kind": "MINI_GUIDE_LEGACY_ALIAS",
+              "full_manual": None,
+              "full_manual_status": "HISTORICAL_V1_3_SPANISH_SOURCE_ONLY",
+              "full_manual_source_url":
+                  "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md"}
     print(json.dumps(output, ensure_ascii=False, indent=2) if args.json else
           language + " (" + source + ") " + str(paths["readme"]))
     return 0

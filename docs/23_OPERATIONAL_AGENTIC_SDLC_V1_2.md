@@ -2,6 +2,8 @@
 
 Status: v1.2.0 portable core released. Separate maintainer integration tests do not determine whether another developer can install and use this starter in an unrelated repository.
 
+**Historical reference, not the current install contract.** The latest published version is [v1.4.0](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md), with [current first-user installation and limits](46_V1_4_PUBLIC_START_AND_SUPPORT.md). The v1.2-specific sections below preserve the original scope and must not be interpreted as current v1.4 host-support promises.
+
 ## Purpose
 
 v1.2 transfers observed generic failure classes into an opt-in operational layer:
@@ -18,7 +20,7 @@ Do not equate a passing code test with a model-host integration, user consent, a
 - tools/owner_task_recovery.py: pure, five-role mutual-recovery decision policy that respects explicit CLIENT or platform suspensions and never edits scheduler metadata. Actual scheduler integration/readback is a separate gate.
 - tools/selftest_operational_v12.py: synthetic and adversarial tests without network calls or mutations to real projects.
 
-Current v1.4 candidate installations copy the optional provider/source-engineering tools only with explicit `--with-runtime`; selecting `MULTI_PRODUCT` alone supplies its disabled owner/recovery policy but does not install cognitive/provider tools. SMALL without runtime remains free of these optional tools. This clarifies installation behavior without changing the immutable v1.2 release artifacts. File presence never authorizes a paid call or native agent execution.
+Published v1.4 source installations copy the optional provider/source-engineering tools only with explicit `--with-runtime`; selecting `MULTI_PRODUCT` alone supplies its disabled owner/recovery policy but does not install cognitive/provider tools. SMALL without runtime remains free of these optional tools. This clarifies installation behavior without changing the versioned historical v1.2 release artifacts. File presence never authorizes a paid call or native agent execution.
 
 ## Goal contract
 

@@ -17,7 +17,7 @@ ArquitecturaRepo 是一套**存放在项目仓库中的开发控制层**：组�
 
 ## 01 · 安全安装
 
-使用通过 CI 验证的 Python 3.12。下载 [v1.4.0 便携 ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip)，核对同时发布的 `.sha256`，解压后在**框架源码目录**打开终端。也可以检出不可变的 Git 标签 `v1.4.0`。
+使用通过 CI 验证的 Python 3.12。下载 [v1.4.0 便携 ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip)，核对同时发布的 `.sha256`，解压后在**框架源码目录**打开终端。也可以检出带版本号的 Git 标签 `v1.4.0` 并核实其源码身份。
 
 对于新项目，或虽有应用代码但**没有现存正式控制层**的项目，先选最小的 `SMALL`：
 

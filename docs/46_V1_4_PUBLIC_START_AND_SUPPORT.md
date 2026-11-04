@@ -1,9 +1,9 @@
 # ArquitecturaRepo v1.4.0 — start here and actual support
 
-Status: **versioned public source**. Use only the immutable
+Status: **v1.4.0 published**. Use the versioned
 [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0)
-and its verified assets as a published distribution; an untagged branch or
-unpublished candidate is not a release. The previous published version is
+and verify its ZIP/checksum before installation. The moving `main` branch may
+contain later changes and is not itself a release. The previous version is
 [v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0).
 Publishing does not authorize autonomous execution in an adopter's project.
 
@@ -124,7 +124,7 @@ an automatic history rewrite. No history-wide confidentiality audit or
 published-v1.4 artifact inspection is implied by source-only tests.
 
 CLIENT authorized E6 merge, v1.4.0 tagging, archive/checksum and package
-publication on 2026-11-04. Execution still requires the exact main-source,
-Linux/Windows CI, integrity, privacy and public-download verification gates.
-Release authorization is not an assertion that a tag, ZIP or package already
-exists; check the actual assets before distributing.
+publication on 2026-11-04. The GitHub Release and its versioned ZIP,
+checksum and manifest were subsequently published; verify their actual
+current availability and bytes before distributing them. That publication
+does not grant authority for unrelated host integrations or application work.

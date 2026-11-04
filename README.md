@@ -17,7 +17,7 @@ GitHub shows a **static** repository README and does not auto-select the viewer'
 
 A forkable, Git-repository-based system for developing software with human decisions and optional AI agents. Its main job is to keep product intent, ownership, code/currentness, evidence and the next permitted action **reconstructible after a chat or agent loses context**. GitHub holds durable decisions; Python scripts support validation and recovery. They do not replace the source of truth or grant agents permissions.
 
-**New here?** Follow the [runnable quick start](#quick-start) or the [v1.4 first-user guide and support matrix](docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md). If a project already has its own governance, use the [read-only attachment path](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). Source version is **1.4.0**; only the immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) and its downloadable assets, when present, constitute the published version. An untagged branch is not a release. No provider credentials or native agent automation are bundled.
+**New here?** Follow the [runnable quick start](#quick-start) or the [v1.4 first-user guide and support matrix](docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md). If a project already has its own governance, use the [read-only attachment path](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). **v1.4.0 is published** at the [versioned GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) with portable ZIP, checksum and manifest; the moving `main` branch also contains later documentation changes. For reproducible installation use the tag and verify the ZIP checksum. An untagged branch is not a release. No provider credentials or native agent automation are bundled.
 
 The core idea:
 
@@ -27,7 +27,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 **Español:** [Preguntas frecuentes (FAQ) — instalación, uso, límites y cómo reportar problemas](docs/FAQ_ES.md).
 
-## Existing projects and SQLite WAL (v1.2)
+## Existing governed projects and SQLite WAL (supported path in v1.4)
 
 - [Read-only existing-governance attachment preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md) checks pinned source owners without installing a second Product State or I3; **it does not authorize material attachment**.
 - SQLite canonical stores with an active WAL must be pinned to a transactionally consistent `sqlite_snapshot_sha256` witness or return HOLD. The ordinary main-file SHA alone is not enough. The adopter supplies its own database and currentness reference; this starter never connects to a third-party project without authorization.
@@ -52,7 +52,7 @@ For a released build, download the [v1.4.0 portable ZIP](https://github.com/Mati
 
 ## v1.3.0 — previous published portable framework
 
-v1.3 strengthens the portable Goal/Plan/campaign lifecycle, physically revalidates frozen independent review evidence, binds controlled work-unit starts to the active actor/run/lease, and refuses shadow Product State creation in already governed projects. A deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **v1.3.0 is published** at the immutable, manually authorized [tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0); subsequent untagged work on `main` is not automatically part of that release. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Release notes, supported scope and upgrade/rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
+v1.3 strengthened the portable Goal/Plan/campaign lifecycle, physically revalidated frozen independent review evidence, bound controlled work-unit starts to the active actor/run/lease, and refused shadow Product State creation in already governed projects. The deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **v1.3.0 remains available as a previous release** at its [versioned tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0); subsequent work on `main` is not part of that historical release. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Historical release notes and rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
 
 The v1.3.0 source is also distributed as a verified [portable ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip). A Docker-based scaffold is published under `ghcr.io/matiasacunia/arquitecturarepo:1.3.0`, with [instructions in the Spanish manual](docs/manual/ES/README.md). GitHub Container Registry package visibility is independently managed and should be confirmed as public before advertising anonymous pulls.
 

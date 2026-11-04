@@ -18,7 +18,7 @@ Your application can remain private. The public starter does not need its code, 
 
 ## 01 · Safe installation
 
-Use Python 3.12 (tested in CI). Download the [v1.4.0 portable ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip), verify it against the accompanying published `.sha256`, extract it, and open a terminal in that extracted source directory. You may also check out immutable Git tag `v1.4.0`.
+Use Python 3.12 (tested in CI). Download the [v1.4.0 portable ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip), verify it against the accompanying published `.sha256`, extract it, and open a terminal in that extracted source directory. You may also check out the versioned Git tag `v1.4.0`; verify its source identity rather than assuming the hosting platform enforces immutability.
 
 For a new project, or an existing application **without canonical governance**, start with `SMALL`:
 
@@ -89,6 +89,6 @@ Treat unit, integration, DB/currentness, semantic/generalization, physical, perc
 
 - [Short guide](README_en.md) · [English FAQ](FAQ_en.md) · [Root README](../../README.md).
 - [v1.4 start, supported scope and privacy](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md).
-- [Immutable v1.4.0 release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0).
+- [Versioned v1.4.0 release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0).
 
 This guide is not a security certification, independent human usability test, native-host integration claim, or proof that the framework outperforms direct Codex use. The MIT license does not cover third-party materials automatically.

@@ -2,6 +2,8 @@
 
 [Kurzleitfaden v1.4](MINI_GUIDE_de.md) · [FAQ](FAQ_de.md)
 
+Das [vollständige Handbuch mit acht Kapiteln](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) ist **im Quellrepository, nur auf Spanisch**, als **historische v1.3-Ausgabe** verfügbar und wird nicht in installierte Steuerungsebenen kopiert. Diese Seite ist eine kurze Einführung in v1.4, keine vollständige Übersetzung. Aktuelle Befehle stehen in der [v1.4-Installationsanleitung](../46_V1_4_PUBLIC_START_AND_SUPPORT.md).
+
 Eine wiederverwendbare, repositorybasierte Architektur für Softwareentwicklung mit Agenten. Sie bietet Rollen, dauerhaften Zustand, Planung, Wiederaufnahme und Prüfungen. Sie entwickelt nicht automatisch jede Software und ersetzt keine Produktentscheidungen.
 
 ## In einem Projekt installieren
@@ -24,7 +26,7 @@ Für die vollständige Deaktivierung aller Berichte enabled=false in .agentic-sd
 
 ## Sicherheit und Versionen
 
-Dieser Quellcode hat Version 1.4.0. **Eine Veröffentlichung liegt nur vor, wenn das unveränderliche [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) einschließlich geprüftem ZIP und Prüfsumme existiert**. Das vorherige v1.3.0 Release bleibt verfügbar. Für neue oder bisher ungeregelte Projekte gilt die [v1.4-Einstiegsanleitung](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); bereits geregelte Projekte benötigen zunächst eine [schreibgeschützte Prüfung](../32_EXISTING_GOVERNED_ATTACHMENT.md), keine automatische Überschreibung. Portable CI bestätigt weder native Codex-Desktop-Ausführung noch externe KI-Anbieter oder reale externe Aktionen.
+**v1.4.0 ist veröffentlicht**: Das [versionierte GitHub Release enthält ein portables ZIP und eine SHA-256-Prüfsumme](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Prüfe heruntergeladene Dateien vor der Installation; der veränderliche Branch `main` kann spätere Dokumentationsänderungen enthalten und ist nicht das Release-Artefakt. Das vorherige v1.3.0 Release bleibt verfügbar. Für neue oder bisher ungeregelte Projekte gilt die [v1.4-Einstiegsanleitung](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); bereits geregelte Projekte benötigen zunächst eine [schreibgeschützte Prüfung](../32_EXISTING_GOVERNED_ATTACHMENT.md), keine automatische Überschreibung. Portable CI bestätigt weder native Codex-Desktop-Ausführung noch externe KI-Anbieter oder reale externe Aktionen.
 
 ## Sprachen
 

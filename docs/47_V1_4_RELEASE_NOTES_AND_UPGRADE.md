@@ -3,8 +3,17 @@
 ArquitecturaRepo is a Git-anchored, model-neutral Agentic SDLC starter. Version
 1.4.0 consolidates the portable framework after v1.3.0. A GitHub branch or
 source VERSION field alone is **not** evidence of publication: the release is
-the immutable [v1.4.0 tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0)
+the versioned [v1.4.0 tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0)
 with a downloadable archive, checksum, and exact-source receipts.
+
+Published release record (verified from GitHub's release metadata on
+2026-11-04): tag-target SHA prefix `6426fd0f0b79` (full identity in the
+release's exact-source manifest);
+`ArquitecturaRepo-v1.4.0-portable.zip` is 764,988 bytes and has reported
+SHA-256 `d5b1eaeaea67de45f30923bd95968f00ffb6e938d9eeab51af50dd8cd61e861d`.
+The release also carries the matching `.sha256` and a JSON manifest. This is
+an exact-source reference, **not** a guarantee that GitHub makes tags or
+releases uneditable: compare current metadata and downloaded bytes before use.
 
 ## User-visible improvements
 
@@ -49,7 +58,7 @@ does not establish anonymous/public pull access.
 The complete `validate-starter` Linux and Windows matrix must pass against
 the exact source. The publication workflow checks that the validated SHA is
 still canonical `main`, builds the portable archive with a source-tree/byte
-receipt, creates an immutable GitHub Release, downloads published assets and
+receipt, publishes the tag-bound GitHub Release, downloads published assets and
 rechecks the checksum and a real extraction/install. The optional GHCR build
 is exercised in a disposable mounted project before publishing a versioned
 container and then inspected from the registry.
@@ -65,8 +74,8 @@ telemetry are disclosed in [privacy controls](https://github.com/MatiasAcunia/Ar
 
 ## Compatibility, rollback, and confidentiality
 
-- Historical `v1.3.0` assets and tag remain immutable. Roll back a fresh
-  installation by choosing that immutable release; do not replace an active
+- Historical `v1.3.0` assets and tag remain available as a versioned release. Roll back a fresh
+  installation by choosing that previous release; do not replace an active
   installed Product State, database or owner registry without its own reviewed
   migration/rollback procedure.
 - New installations should use the versioned archive rather than copying
