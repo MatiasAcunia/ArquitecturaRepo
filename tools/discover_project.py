@@ -39,10 +39,17 @@ def sha256(path: Path) -> str:
 def inventory(project: Path) -> dict[str, Any]:
     files: list[dict[str, Any]] = []
     for root, dirs, names in os.walk(project):
-        dirs[:] = sorted(d for d in dirs if d not in EXCLUDED_DIRS)
+        # A project inventory must never dereference a link to data outside
+        # its authorized tree (including links inside otherwise safe folders).
+        dirs[:] = sorted(
+            d for d in dirs
+            if d not in EXCLUDED_DIRS and not (Path(root) / d).is_symlink()
+        )
         root_path = Path(root)
         for name in sorted(names):
             path = root_path / name
+            if path.is_symlink() or not path.is_file():
+                continue
             if is_managed_control_file(project, path):
                 continue
             try:
@@ -88,7 +95,15 @@ def main() -> int:
     payload = json.dumps(data, indent=2) + "\n"
 
     if args.output:
-        output = Path(args.output).resolve()
+        # Preserve the lexical path until link checks are complete. resolve()
+        # would follow a malicious output link before we could reject it.
+        output = Path(os.path.abspath(args.output))
+        if any(candidate.is_symlink() for candidate in (output, *output.parents)):
+            print("DISCOVERY FAILED: symlinked output path refused", file=sys.stderr)
+            return 1
+        if output.exists() and not output.is_file():
+            print("DISCOVERY FAILED: output is not a regular file", file=sys.stderr)
+            return 1
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(payload, encoding="utf-8")
         print(str(output))

@@ -1,6 +1,6 @@
 # Documentation index — ArquitecturaRepo
 
-This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. The latest release is v1.2.0; v1.3 M0–M6 remain engineering/QA work, and M7 is later optional package/plugin absorption.
+This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. The latest published release is **v1.3.0**; the v1.4 consolidation branch remains an unreleased engineering candidate.
 
 ## Start here — ordinary adopter
 
@@ -25,8 +25,8 @@ The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference 
 ## Contributor / maintainer engineering — NOT adopter prerequisites
 
 - [v1.2 security audit](25_V1_2_SECURITY_HARDENING_AUDIT.md), [Windows physical acceptance scenario](26_L3_WINDOWS_PHYSICAL_ACCEPTANCE.md), [longitudinal fixture protocol](28_LONGITUDINAL_L3_TEST_PROTOCOL.md), [existing-governance transfer pilot](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md).
-- [Current v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
-- [v1.3 portable support and release limits (engineering candidate)](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md): local governance controls, optional host dependencies and unreleased capability matrix.
+- [Historical v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
+- [Historical v1.3 portable support/release qualification](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md) and [published v1.3.0 release notes](43_V1_3_RELEASE_NOTES_AND_UPGRADE.md). Historical candidate status does not supersede its subsequent release.
 
 These are auditable design and QA inputs, not additional installation contracts, external-platform guarantees, private-controller dependencies or instructions for users to run personal pilot Goals. Any resumed engineering must remain within its existing authorized campaign and receive independent terminal review.
 

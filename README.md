@@ -9,7 +9,7 @@
 GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **no data can reach a maintainer until a verified collector endpoint is configured**; after that, minimal outbound reporting defaults ON with a conspicuous opt-out. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
 
 
-A forkable starter for building a durable multi-agent software-development system around a real project.
+A forkable, Git-repository-based system for developing software with human decisions and optional AI agents. Its main job is to keep product intent, ownership, code/currentness, evidence and the next permitted action **reconstructible after a chat or agent loses context**. GitHub holds durable decisions; Python scripts support validation and recovery. They do not replace the source of truth or grant agents permissions.
 
 The core idea:
 
@@ -113,15 +113,31 @@ It provides:
 
 ### Option B — create a fail-closed scaffold first
 
+Use this route for an empty project or one with application code **but no existing Agentic SDLC/Product State**. The installer preserves existing application files; it does not initialize Git, connect to a model, or declare the product ready. Choose `SMALL` unless your actual state, scale or risk justifies another [profile](docs/06_SCALING_PROFILES.md).
+
 ```bash
 python tools/scaffold_project.py \
   --target "../my-project" \
   --profile SMALL \
   --product-id PROJECT_ALPHA \
-  --objective "Describe the client-visible product objective."
+  --objective "Describe the client-visible product objective." \
+  --no-feedback-workflow
 ```
 
 The generated control layer starts in `HOLD / UNTRUSTED_CONTEXT`. It does not invent live code, campaign or acceptance state.
+
+From inside the target project, run these first checks (they do not authorize execution):
+
+```bash
+python -m pip install -r ".agentic-sdlc/requirements-validation.txt"
+python ".agentic-sdlc/tools/project_status.py" --control-root ".agentic-sdlc"
+python ".agentic-sdlc/tools/discover_project.py" --project-root "."
+python ".agentic-sdlc/tools/reconstruct_context.py" --root ".agentic-sdlc"
+```
+
+Seeing `UNTRUSTED_CONTEXT` immediately after installation is correct. An agent should inspect the inventory and [prepare an explicit adoption spec](docs/16_TRANSFER_ADOPTION.md) from the real product and source evidence before promoting the current state. A first-time installation is not an accepted engineering campaign. The generated installer output also prints the exact local read-only commands with quoted paths.
+
+If a repository **already has** a canonical Product State or another governed SDLC, **do not run the generic scaffold**: start with [read-only existing-governance attachment](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). There is no automatic, safe in-place upgrade of v1.2/v1.3 governed state. Existing project code without such governance may use Option B.
 
 To include the optional runtime:
 

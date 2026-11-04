@@ -961,19 +961,35 @@ Generated from Agentic SDLC starter {version}.
 - product/workstream: {product_id}
 - initial state: HOLD / UNTRUSTED_CONTEXT
 
-Next action: read-only discovery -> currentness reconstruction -> product discovery -> CLIENT requirements confirmation -> technical baseline -> dated delivery plan -> baseline guard.
+Next action: read-only discovery -> currentness reconstruction -> product discovery -> CLIENT requirements confirmation -> technical baseline -> dated delivery plan -> baseline guard. The initial HOLD / UNTRUSTED_CONTEXT is expected; this installation alone grants no campaign authority.
 
 Install the validation dependency:
 
 ```bash
-python -m pip install -r {control_dir_name}/requirements-validation.txt
+python -m pip install -r "{control_dir_name}/requirements-validation.txt"
 ```
 
-Validate this control layer with its copied validator:
+Validate this control layer with its copied validator (`--root` is relative
+to the validator's installed control-layer directory, not your shell's cwd):
 
 ```bash
-python {control_dir_name}/tools/validate_project.py --root .
+python "{control_dir_name}/tools/validate_project.py" --root "."
 ```
+
+First read-only checks, from the project root:
+
+```bash
+python "{control_dir_name}/tools/project_status.py" --control-root "{control_dir_name}"
+python "{control_dir_name}/tools/discover_project.py" --project-root "."
+python "{control_dir_name}/tools/reconstruct_context.py" --root "{control_dir_name}"
+```
+
+An existing ungoverned application's code and workflows remain user-owned. If
+the repository already has a canonical Product State or another control layer,
+stop and use the documented read-only existing-governance attachment instead of
+installing another one. Do not treat an existing v1.2/v1.3 installation as an
+automatically supported in-place upgrade. Confirm the real source, adoption
+boundary and CLIENT requirements before authorizing execution.
 
 ## Operating dimensions
 
@@ -990,10 +1006,14 @@ python {control_dir_name}/tools/validate_project.py --root .
 The persistent local runtime/ARTIFACT_LIFECYCLE_CURRENT.json records owned
 scratch outputs with owner, campaign, category, hash, retention and delete
 permission. It is NOT a global DB or a second Product State.
-Use python {control_dir_name}/tools/artifact_ledger.py --project .
---control-dir {control_dir_name} init-root --root
-.agentic-sdlc-scratch/campaign --owner I3 --campaign CAMPAIGN to claim a fresh
-output root, then route generators via capture. Reconcile after interruption.
+To claim a fresh output root after an authorized campaign, run:
+
+```bash
+python "{control_dir_name}/tools/artifact_ledger.py" --project "." --control-dir "{control_dir_name}" init-root --root ".agentic-sdlc-scratch/campaign" --owner "I3" --campaign "CAMPAIGN"
+```
+
+Replace the example campaign identity with the authorized one, route generators
+via capture, and reconcile after interruption.
 The gc command is read-only by default; gc --execute only removes exact,
 expired, ignored, owned rebuildables/temporaries, never unknown/DB/source.
 Unwrapped IDE/host writes still need real host integration and Git review.
@@ -1245,7 +1265,12 @@ def main() -> int:
 
     print(f"SCAFFOLD CREATED: {control}")
     print("STATUS: HOLD / UNTRUSTED_CONTEXT")
-    print("NEXT: read-only discovery -> currentness reconstruction -> fresh-context probe")
+    print("NEXT (read-only; these do not authorize execution):")
+    print(f'  python "{control / "tools" / "project_status.py"}" --control-root "{control}"')
+    print(f'  python "{control / "tools" / "discover_project.py"}" --project-root "{Path(args.target).absolute()}"')
+    print(f'  python "{control / "tools" / "reconstruct_context.py"}" --root "{control}"')
+    print("The initial UNTRUSTED_CONTEXT is expected. Establish an explicit product baseline/adoption before engineering execution.")
+    print("If this project already has canonical Product State, stop: use read-only existing-governance attachment, never a second scaffold.")
     workflow = Path(args.target).absolute() / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
     scheduler = "EXISTING_PRESERVED" if args.no_feedback_workflow and workflow.exists() else (
         "DISABLED_BY_INSTALL_OPTION" if args.no_feedback_workflow else (

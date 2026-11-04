@@ -184,6 +184,12 @@ def validate(root: Path) -> None:
     )
     if result.returncode != 0:
         message = (result.stdout + "\n" + result.stderr).strip()
+        if "No module named 'jsonschema'" in message or 'No module named "jsonschema"' in message:
+            raise ReconstructionError(
+                "validation dependency 'jsonschema' is missing. Install the "
+                "declared dependencies with: python -m pip install -r "
+                f'\"{root / "requirements-validation.txt"}\"'
+            )
         raise ReconstructionError("project validation failed before reconstruction:\n" + message)
 
 
