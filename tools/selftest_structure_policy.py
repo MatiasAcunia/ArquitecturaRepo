@@ -59,6 +59,9 @@ class StructurePolicyTests(unittest.TestCase):
 
     def test_root_policy_and_credentials_stay_protected(self):
         self.assertTrue(any("project-specific" in error for error in self.check({"AGENTS.md": "MUSIC"})))
+        self.assertTrue(any("project-specific" in error for error in self.check({
+            "templates/EXAMPLE.json": '{"unrelated_gate":"G007"}',
+        })))
         self.assertTrue(any("private-key" in error for error in self.check({
             "docs/README.md": "BEGIN " + "PRIVATE KEY",
         })))
