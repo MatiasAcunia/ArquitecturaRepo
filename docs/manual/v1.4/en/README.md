@@ -28,7 +28,7 @@ This manual is model-neutral. It neither installs an LLM nor authorizes paid pro
 
 ## Language and publication status
 
-This English long-form edition, the [complete Spanish v1.4 edition](../es/README.md) (60-page PDF) and the [complete Portuguese v1.4 edition](../pt/README.md) (57-page PDF) are available as distinct books. The eight short localized guides remain separate. Do not interpret the presence of a mini guide in another language as a translated full manual. Other long-form editions must be individually completed and verified before being advertised as such.
+This English long-form edition, the [complete Spanish v1.4 edition](../es/README.md) (60-page PDF), [complete Portuguese v1.4 edition](../pt/README.md) (57-page PDF), and [complete French v1.4 edition](../fr/README.md) (57-page PDF) are distinct books. The eight short localized guides remain separate. Do not interpret the presence of a mini guide in another language as a translated full manual. Other long-form editions must be individually completed and verified before being advertised as such.
 
 The original illustrated PDF had approximately 60 pages. Pagination depends on page size and typesetting; the Markdown chapter numbers preserve content order, not the original fixed page breaks. The figures in the historical Spanish Markdown were caption-only transcriptions. This v1.4 edition explains those relationships in text and tables without claiming to reproduce missing original graphics.
 

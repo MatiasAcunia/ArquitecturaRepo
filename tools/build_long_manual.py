@@ -59,6 +59,15 @@ LOCALE_LABELS = {
         "byline": "Documentação verificada com o código-fonte do ArquitecturaRepo.",
         "contents": "Índice geral", "date": "4 de novembro de 2026", "version": "VERSÃO", "footer_date": "NOVEMBRO DE 2026",
     },
+    "fr": {
+        "title": "Manuel d'utilisation complet", "code": "FRANÇAIS", "lang": "fr-FR",
+        "chapter": "CHAPITRE", "header": "MANUEL COMPLET · v1.4",
+        "eyebrow": "INGÉNIERIE LOGICIELLE / GUIDES D'UTILISATION",
+        "summary1": "Huit chapitres : découverte, installation, adoption, opération,",
+        "summary2": "changements, récupération, acceptation et exemple de produit.",
+        "byline": "Documentation vérifiée par rapport aux sources d'ArquitecturaRepo.",
+        "contents": "Table des matières", "date": "4 novembre 2026", "version": "VERSION", "footer_date": "NOVEMBRE 2026",
+    },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 
