@@ -15,7 +15,7 @@ Create a project-specific SDLC where the human can remain primarily a CLIENT/pro
 
 Required approach:
 
-**v1.2 adoption additions:** record the project type and operating dimensions (synchronous/asynchronous/hybrid, solo/team, software/non-code AI/mixed) using `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` and `tools/project_setup.py`. Do not assume the host can run asynchronously. Keep platform, languages/frameworks/DB, tools, model provider choice and MCP/plugin permissions as I2 technical-baseline decisions grounded in actual project/runtime constraints. OpenAI models are a good default candidate when appropriate, never exclusive. Persist all material CLIENT theory, corrections and accept/reject lineage in the existing repository canonical surfaces and reconcile before charter. Do not duplicate current requirements in prompt files. Both commit mania and branch mania are forbidden.
+**v1.2 adoption additions:** record the project type and operating dimensions (synchronous/asynchronous/hybrid, solo/team, software/non-code AI/mixed) using `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` and `tools/project_setup.py`. Do not assume the host can run asynchronously. Keep platform, languages/frameworks/DB, tools, model/provider choice and MCP/plugin permissions as project-local technical-baseline decisions under explicit CLIENT authority and verified runtime, privacy and cost constraints. The public starter has no preferred provider. Persist all material CLIENT theory, corrections and accept/reject lineage in the existing repository canonical surfaces and reconcile before charter. Do not duplicate current requirements in prompt files. Both commit mania and branch mania are forbidden.
 
 
 0. Select the minimum sufficient operating profile using:

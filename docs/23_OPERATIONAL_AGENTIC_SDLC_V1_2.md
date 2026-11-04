@@ -18,7 +18,7 @@ Do not equate a passing code test with a model-host integration, user consent, a
 - tools/owner_task_recovery.py: pure, five-role mutual-recovery decision policy that respects explicit CLIENT or platform suspensions and never edits scheduler metadata. Actual scheduler integration/readback is a separate gate.
 - tools/selftest_operational_v12.py: synthetic and adversarial tests without network calls or mutations to real projects.
 
-These tools are only copied into profiles that request the optional runtime or OWNER-compatible multi-product role. SMALL does not silently activate a resident supervisor or an LLM.
+Current v1.4 candidate installations copy the optional provider/source-engineering tools only with explicit `--with-runtime`; selecting `MULTI_PRODUCT` alone supplies its disabled owner/recovery policy but does not install cognitive/provider tools. SMALL without runtime remains free of these optional tools. This clarifies installation behavior without changing the immutable v1.2 release artifacts. File presence never authorizes a paid call or native agent execution.
 
 ## Goal contract
 
