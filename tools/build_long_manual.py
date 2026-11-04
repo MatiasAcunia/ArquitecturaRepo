@@ -31,7 +31,26 @@ CHAPTERS = [
     "06_closing_capabilities.md",
     "07_worked_club_example.md",
 ]
-EXPECTED_TITLES = {"en": "The Complete User Manual"}
+LOCALE_LABELS = {
+    "en": {
+        "title": "The Complete User Manual", "code": "ENGLISH", "lang": "en-US",
+        "chapter": "CHAPTER", "header": "COMPLETE USER MANUAL",
+        "eyebrow": "ENGINEERING SYSTEMS / USER GUIDES",
+        "summary1": "Eight full chapters: discovery, installation, adoption, operation,",
+        "summary2": "changes, recovery, acceptance and a worked product example.",
+        "byline": "Source-backed documentation for the public ArquitecturaRepo framework.",
+        "contents": "Contents", "date": "4 November 2026",
+    },
+    "es": {
+        "title": "Manual completo de uso", "code": "ESPAÑOL", "lang": "es-ES",
+        "chapter": "CAPÍTULO", "header": "MANUAL COMPLETO · v1.4",
+        "eyebrow": "SISTEMAS DE INGENIERÍA / GUÍAS DE USO",
+        "summary1": "Ocho capítulos extensos: descubrimiento, instalación, adopción,",
+        "summary2": "operación, cambios, recuperación, aceptación y ejemplo guiado.",
+        "byline": "Documentación contrastada con las fuentes de ArquitecturaRepo.",
+        "contents": "Índice general", "date": "4 de noviembre de 2026",
+    },
+}
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 
 
@@ -79,8 +98,9 @@ def main() -> int:
     parser.add_argument("--language", default="en", help="Completed long-form locale")
     parser.add_argument("--output", type=Path, required=True, help="PDF output path")
     args = parser.parse_args()
-    if args.language not in EXPECTED_TITLES:
+    if args.language not in LOCALE_LABELS:
         parser.error(f"No verified PDF typography settings for locale {args.language!r}")
+    labels = LOCALE_LABELS[args.language]
     if not shutil.which("pandoc") or not shutil.which("xelatex"):
         parser.error("PDF generation requires local pandoc and xelatex")
 
@@ -96,8 +116,7 @@ def main() -> int:
         rendered = temp_dir / "manual.md"
         rendered.write_text(source, encoding="utf-8")
         preamble = temp_dir / "preamble.tex"
-        preamble.write_text(
-            r"""\usepackage{microtype}
+        latex = r"""\usepackage{microtype}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage{etoolbox}
@@ -148,16 +167,30 @@ def main() -> int:
   \end{titlepage}
 }
 \makeatother
-""",
-            encoding="utf-8",
-        )
+"""
+        replacements = {
+            "CHAPTER \\thechapter": f"{labels['chapter']} \\thechapter",
+            "COMPLETE USER MANUAL · v1.4": labels["header"],
+            "ENGINEERING SYSTEMS / USER GUIDES": labels["eyebrow"],
+            "The Complete User Manual": labels["title"],
+            "VERSION 1.4 / ENGLISH": f"VERSIÓN 1.4 / {labels['code']}" if args.language == "es" else "VERSION 1.4 / ENGLISH",
+            "Eight full chapters: discovery, installation, adoption, operation,": labels["summary1"],
+            "changes, recovery, acceptance and a worked product example.": labels["summary2"],
+            "Source-backed documentation for the public ArquitecturaRepo framework.": labels["byline"],
+            "MATÍAS ACUÑA  ·  NOVEMBER 2026": "MATÍAS ACUÑA  ·  NOVIEMBRE DE 2026" if args.language == "es" else "MATÍAS ACUÑA  ·  NOVEMBER 2026",
+        }
+        for old, new in replacements.items():
+            latex = latex.replace(old, new)
+        preamble.write_text(latex, encoding="utf-8")
         command = [
             "pandoc", str(rendered), "--standalone", "--toc", "--toc-depth=2",
             "--top-level-division=chapter", "--pdf-engine=xelatex",
             "--metadata", "title:ArquitecturaRepo",
-            "--metadata", f"subtitle:{EXPECTED_TITLES[args.language]} · v1.4 · English",
+            "--metadata", f"subtitle:{labels['title']} · v1.4 · {labels['code']}",
             "--metadata", "author:Matías Acuña",
-            "--metadata", "date:4 November 2026",
+            "--metadata", f"date:{labels['date']}",
+            "--metadata", f"lang:{labels['lang']}",
+            "--metadata", f"toc-title:{labels['contents']}",
             "--variable", "documentclass=scrreprt", "--variable", "classoption=oneside",
             "--variable", "papersize=a4", "--variable", "fontsize=11pt",
             "--variable", "mainfont=DejaVu Serif", "--variable", "sansfont=DejaVu Sans",
