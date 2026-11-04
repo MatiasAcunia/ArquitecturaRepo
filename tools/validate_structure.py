@@ -174,26 +174,34 @@ def strip_approved_source_pins(text: str, rel: Path) -> str:
             text,
         )
     if rel.as_posix() == "engines/portable-goal/engine.json":
-        text = re.sub(
-            r'(?m)^(\s*"source_commit_sha"\s*:\s*")[0-9a-f]{40}("\s*,?\s*)$',
-            r"\1<immutable-engine-commit>\2", text,
-        )
-        # Only the candidate's source-file Git blob identities qualify.
-        # Validate the manifest's data shape rather than trusting arbitrary
-        # similarly named fields in unrelated files.
-        manifest = json.loads((ROOT / rel).read_text(encoding="utf-8"))
-        permitted = {
-            (path, digest)
-            for candidate in manifest.get("candidates", [])
-            for path, digest in candidate.get("source_git_blob_sha1", {}).items()
-        }
-        for path, digest in permitted:
-            if not re.fullmatch(r"tools/[a-zA-Z0-9_./-]+\.py", path):
+        # Work on the parsed candidate fields, never generic JSON key names.
+        # Malformed JSON remains visible to the independent JSON parser and
+        # privacy scanner; it must not crash source-structure validation.
+        try:
+            manifest = json.loads(text)
+        except json.JSONDecodeError:
+            return text
+        if not isinstance(manifest, dict):
+            return text
+        candidates = manifest.get("candidates", [])
+        if not isinstance(candidates, list):
+            return text
+        for candidate in candidates:
+            if not isinstance(candidate, dict):
                 continue
-            if not re.fullmatch(r"[0-9a-f]{40}", digest):
+            commit = candidate.get("source_commit_sha")
+            if isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit):
+                candidate["source_commit_sha"] = "<immutable-engine-commit>"
+            blobs = candidate.get("source_git_blob_sha1")
+            if not isinstance(blobs, dict):
                 continue
-            pattern = rf'(?m)^(\s*"{re.escape(path)}"\s*:\s*"){digest}("\s*,?\s*)$'
-            text = re.sub(pattern, r"\1<immutable-engine-blob>\2", text)
+            for path, digest in blobs.items():
+                if (isinstance(path, str)
+                    and re.fullmatch(r"tools/[a-zA-Z0-9_./-]+\.py", path)
+                    and isinstance(digest, str)
+                    and re.fullmatch(r"[0-9a-f]{40}", digest)):
+                    blobs[path] = "<immutable-engine-blob>"
+        text = json.dumps(manifest, ensure_ascii=False)
     elif rel.as_posix() == "engines/portable-goal/CHANGELOG.md":
         text = re.sub(
             r"(?m)^(- Exact baseline Git commit: `)[0-9a-f]{40}(`\.)$",

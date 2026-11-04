@@ -53,6 +53,8 @@ class StructurePolicyTests(unittest.TestCase):
             ("docs/source.md", f"Unrelated source identity: {commit}"),
             ("engines/portable-goal/CHANGELOG.md", f"- Arbitrary source: `{commit}`"),
             ("engines/portable-goal/engine.json", json.dumps({**manifest, "private": commit})),
+            ("engines/portable-goal/engine.json", json.dumps({**manifest, "unrelated": {"source_commit_sha": commit}})),
+            ("engines/portable-goal/engine.json", '{"candidates": ' + commit),
         ):
             with self.subTest(relative=relative):
                 self.assertTrue(any("40-char" in error for error in self.check({**allowed, relative: changed})))
