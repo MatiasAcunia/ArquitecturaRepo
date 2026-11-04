@@ -48,7 +48,7 @@ Usa --language auto|en|es|pt|fr|de|it|ja|zh. Per disattivare: enabled=false o --
 
 ### 12. Che cosa è testato e come segnalo un errore?
 
-1.1.0 è stabile; v1.2 resta candidata fino a test fisici indipendenti. Apri una Issue con passaggi riproducibili e log senza segreti. Il materiale originale usa MIT.
+Il codice sorgente è alla versione 1.4.0, ma la release esiste solo dopo la pubblicazione e la verifica di [tag immutabile v1.4.0, ZIP e checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 rimane disponibile. I test portabili Linux/Windows non certificano host nativi per agenti né l'usabilità da parte di terzi. Apri una Issue con passaggi riproducibili e log senza segreti. Il materiale originale usa MIT.
 
 ### 13. Posso combinare modalità asincrone, team e IA non dedicata alla programmazione?
 

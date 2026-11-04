@@ -22,7 +22,7 @@ Disable feedback by setting enabled=false in .agentic-sdlc/feedback/ARCHITECTURE
 
 ## Safety and release status
 
-Stable release: 1.1.0. Version 1.2 is a candidate under testing; Codex Desktop Goal, Gemini, external-effect adapters and scheduled multi-project tasks need physical acceptance. CI alone is not product acceptance.
+This source tree is version 1.4.0. It is a **published release only when the immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) and its verified ZIP/checksum exist**. The previous published v1.3.0 release remains available. New or ungoverned projects can use the [v1.4 first-user guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); already governed projects require [read-only attachment](../32_EXISTING_GOVERNED_ATTACHMENT.md), not an automatic overwrite. Native Codex Desktop, third-party AI providers and external effects have not been physically certified by portable CI alone.
 
 ## Languages
 

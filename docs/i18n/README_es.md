@@ -22,7 +22,7 @@ Para desactivarlo, poné enabled=false en .agentic-sdlc/feedback/ARCHITECTURE_FE
 
 ## Seguridad y versión
 
-La versión estable es 1.1.0. La 1.2 es candidata: la integración real con Codex Desktop Goal, Gemini, efectos externos y cinco tareas todavía necesita pruebas físicas. La CI verde no sustituye la aceptación del producto.
+Este árbol de código corresponde a la versión 1.4.0. **Solo está publicada cuando existen la [release inmutable v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), su ZIP y su checksum verificados**. La release anterior v1.3.0 sigue disponible. Para proyectos nuevos o sin gobierno previo, seguí la [guía de primera instalación v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); para proyectos ya gobernados, usá el [preflight de solo lectura](../32_EXISTING_GOVERNED_ATTACHMENT.md), sin sobrescribir su estado. La CI portátil no certifica ejecución nativa de Codex Desktop, proveedores externos de IA ni efectos reales.
 
 ## Idiomas
 

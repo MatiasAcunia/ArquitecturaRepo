@@ -48,7 +48,7 @@ starter 本身不会。Codex Daily Control 2.0.2 是独立参考；v1.2 的主�
 
 ### 12. 哪些功能通过测试，如何报告问题？
 
-1.1.0 为稳定版；1.2 仍需独立真实环境验证。请在 GitHub Issue 中提交可复现步骤和脱敏日志。原创材料采用 MIT 许可证。
+源码版本为 1.4.0，但只有在 [v1.4.0 不可变标签、ZIP 和校验文件](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) 正式发布并经过验证后才算真正发布；此前的 v1.3.0 仍可使用。Linux/Windows 便携式测试不等于原生智能体宿主或第三方可用性验收。请在 GitHub Issue 中提交可复现步骤和脱敏日志。原创材料采用 MIT 许可证。
 
 ### 13. 可以组合异步、团队协作和非编程 AI 模式吗？
 

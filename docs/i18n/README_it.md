@@ -22,7 +22,7 @@ Per disabilitare: enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_
 
 ## Sicurezza e versioni
 
-La versione stabile è 1.1.0. La 1.2 è candidata: le integrazioni reali con Codex Desktop Goal, Gemini, effetti esterni e task multiprogetto richiedono test fisici. CI verde non equivale ad accettazione del prodotto.
+Questo codice sorgente è alla versione 1.4.0. **La pubblicazione è effettiva solo quando esistono la [release immutabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), lo ZIP e il checksum verificati**. La release precedente v1.3.0 rimane disponibile. Per progetti nuovi o non ancora governati, segui la [guida al primo utilizzo v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); per progetti già governati è necessaria una [verifica in sola lettura](../32_EXISTING_GOVERNED_ATTACHMENT.md), senza sovrascrivere lo stato. La CI portabile non certifica l'esecuzione nativa di Codex Desktop, provider IA esterni o effetti reali.
 
 ## Lingue
 

@@ -1,6 +1,6 @@
 # Agentic SDLC v1.2.0 — Estado, instalación y límites
 
-**Estado:** v1.2.0 es la última release pública publicada. Este documento sustituye el resumen previo de candidatura, que afirmaba incorrectamente que v1.1 era la última versión estable. No constituye un nuevo gate de aceptación ni prueba de ejecución nativa de agentes.
+**Estado histórico:** esta página documenta la publicación de v1.2.0 en su momento; ya no identifica la última versión. Consultar el [README principal](../README.md) para comprobar la versión efectivamente publicada y la [documentación de v1.4.0](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md) para sus nuevos límites. Este texto no constituye un nuevo gate de aceptación ni prueba de ejecución nativa de agentes.
 
 La versión portátil incluye mecanismos de Goal/Plan y campañas, validación y currentness, recuperación de estado, registro de artefactos y controles de privacidad. Las operaciones realmente disponibles se verifican mediante el código y la matriz de soporte de la versión instalada.
 

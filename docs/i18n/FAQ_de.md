@@ -48,7 +48,7 @@ Verwenden Sie --language auto|en|es|pt|fr|de|it|ja|zh. Zum Abschalten enabled=fa
 
 ### 12. Was ist getestet und wie melde ich Fehler?
 
-1.1.0 ist stabil, v1.2 bleibt ein Kandidat bis zu unabhängigen Praxistests. Erstellen Sie ein Issue mit Reproduktionsschritten und bereinigten Logs. Originalmaterial steht unter MIT.
+Der Quellcode hat Version 1.4.0, gilt aber erst nach Veröffentlichung und Prüfung des [unveränderlichen v1.4.0 Tags, ZIPs und der Prüfsumme](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) als Release; v1.3.0 bleibt verfügbar. Portable Linux/Windows-Tests bestätigen weder native Agenten-Hosts noch die Benutzbarkeit durch Dritte. Erstellen Sie ein Issue mit Reproduktionsschritten und bereinigten Logs. Originalmaterial steht unter MIT.
 
 ### 13. Lassen sich asynchroner Betrieb, Teamarbeit und KI ohne Programmierung kombinieren?
 
