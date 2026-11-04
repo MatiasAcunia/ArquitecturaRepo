@@ -2,6 +2,8 @@
 
 [Miniguia v1.4](MINI_GUIDE_pt.md) · [FAQ](FAQ_pt.md)
 
+O [manual completo de oito capítulos](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) está disponível **no repositório de origem, somente em espanhol**, como **edição histórica v1.3**; ele não é copiado para a instalação local. Este guia é uma introdução breve à v1.4, não a tradução integral; consulte o [guia de instalação v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) para comandos atuais.
+
 Arquitetura reutilizável, baseada no repositório, para desenvolvimento de software com agentes. Oferece papéis, estado durável, planejamento, recuperação e verificação. Não constrói qualquer aplicativo automaticamente nem substitui decisões do responsável pelo produto.
 
 ## Instalar em um projeto
@@ -24,7 +26,7 @@ Para desativar todos os relatórios, defina enabled=false em .agentic-sdlc/feedb
 
 ## Segurança e versões
 
-Este código-fonte está na versão 1.4.0. **A versão só está publicada quando a [release imutável v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), seu ZIP e checksum verificados existirem**. A release anterior v1.3.0 continua disponível. Projetos novos ou sem governança podem seguir o [guia de primeira instalação v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); projetos já governados exigem uma [verificação somente leitura](../32_EXISTING_GOVERNED_ATTACHMENT.md), sem sobrescrever o estado existente. A CI portátil não certifica execução nativa do Codex Desktop, provedores externos de IA ou efeitos reais.
+**A v1.4.0 já foi publicada** como [release versionada com ZIP portátil e checksum SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Confira os arquivos baixados antes da instalação; a branch `main` pode incluir alterações posteriores de documentação e não é o artefato publicado. A release anterior v1.3.0 continua disponível. Projetos novos ou sem governança podem seguir o [guia de primeira instalação v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); projetos já governados exigem uma [verificação somente leitura](../32_EXISTING_GOVERNED_ATTACHMENT.md), sem sobrescrever o estado existente. A CI portátil não certifica execução nativa do Codex Desktop, provedores externos de IA ou efeitos reais.
 
 ## Idiomas
 

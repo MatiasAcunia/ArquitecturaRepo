@@ -17,7 +17,7 @@ L'applicazione può restare privata. Lo starter pubblico non richiede codice, da
 
 ## 01 · Installazione sicura
 
-Usa Python 3.12, verificato nella CI. Scarica lo [ZIP portabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip), verifica il `.sha256` pubblicato, estrai il contenuto e apri un terminale **nella cartella del framework**. In alternativa usa il tag Git immutabile `v1.4.0`.
+Usa Python 3.12, verificato nella CI. Scarica lo [ZIP portabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip), verifica il `.sha256` pubblicato, estrai il contenuto e apri un terminale **nella cartella del framework**. In alternativa usa il tag Git versionato `v1.4.0`, verificandone l'identità della sorgente.
 
 Per un progetto nuovo, o già con codice ma **senza controllo canonico**, scegli `SMALL`:
 

@@ -1,6 +1,6 @@
 # Documentation index — ArquitecturaRepo
 
-This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. Version 1.4.0 is available as a release only when its [immutable GitHub tag and assets](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) actually exist. Untagged branches remain candidates; v1.3.0 stays an immutable previous release.
+This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. **v1.4.0 has been published** as a [versioned GitHub Release with portable ZIP, checksum and manifest](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). `main` can contain later documentation edits and is not itself that release; v1.3.0 is the previous version.
 
 ## Start here — ordinary adopter
 
@@ -33,13 +33,12 @@ The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference 
 - [Historical v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
 - The historical v1.3 route also mentioned **M7** as optional subsequent package/plugin absorption. It is not a prerequisite for first-time adoption, a claim of completed support, or an E4 authorization.
 - [Historical v1.3 portable support/release qualification](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md) and [published v1.3.0 release notes](43_V1_3_RELEASE_NOTES_AND_UPGRADE.md). Historical candidate status does not supersede its subsequent release.
-- [Historical full Spanish v1.3 manual](manual/ES/README.md), preserved for version-specific archaeology; not the current v1.4 installation guide.
 
 These are auditable design and QA inputs, not additional installation contracts, external-platform guarantees, private-controller dependencies or instructions for users to run personal pilot Goals. Any resumed engineering must remain within its existing authorized campaign and receive independent terminal review.
 
-## Private historical maintainer records — removed from the public working tree
+## Historical source and confidentiality
 
-Six superseded v1.2 internal documents were moved into a separately held private archive (see the maintainer's private CURRENT index, **not linked here**): stabilization master plan 30, private L3 terminal intake 31, portfolio adoption design 33, engineering-first historical plan 35, and version-specific Codex Daily Control 2.0.2 and 2.1 integration reports 36–37. Their old names and blob identities are recorded privately for audit. They were never adopter dependencies, and their removal does not supersede canonical source/charter/state.
+Obsolete maintainer records are not part of the current starter or adopter instructions. This public index intentionally does not list private archive names, identities or locations. Such records are never required for installing or using ArquitecturaRepo.
 
 **Important:** removing files from the current public Git tree does not delete their old contents from existing commits, forks, clones or caches. A separate coordinated exposure/history-remediation process is required if historical content contains actual secrets or confidential personal data. Do not rewrite shared history automatically.
 

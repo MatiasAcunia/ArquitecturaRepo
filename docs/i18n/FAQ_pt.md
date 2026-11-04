@@ -48,7 +48,7 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh. Para desligar todos os relatórios,
 
 ### 12. O que foi testado e como relatar problemas?
 
-O código-fonte está na versão 1.4.0, mas ela só é uma release quando o [tag imutável v1.4.0, ZIP e checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) forem publicados e verificados; v1.3.0 continua disponível. Os testes portáteis de Linux/Windows não certificam hosts de agentes nativos nem usabilidade de terceiros. Abra um Issue com reprodução e logs sem segredos. O material original usa MIT.
+**A v1.4.0 foi publicada** com [tag versionada, ZIP portátil e checksum SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); verifique os arquivos baixados. A branch `main` pode conter documentação posterior, enquanto a v1.3.0 continua disponível como release anterior. Os testes portáteis de Linux/Windows não certificam hosts de agentes nativos nem usabilidade de terceiros. Abra um Issue com reprodução e logs sem segredos. O material original usa MIT.
 
 ### 13. Posso combinar modos assíncronos, híbridos, equipes e IA sem programação?
 

@@ -2,6 +2,8 @@
 
 [v1.4 迷你指南](MINI_GUIDE_zh.md) · [FAQ](FAQ_zh.md)
 
+[完整的八章详细手册](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md)位于**源代码仓库内，目前只有西班牙语**，属于**历史 v1.3 版本**，不会复制到已安装的控制层。本页面是 v1.4 的简要入门，并非全文翻译。当前操作命令请查阅 [v1.4 安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)。
+
 一种以代码仓库为中心、可复用的智能体软件开发架构，包含职责分工、持久状态、规划、恢复和验证机制。它不能自动完成任意软件，也不能替代产品负责人的决策。
 
 ## 在项目中安装
@@ -24,7 +26,7 @@ CLIENT 负责产品决策和敏感操作授权；I2 负责战略和验收；I3 �
 
 ## 安全与版本
 
-当前源码版本为 1.4.0。**只有在不可变的 [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) 及经过验证的 ZIP 和校验文件实际存在时，才能视为已发布**。此前发布的 v1.3.0 仍可使用。新项目或尚未建立治理状态的项目请参考 [v1.4 首次安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)；已有治理状态的项目须先进行 [只读检查](../32_EXISTING_GOVERNED_ATTACHMENT.md)，不能自动覆盖原有状态。便携式 CI 不能单独证明 Codex Desktop 原生执行、外部 AI 服务或真实外部操作已经通过验收。
+**v1.4.0 已正式发布**：[带版本号的 GitHub Release 提供便携式 ZIP 和 SHA-256 校验文件](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0)。安装前请核对下载文件；持续变化的 `main` 分支可能包含发布后的文档更新，不等同于发布文件。此前发布的 v1.3.0 仍可使用。新项目或尚未建立治理状态的项目请参考 [v1.4 首次安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)；已有治理状态的项目须先进行 [只读检查](../32_EXISTING_GOVERNED_ATTACHMENT.md)，不能自动覆盖原有状态。便携式 CI 不能单独证明 Codex Desktop 原生执行、外部 AI 服务或真实外部操作已经通过验收。
 
 ## 语言
 

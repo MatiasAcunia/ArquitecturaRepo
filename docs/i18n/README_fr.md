@@ -2,6 +2,8 @@
 
 [Mini-guide v1.4](MINI_GUIDE_fr.md) · [FAQ](FAQ_fr.md)
 
+Le [manuel complet en huit chapitres](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) est disponible **dans le dépôt source, uniquement en espagnol**, dans une **édition historique v1.3** ; il n'est pas copié dans le projet installé. Ce guide est une introduction abrégée à v1.4, pas une traduction intégrale ; consultez le [guide d'installation v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) pour les commandes actuelles.
+
 Une architecture réutilisable, fondée sur le dépôt, pour le développement logiciel avec des agents. Elle fournit des rôles, un état durable, la planification, la reprise et la vérification. Elle ne construit pas automatiquement tout logiciel et ne remplace pas les décisions du responsable produit.
 
 ## Installer dans un projet
@@ -24,7 +26,7 @@ Pour arrêter tous les rapports, utilisez enabled=false dans .agentic-sdlc/feedb
 
 ## Sécurité et versions
 
-Ce code source correspond à la version 1.4.0. **Elle n'est publiée que lorsque la [release immuable v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0), son ZIP et sa somme de contrôle vérifiés sont disponibles**. La release précédente v1.3.0 reste accessible. Pour un projet nouveau ou sans gouvernance préalable, suivez le [guide de première installation v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) ; pour un projet déjà gouverné, utilisez le [contrôle en lecture seule](../32_EXISTING_GOVERNED_ATTACHMENT.md), sans écraser son état. La CI portable ne certifie pas l'exécution native de Codex Desktop, les fournisseurs d'IA externes ni les effets réels.
+**La v1.4.0 a été publiée** sous forme de [release versionnée avec archive ZIP portable et somme SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Vérifiez les fichiers téléchargés avant installation ; la branche `main` peut contenir des changements de documentation ultérieurs et ne constitue pas l'archive publiée. La release précédente v1.3.0 reste accessible. Pour un projet nouveau ou sans gouvernance préalable, suivez le [guide de première installation v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) ; pour un projet déjà gouverné, utilisez le [contrôle en lecture seule](../32_EXISTING_GOVERNED_ATTACHMENT.md), sans écraser son état. La CI portable ne certifie pas l'exécution native de Codex Desktop, les fournisseurs d'IA externes ni les effets réels.
 
 ## Langues
 

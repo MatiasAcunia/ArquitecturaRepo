@@ -48,7 +48,7 @@ Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el i
 
 ### 12. ¿Qué está probado y cómo reporto errores?
 
-El código está en 1.4.0, pero solo cuenta como release cuando se publican y verifican el [tag inmutable v1.4.0, el ZIP y su checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 sigue disponible. Las pruebas portátiles en Linux/Windows no certifican hosts de agentes nativos ni usabilidad de terceros. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
+**v1.4.0 está publicada** con [tag versionado, ZIP portátil y checksum SHA-256](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); verificá los archivos descargados. `main` puede incluir documentación más reciente, mientras v1.3.0 sigue disponible como release anterior. Las pruebas portátiles en Linux/Windows no certifican hosts de agentes nativos ni usabilidad de terceros. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
 
 ### 13. ¿Puedo combinar modos asíncrono, mixto, equipos y tareas de IA sin programación?
 

@@ -97,6 +97,8 @@ def main() -> int:
               "manual recovery boundaries missing: " + code)
         check("https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0" in manual_text,
               "manual release source missing: " + code)
+        check("https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md"
+              in readme_text, "historical full-manual source reference missing: " + code)
         check(len(manual_text) >= (2500 if code in {"ja", "zh"} else 3500),
               "localized mini guide unexpectedly thin: " + code)
         for label, content in (("readme", readme_text), ("faq", faq_text)):
@@ -154,6 +156,11 @@ def main() -> int:
               and Path(selected_docs["mini_guide"]).is_file()
               and selected_docs["manual"] == selected_docs["mini_guide"],
               "switching docs offline did not work")
+        check(selected_docs["manual_kind"] == "MINI_GUIDE_LEGACY_ALIAS"
+              and selected_docs["full_manual"] is None
+              and selected_docs["full_manual_status"] == "HISTORICAL_V1_3_SPANISH_SOURCE_ONLY"
+              and selected_docs["full_manual_source_url"].endswith("/docs/manual/ES/README.md"),
+              "mini guide was misrepresented as an installed full-length manual")
 
     print("I18N SELF-TEST PASSED — 8 locales, 13 FAQ topics each, auto, override, fallback, offline install")
     return 0

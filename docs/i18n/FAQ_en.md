@@ -48,7 +48,7 @@ Use --language auto|en|es|pt|fr|de|it|ja|zh; offline documentation follows the s
 
 ### 12. What is tested, and how do I report a problem?
 
-Source version 1.4.0 is a release only when the [immutable v1.4.0 tag, ZIP and checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) are published and verified; v1.3.0 remains available. Portable Linux/Windows checks do not certify native agent hosts or third-party usability. File a GitHub Issue with reproducible steps and redacted logs. Original source and documentation use MIT; third-party rights remain separate.
+**v1.4.0 is published** with a [versioned tag, portable ZIP and SHA-256 checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); verify downloaded bytes. `main` may contain newer documentation, while v1.3.0 remains available as the previous release. Portable Linux/Windows checks do not certify native agent hosts or third-party usability. File a GitHub Issue with reproducible steps and redacted logs. Original source and documentation use MIT; third-party rights remain separate.
 
 ### 13. Can asynchronous, team and non-code AI modes be combined?
 

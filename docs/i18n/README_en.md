@@ -2,6 +2,8 @@
 
 [Mini guide v1.4](MINI_GUIDE_en.md) · [FAQ](FAQ_en.md)
 
+The [complete eight-chapter manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) is available in the **source repository, in Spanish only**, as a **historical v1.3 edition**; it is not copied into installed control layers. This English guide is a short v1.4 introduction, not a full translation; use the [v1.4 installation guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) for current commands.
+
 A reusable, repository-first architecture for agent-assisted software development. It provides roles, durable state, planning, recovery and verification. It does not autonomously build arbitrary software or remove product-owner decisions.
 
 ## Install in an existing project
@@ -24,7 +26,7 @@ To disable all reporting, set enabled=false in .agentic-sdlc/feedback/ARCHITECTU
 
 ## Safety and release status
 
-This source tree is version 1.4.0. It is a **published release only when the immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) and its verified ZIP/checksum exist**. The previous published v1.3.0 release remains available. New or ungoverned projects can use the [v1.4 first-user guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); already governed projects require [read-only attachment](../32_EXISTING_GOVERNED_ATTACHMENT.md), not an automatic overwrite. Native Codex Desktop, third-party AI providers and external effects have not been physically certified by portable CI alone.
+**v1.4.0 has been published** as a [versioned GitHub Release with portable ZIP and SHA-256 checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). Verify downloaded bytes before installation; the moving `main` branch can contain later documentation changes and is not the release artifact. The previous v1.3.0 release remains available. New or ungoverned projects can use the [v1.4 first-user guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md); already governed projects require [read-only attachment](../32_EXISTING_GOVERNED_ATTACHMENT.md), not an automatic overwrite. Native Codex Desktop, third-party AI providers and external effects have not been physically certified by portable CI alone.
 
 ## Languages
 
