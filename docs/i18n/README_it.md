@@ -2,7 +2,7 @@
 
 [Mini guida v1.4](MINI_GUIDE_it.md) · [FAQ](FAQ_it.md)
 
-Il [manuale completo in otto capitoli](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) è disponibile **nel repository sorgente, solo in spagnolo**, come **edizione storica v1.3**; non viene copiato nel progetto installato. Questa pagina è un'introduzione breve alla v1.4, non una traduzione completa; per i comandi aggiornati consulta la [guida all'installazione v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md).
+Il [manuale completo italiano v1.4 in otto capitoli](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/it/README.md) è disponibile nel repository sorgente con il [PDF impaginato](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manuale_Completo_v1.4_IT.pdf). Il [manuale storico spagnolo v1.3](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) rimane separato. Lo ZIP v1.4.0 è stato pubblicato prima di questi libri e non li contiene. Questa pagina, la mini guida e le FAQ restano introduzioni brevi; i comandi correnti sono nella [guida v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md).
 
 Architettura riutilizzabile basata sul repository per sviluppare software con agenti. Offre ruoli, stato persistente, pianificazione, ripristino e verifiche. Non costruisce automaticamente ogni applicazione né sostituisce le decisioni del responsabile del prodotto.
 
