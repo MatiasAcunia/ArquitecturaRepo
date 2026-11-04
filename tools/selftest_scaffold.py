@@ -100,8 +100,14 @@ def main() -> int:
                 raise AssertionError(f"{profile}: copied migration tool missing")
             if not (control / "tools" / "reconstruct_context.py").exists():
                 raise AssertionError(f"{profile}: copied reconstruction tool missing")
+            if (
+                (control / "tools" / "git_currentness.py").read_bytes()
+                != (ROOT / "tools" / "git_currentness.py").read_bytes()
+            ):
+                raise AssertionError(f"{profile}: Git currentness probe differs from source")
             for portable_tool in (
                 "state_tx.py",
+                "git_currentness.py",
                 "discover_project.py",
                 "apply_adoption.py",
                 "repo_delta.py",

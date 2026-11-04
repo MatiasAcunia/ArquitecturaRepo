@@ -43,6 +43,15 @@ def main() -> int:
         ("INDEPENDENT", 1), ("READY", 1),
     ]
 
+    # Unit identifiers are independent of status names. A unit *named* DONE
+    # that is actually READY must not be silently treated as completed.
+    status_named_unit = {"work_units": [
+        unit("DONE", priority=5),
+        unit("NEXT", status="BLOCKED_DEPENDENCY", dependencies=("DONE",)),
+    ]}
+    assert [(entry[0]["id"], entry[1]) for entry in
+            campaignctl.rank_ready_work_units(status_named_unit)] == [("DONE", 2)]
+
     # Once the dependent capability is complete, ordinary priority resolves
     # the independent ready work. Terminal descendants no longer inflate paths.
     state["work_units"][1]["status"] = "DONE"
@@ -77,7 +86,7 @@ def main() -> int:
         "work_unit_id": "ACTIVE", "kind": "shared_resource", "surfaces": ["db:main"]
     }]
     assert campaignctl.active_conflicts(leased, leased["work_units"][3]) == []
-    print("CAMPAIGN PLANNING SELF-TEST PASSED (dependency path, priority, terminal and cycle cases)")
+    print("CAMPAIGN PLANNING SELF-TEST PASSED (dependency path, status-name IDs, priority, terminal and cycle cases)")
     return 0
 
 

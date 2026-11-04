@@ -6,7 +6,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from reconstruct_context import control_json_snapshot, observe_git_currentness
+from git_currentness import observe_git_currentness
+from reconstruct_context import control_json_snapshot
 
 
 def git(repo: Path, *args: str) -> str:

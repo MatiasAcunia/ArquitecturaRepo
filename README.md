@@ -340,6 +340,7 @@ See `docs/17_V1_RELEASE_GATES.md`, `docs/18_RELEASE_CANDIDATE_HARDENING.md`, `do
 - `tools/campaignctl.py` — optional durable Campaign Lead runtime.
 - `tools/migrate_state.py` — explicit state-schema migration planner/executor.
 - `tools/reconstruct_context.py` — validate-first deterministic fresh-context reconstruction.
+- `tools/git_currentness.py` — read-only local Git/currentness observation, kept separate from canonical state reconstruction and installed with all core profiles.
 - `tools/discover_project.py` — deterministic read-only project inventory.
 - `tools/apply_adoption.py` — preflighted, journaled adoption promotion.
 - `tools/state_tx.py` — canonical local control-state transaction/recovery engine shared by runtime, migrations and adoption.

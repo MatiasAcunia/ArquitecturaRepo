@@ -221,7 +221,7 @@ def rank_ready_work_units(state: dict[str, Any]) -> list[tuple[dict[str, Any], i
     visiting: set[str] = set()
 
     def remaining_path(unit_id: str) -> int:
-        if unit_id in terminal or units[unit_id]["status"] in terminal:
+        if units[unit_id]["status"] in terminal:
             return 0
         if unit_id in memo:
             return memo[unit_id]

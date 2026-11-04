@@ -1,6 +1,6 @@
 # ArquitecturaRepo v1.4 — E0 strategic reconstruction and proposed engineering charter
 
-Status: **E0 STRATEGIC AUDIT COMPLETE; E1 AND E2 EXECUTION AUTHORIZED BY CLIENT (2026-11-04)**. This file records the original E0 proposal and subsequent staged authorizations, not a release PASS. Scope is the generic public starter, not the maintainer's private portfolio. The CLIENT explicitly authorized E1 and then E2 within the same consolidation charter and integration branch; E3–E6 execution, merging and release/publication are not approved.
+Status: **E0 STRATEGIC AUDIT COMPLETE; E1, E2 AND E3 EXECUTION AUTHORIZED BY CLIENT (2026-11-04)**. This file records the original E0 proposal and subsequent staged authorizations, not a release PASS. Scope is the generic public starter, not the maintainer's private portfolio. The CLIENT explicitly authorized E1, E2 and now E3 within the same consolidation charter and integration branch; E4–E6 execution, merging and release/publication are not approved.
 
 ## 1. Product destination and CLIENT intent
 
@@ -73,7 +73,7 @@ Adversarial verdict: **GO for a narrowly bounded v1.4 consolidation charter prop
 
 ## 5. Proposed unified Engineering Campaign Charter
 
-**ID:** `AR-V14-CONSOLIDATE` (E1/E2 scope authorized; subsequent execution stages require CLIENT go-ahead). **Capability:** a truthful, transferable, maintainable Git-repository-based Agentic SDLC starter, replacing the inconsistent post-v1.3 main candidate. **Authority:** CLIENT product intent and release approval; I2 strategic scope and terminal audit; one continuous I3 implementation, tests, refactors, integration, recovery and in-envelope QA; independent reviewer verifies exact candidate. Keep one integration branch/PR, not one branch or charter per defect.
+**ID:** `AR-V14-CONSOLIDATE` (E1/E2/E3 scope authorized; subsequent execution stages require CLIENT go-ahead). **Capability:** a truthful, transferable, maintainable Git-repository-based Agentic SDLC starter, replacing the inconsistent post-v1.3 main candidate. **Authority:** CLIENT product intent and release approval; I2 strategic scope and terminal audit; one continuous I3 implementation, tests, refactors, integration, recovery and in-envelope QA; independent reviewer verifies exact candidate. Keep one integration branch/PR, not one branch or charter per defect.
 
 **In scope:** known CI defect repair; public/private governance separation; core/optional/profile classification; canonical currentness and handoff ergonomics; code modularity/refactoring where warranted; compatible schema/CLI and explicit migrations; safe adoption into fresh/existing repositories; docs and packaging truth; A+B physical framework tests, cross-OS smoke and exact release qualification.
 
@@ -113,4 +113,4 @@ These are execution-review milestones inside **one** continuous I3 authority aft
 
 ## 7. E0 handoff and decision boundary
 
-At the E0 closeout, no source was fixed, and no release approval existed. Subsequently the CLIENT explicitly instructed full E1, then E2 execution. Both are part of the same authorized charter and integration branch; these decisions do not retroactively make the E0 audit an implementation PASS or authorize E3–E6. Preserve the charter's same-campaign failure/rework ownership and all distinct final gates.
+At the E0 closeout, no source was fixed, and no release approval existed. Subsequently the CLIENT explicitly instructed full E1, E2 and then E3 execution. All remain part of the same authorized charter and integration branch; these decisions do not retroactively make the E0 audit an implementation PASS or authorize E4–E6. Preserve the charter's same-campaign failure/rework ownership and all distinct final gates.

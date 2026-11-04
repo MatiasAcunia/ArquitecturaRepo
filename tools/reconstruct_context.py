@@ -4,12 +4,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
-import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+from git_currentness import observe_git_currentness
 
 TOOL_ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = Path(__file__).resolve().parent / "validate_project.py"
@@ -17,16 +17,6 @@ VALIDATOR = Path(__file__).resolve().parent / "validate_project.py"
 
 class ReconstructionError(Exception):
     pass
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception as exc:
-        raise ReconstructionError(f"cannot read JSON {path}: {exc}")
-    if not isinstance(data, dict):
-        raise ReconstructionError(f"expected JSON object: {path}")
-    return data
 
 
 def scan_json(root: Path) -> list[tuple[Path, dict[str, Any]]]:
@@ -195,160 +185,6 @@ def validate(root: Path) -> None:
     if result.returncode != 0:
         message = (result.stdout + "\n" + result.stderr).strip()
         raise ReconstructionError("project validation failed before reconstruction:\n" + message)
-
-
-def observe_git_currentness(control_root: Path, declared_code_ref: str) -> dict[str, Any]:
-    """Read-only local Git evidence; never fetch, promote or infer actor authority.
-
-    The Product State may live inside Git, so its current_code_ref cannot in
-    general equal the commit containing that very declaration. An ancestor
-    whose subsequent changes affect only declarative control state is
-    distinguished from an ancestor with code changes; neither proves live
-    remote freshness.
-    """
-
-    def git(*args: str) -> subprocess.CompletedProcess[str]:
-        return subprocess.run(
-            ["git", "-C", str(control_root), *args],
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            capture_output=True,
-            check=False,
-            timeout=12,
-            env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"},
-        )
-
-    result: dict[str, Any] = {
-        "schema_version": "git-currentness-observation-0.1",
-        "mode": "LOCAL_READ_ONLY_NO_FETCH",
-        "repository_root": None,
-        "head": None,
-        "branch": None,
-        "declared_code_ref": declared_code_ref,
-        "code_ref_relation": "UNOBSERVED",
-        "worktree": {"status": "UNKNOWN", "changed_entries": None},
-        "upstream": {
-            "tracking_ref": None,
-            "tracking_head": None,
-            "relation": "UNKNOWN",
-            "live_remote_verified": False,
-        },
-        "local_source_reconciled": False,
-        "reconciliation_required": [],
-        "git_proves_actor_authority": False,
-    }
-    required: list[str] = result["reconciliation_required"]
-    try:
-        top = git("rev-parse", "--show-toplevel")
-        if top.returncode:
-            result["code_ref_relation"] = "NO_GIT_REPOSITORY"
-            required.append("Attach or initialize the intended Git repository and observe its HEAD.")
-            return result
-
-        repo = Path(top.stdout.strip()).resolve()
-        result["repository_root"] = str(repo)
-        head = git("rev-parse", "--verify", "HEAD^{commit}")
-        if head.returncode:
-            result["code_ref_relation"] = "NO_COMMIT"
-            required.append("Create or identify a real committed source baseline.")
-            return result
-        result["head"] = head.stdout.strip()
-
-        branch = git("symbolic-ref", "--quiet", "--short", "HEAD")
-        if branch.returncode == 0:
-            result["branch"] = branch.stdout.strip()
-        else:
-            required.append("Detached HEAD: identify the intended integration branch before writes.")
-
-        dirty = git("status", "--porcelain=v1", "--untracked-files=normal")
-        if dirty.returncode:
-            required.append("Git worktree status could not be verified.")
-        else:
-            changed = len(dirty.stdout.splitlines())
-            result["worktree"] = {
-                "status": "CHANGED" if changed else "CLEAN",
-                "changed_entries": changed,
-            }
-            if changed:
-                required.append("Review uncommitted and untracked files before source-sensitive writes.")
-
-        upstream = git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
-        if upstream.returncode:
-            result["upstream"]["relation"] = "NO_TRACKING_REF"
-            required.append("No upstream tracking ref; live remote source has not been compared.")
-        else:
-            result["upstream"]["tracking_ref"] = upstream.stdout.strip()
-            tracked = git("rev-parse", "--verify", "@{upstream}^{commit}")
-            if tracked.returncode:
-                result["upstream"]["relation"] = "TRACKING_REF_UNRESOLVED"
-                required.append("Resolve the configured upstream tracking commit.")
-            else:
-                tracking_sha = tracked.stdout.strip()
-                result["upstream"]["tracking_head"] = tracking_sha
-                if tracking_sha == result["head"]:
-                    relation = "EXACT_TRACKING_SNAPSHOT"
-                else:
-                    local_a = git("merge-base", "--is-ancestor", result["head"], tracking_sha)
-                    remote_a = git("merge-base", "--is-ancestor", tracking_sha, result["head"])
-                    if local_a.returncode == 0:
-                        relation = "LOCAL_BEHIND_TRACKING"
-                    elif remote_a.returncode == 0:
-                        relation = "LOCAL_AHEAD_TRACKING"
-                    else:
-                        relation = "DIVERGED_OR_UNRELATED_TRACKING"
-                result["upstream"]["relation"] = relation
-                if relation != "EXACT_TRACKING_SNAPSHOT":
-                    required.append("Reconcile local HEAD with the upstream tracking commit.")
-
-        if not re.fullmatch(r"[0-9a-fA-F]{40}", declared_code_ref or ""):
-            result["code_ref_relation"] = "UNBOUND_SYMBOLIC_CODE_REF"
-            required.append("Bind the declared code baseline to an immutable full commit SHA.")
-        else:
-            declared = git("cat-file", "-e", f"{declared_code_ref}^{{commit}}")
-            if declared.returncode:
-                result["code_ref_relation"] = "CODE_REF_NOT_LOCAL"
-                required.append("Obtain and verify the declared code commit locally.")
-            elif declared_code_ref.lower() == result["head"].lower():
-                result["code_ref_relation"] = "EXACT_HEAD"
-            else:
-                ancestor = git("merge-base", "--is-ancestor", declared_code_ref, result["head"])
-                if ancestor.returncode:
-                    result["code_ref_relation"] = "CODE_REF_NOT_ANCESTOR"
-                    required.append("Reconcile the declared code commit with the current HEAD lineage.")
-                else:
-                    # Disable rename detection: a moved code file must not
-                    # masquerade as a change inside the control layer only.
-                    differences = git("diff", "--no-renames", "--name-only", declared_code_ref, result["head"], "--")
-                    try:
-                        control_relative = control_root.resolve().relative_to(repo)
-                    except ValueError:
-                        control_relative = Path(".")
-                    prefix = control_relative.as_posix().rstrip("/") + "/state/"
-                    if (
-                        differences.returncode == 0
-                        and not prefix.startswith("./")
-                        and all(
-                            path.startswith(prefix)
-                            and Path(path).suffix.lower() in {".json", ".md", ".txt"}
-                            for path in differences.stdout.splitlines()
-                        )
-                    ):
-                        result["code_ref_relation"] = "ANCESTOR_DECLARATIVE_STATE_ONLY"
-                    else:
-                        result["code_ref_relation"] = "ANCESTOR_WITH_SOURCE_CHANGES"
-                        required.append("Review source changes after the declared code baseline.")
-
-        result["local_source_reconciled"] = (
-            result["code_ref_relation"] in {"EXACT_HEAD", "ANCESTOR_DECLARATIVE_STATE_ONLY"}
-            and result["worktree"]["status"] == "CLEAN"
-            and result["branch"] is not None
-        )
-        required.append("Before remote-sensitive operations, verify the live remote ref explicitly; a tracking ref is only a local snapshot.")
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        result["code_ref_relation"] = "GIT_OBSERVATION_FAILED"
-        required.append(f"Local Git observation failed ({type(exc).__name__}); investigate without assuming currentness.")
-    return result
 
 
 def reconstruct(root: Path) -> dict[str, Any]:
