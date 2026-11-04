@@ -84,6 +84,19 @@ class StructurePolicyTests(unittest.TestCase):
             with self.subTest(bad=bad):
                 self.assertTrue(any("project-specific" in err for err in self.check({"docs/manual/README.md": bad})))
 
+    def test_generated_release_manifest_is_not_source_policy(self):
+        full_commit = "a" * 40
+        self.assertEqual(self.check({
+            "dist/ArquitecturaRepo-v1.4.0-release-manifest.json": json.dumps(
+                {"source_commit_sha1": full_commit},
+            ),
+        }), [])
+        self.assertTrue(any("40-char" in err for err in self.check({
+            "state/UNEXPECTED_RELEASE_RECEIPT.json": json.dumps(
+                {"source_commit_sha1": full_commit},
+            ),
+        })))
+
 
 if __name__ == "__main__":
     unittest.main()

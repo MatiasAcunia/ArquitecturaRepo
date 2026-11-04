@@ -19,7 +19,7 @@ from pathlib import Path, PurePosixPath
 
 
 SOURCE = Path(__file__).resolve().parents[1]
-PREFIX = "ArquitecturaRepo-candidate/"
+PREFIX = f"ArquitecturaRepo-v{(SOURCE / 'VERSION').read_text(encoding='utf-8').strip()}/"
 FORBIDDEN_SUFFIXES = {".pem", ".key", ".p12", ".pfx", ".sqlite", ".db"}
 RETIRED_PRIVATE_DOC_PREFIXES = ("docs/30_", "docs/31_", "docs/33_", "docs/35_", "docs/36_", "docs/37_")
 
@@ -68,8 +68,11 @@ def enforce_public_path(name: str) -> None:
         raise AssertionError(f"retired internal maintainer document in public ZIP: {relative}")
 
 
-def test_archive(source_zip: Path) -> tuple[Path, int]:
-    require(invoke("git", "-C", SOURCE, "-c", "core.autocrlf=false", "archive", "--format=zip", f"--prefix={PREFIX}", "-o", source_zip, "HEAD"), "git archive")
+def test_archive(source_zip: Path, *, generate: bool = True) -> tuple[Path, int]:
+    if generate:
+        require(invoke("git", "-C", SOURCE, "-c", "core.autocrlf=false", "archive", "--format=zip", f"--prefix={PREFIX}", "-o", source_zip, "HEAD"), "git archive")
+    elif not source_zip.is_file():
+        raise AssertionError(f"published archive is missing: {source_zip.name}")
     # The released object is HEAD, not the platform-dependent checkout index.
     # On Windows autocrlf/configuration may affect working-tree presentation;
     # bind the archive independently to committed Git TREE blob identities.
@@ -87,10 +90,17 @@ def test_archive(source_zip: Path) -> tuple[Path, int]:
     with zipfile.ZipFile(source_zip) as archive:
         if archive.testzip() is not None:
             raise AssertionError("candidate ZIP failed CRC/readback")
-        entries = {name for name in archive.namelist() if not name.endswith("/")}
-        for name in archive.namelist():
+        members = archive.namelist()
+        if len(members) != len(set(members)):
+            raise AssertionError("public archive contains duplicate ZIP member names")
+        if sum(item.file_size for item in archive.infolist()) > 64 * 1024 * 1024:
+            raise AssertionError("public archive exceeds the uncompressed safety budget")
+        entries = {name for name in members if not name.endswith("/")}
+        for name in members:
             enforce_public_path(name)
             entry = archive.getinfo(name)
+            if entry.file_size > 8 * 1024 * 1024:
+                raise AssertionError(f"oversized ZIP member in public source: {name}")
             if stat.S_IFMT(entry.external_attr >> 16) == stat.S_IFLNK:
                 raise AssertionError(f"portable archive contains a symlink: {name}")
         actual = {name.removeprefix(PREFIX) for name in entries}
@@ -204,10 +214,11 @@ def test_presentation_and_source() -> None:
         raise AssertionError("public README does not identify the starter and an accessible entrypoint")
     if "https://github.com/ArquitecturaRepo/" in (primary + manual):
         raise AssertionError("public-facing GitHub link omits repository owner")
-    for public_link in ("releases/tag/v1.3.0", "releases/download/v1.3.0/", "actions/workflows/publish-ghcr-package.yml"):
+    for public_link in ("releases/tag/v1.3.0", "releases/download/v1.3.0/", "actions/workflows/publish-ghcr-package.yml",
+                        "releases/tag/v1.4.0", "releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip"):
         if f"https://github.com/MatiasAcunia/ArquitecturaRepo/{public_link}" not in (primary + manual):
             raise AssertionError(f"missing canonical public release/workflow link: {public_link}")
-    if "v1.4 candidate" not in primary or "UNTRUSTED_CONTEXT" not in primary:
+    if "v1.4.0" not in primary or "UNTRUSTED_CONTEXT" not in primary:
         raise AssertionError("README confuses released source with untrusted v1.4 candidate")
 
 

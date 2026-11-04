@@ -1,0 +1,25 @@
+{
+  "schema_version": "architecturarepo-v14-client-release-decision-v1",
+  "version": "1.4.0",
+  "authorization_date": "2026-11-04",
+  "authority_source": "EXPLICIT_CLIENT_DIRECTIVE_IN_CONVERSATION_UNATTESTED_BY_NATIVE_HOST",
+  "decision": "AUTHORIZE_E6_INTEGRATION_AND_PUBLIC_RELEASE",
+  "scope": [
+    "MERGE_APPROVED_INTEGRATION_PR",
+    "CREATE_IMMUTABLE_V1_4_0_RELEASE",
+    "PUBLISH_SOURCE_BOUND_PORTABLE_ZIP_AND_CHECKSUM",
+    "PUBLISH_SOURCE_BOUND_GHCR_INSTALLER_PACKAGE",
+    "UPDATE_PUBLIC_RELEASE_DOCUMENTATION_AND_VERIFY_DISTRIBUTION"
+  ],
+  "conditions": [
+    "EXACT_MAIN_SHA_AND_VERSION",
+    "LINUX_AND_WINDOWS_CI_FOR_EXACT_MAIN_SHA",
+    "CURRENT_SOURCE_PRIVACY_AND_ARTIFACT_BYTE_PARITY",
+    "PUBLIC_RELEASE_DOWNLOAD_READBACK",
+    "NO_REWRITE_OF_HISTORICAL_TAGS_OR_PROJECT_STATE",
+    "NO_UNVERIFIED_NATIVE_HOST_OR_EXTERNAL_USER_CLAIMS"
+  ],
+  "historical_git_privacy_certification": false,
+  "native_codex_desktop_acceptance": false,
+  "third_party_customer_usability_acceptance": false
+}

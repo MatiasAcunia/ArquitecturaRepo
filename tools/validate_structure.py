@@ -118,6 +118,12 @@ REQUIRED_PATHS = [
     "tools/selftest_contracts.py",
     "tools/selftest_hardening.py",
     "tools/selftest_v14_public_readiness.py",
+    "tools/package_v14_release.py",
+    "tools/selftest_v14_release_contract.py",
+    "docs/47_V1_4_RELEASE_NOTES_AND_UPGRADE.md",
+    "state/V1_4_RELEASE_SCOPE_DECISION.json",
+    ".github/workflows/publish-v1-4-release.yml",
+    "packaging/v1_4/Dockerfile",
     "tools/repo_delta.py",
     "tools/commit_guard.py",
     "tools/workspace_gc.py",
@@ -147,6 +153,11 @@ PUBLIC_REPOSITORY_LINKS = (
     "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/actions/workflows/publish-ghcr-package.yml",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/32_EXISTING_GOVERNED_ATTACHMENT.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md",
 )
 PUBLIC_REPOSITORY_LINK_RE = re.compile(
     "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"
@@ -176,6 +187,7 @@ def strip_approved_source_pins(text: str, rel: Path) -> str:
         ".github/workflows/publish-v1-3-manual.yml",
         ".github/workflows/publish-ghcr-package.yml",
         ".github/workflows/package-v1-3-release-asset.yml",
+        ".github/workflows/publish-v1-4-release.yml",
         "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
     }:
         text = re.sub(
@@ -225,9 +237,19 @@ def fail(message: str, errors: list[str]) -> None:
     errors.append(message)
 
 
+def is_generated_or_vcs_path(path: Path) -> bool:
+    """Release artifacts are checked by their dedicated byte-bound verifier.
+
+    Never treat ignored dist/build caches as public source policy just because
+    an operator has already run the package generator in this checkout.
+    """
+    relative = path.relative_to(ROOT)
+    return ".git" in relative.parts or (bool(relative.parts) and relative.parts[0] in {"dist", "build"})
+
+
 def parse_json_files(errors: list[str]) -> None:
     for path in ROOT.rglob("*.json"):
-        if ".git" in path.parts:
+        if is_generated_or_vcs_path(path):
             continue
         try:
             json.loads(path.read_text(encoding="utf-8"))
@@ -290,7 +312,7 @@ def validate_required_paths(errors: list[str]) -> None:
 def validate_structure_only(errors: list[str]) -> None:
     text_suffixes = {".md", ".json", ".py", ".yml", ".yaml", ".txt"}
     for path in ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if not path.is_file() or is_generated_or_vcs_path(path):
             continue
         if path.suffix.lower() not in text_suffixes and path.name != "VERSION":
             continue
@@ -329,7 +351,7 @@ def validate_structure_only(errors: list[str]) -> None:
 
 def validate_internal_links(errors: list[str]) -> None:
     for path in ROOT.rglob("*.md"):
-        if ".git" in path.parts:
+        if is_generated_or_vcs_path(path):
             continue
         text = path.read_text(encoding="utf-8")
         for target in MD_LINK_RE.findall(text):

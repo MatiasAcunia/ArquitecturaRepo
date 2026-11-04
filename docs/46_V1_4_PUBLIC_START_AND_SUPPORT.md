@@ -1,9 +1,11 @@
-# ArquitecturaRepo — v1.4 candidate: start here and actual support
+# ArquitecturaRepo v1.4.0 — start here and actual support
 
-Status: **unreleased integration candidate**. The stable public release remains
+Status: **versioned public source**. Use only the immutable
+[v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0)
+and its verified assets as a published distribution; an untagged branch or
+unpublished candidate is not a release. The previous published version is
 [v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0).
-This guide describes the v1.4 candidate's observed portable capabilities, not
-permission to publish it or to execute an autonomous project.
+Publishing does not authorize autonomous execution in an adopter's project.
 
 ## What this gives you
 
@@ -88,7 +90,7 @@ in-place upgrader and does not authorize new execution.
 | DB/recovery/GC | SQLite WAL, journal, idempotent effect and artifact ownership tests; production DB or host behavior is not certified by these fixtures. |
 | Models and plugins | Model-neutral portable source; external models, billed API, cloud credentials, automatic scheduling and native host integrations are not included/verified by default. |
 | Feedback privacy | Local strict-metadata report configuration is enabled by default. `--no-feedback-workflow` disables the scheduler, **not** the local report generator; set `enabled=false` in the generated feedback configuration to disable all reporting. No collector endpoint is bundled. |
-| Public distribution | Current-tree source archive and install readback are exercised on Linux/Windows. No v1.4 published ZIP or container has been released yet. |
+| Public distribution | The source-bound v1.4.0 archive and install readback run on Linux/Windows; the exact published ZIP/checksum and optional container require separate post-publication readback, not merely a green source build. |
 | Human usability | Runnable setup/docs and error/negative paths have deterministic coverage; independent external-user comprehension or taste approval is **not** established by automation. |
 
 ## Troubleshooting and safe recovery
@@ -115,11 +117,14 @@ documents, credential/database paths and symlinks. The author/license and
 public repository URL are intentionally public identifiers. Every artifact
 must be rechecked from its **exact** source commit at release.
 
-These checks cover the **current candidate tree**. Deleting a file from a
+These checks cover the **exact versioned source tree**. Deleting a file from a
 public Git tree does not erase it from older commits, forks or caches; any
 actual historical disclosure requires a separately assessed remediation, not
 an automatic history rewrite. No history-wide confidentiality audit or
-published-v1.4 artifact inspection is claimed here.
+published-v1.4 artifact inspection is implied by source-only tests.
 
-Only an explicit CLIENT-approved E6 can merge, tag `v1.4.0`, publish the
-portable archive/checksum and independently inspect the downloadable bytes.
+CLIENT authorized E6 merge, v1.4.0 tagging, archive/checksum and package
+publication on 2026-11-04. Execution still requires the exact main-source,
+Linux/Windows CI, integrity, privacy and public-download verification gates.
+Release authorization is not an assertion that a tag, ZIP or package already
+exists; check the actual assets before distributing.

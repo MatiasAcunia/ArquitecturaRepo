@@ -78,7 +78,7 @@ def main() -> int:
         if (len(gates) != 15 or not all(g.get("required") is True for g in gates)
             or any(g.get("status") == "PHYSICALLY_VERIFIED_EXACT" for g in gates)):
             raise AssertionError("physical acceptance criteria silently altered for source release")
-    elif release_version == "1.3.0":
+    elif release_version in {"1.3.0", "1.4.0"}:
         # Backward-compatibility gate: never reinterpret v1.2 CLIENT authority
         # as an authorization to publish v1.3.0. A staged version is legal
         # only when it cannot be released by the legacy automatic publisher.
@@ -86,7 +86,7 @@ def main() -> int:
         if (legacy_scope.get("version") != "1.2.0"
             or legacy_scope.get("full_physical_release_accepted") is not False
             or legacy_scope.get("physical_release_gates_overridden") is not False):
-            raise AssertionError("v1.3 staging rewrote v1.2 CLIENT/release history")
+            raise AssertionError("newer source version rewrote v1.2 CLIENT/release history")
         manual_path = ROOT / ".github" / "workflows" / "publish-v1-3-manual.yml"
         old_path = ROOT / ".github" / "workflows" / "publish-version-release.yml"
         if not manual_path.is_file():
@@ -105,6 +105,19 @@ def main() -> int:
             or "skip=true" not in old_auto
             or old_auto.count("steps.identity.outputs.skip != 'true'") != 2):
             raise AssertionError("v1.3 staging weakened exact-source/manual publication boundary")
+        if release_version == "1.4.0":
+            approved = json.loads((ROOT / "state/V1_4_RELEASE_SCOPE_DECISION.json").read_text(encoding="utf-8"))
+            publisher = (ROOT / ".github/workflows/publish-v1-4-release.yml").read_text(encoding="utf-8")
+            if (approved.get("version") != "1.4.0"
+                or approved.get("decision") != "AUTHORIZE_E6_INTEGRATION_AND_PUBLIC_RELEASE"
+                or approved.get("native_codex_desktop_acceptance") is not False
+                or approved.get("historical_git_privacy_certification") is not False
+                or "1.4.0)" not in old_auto
+                or "workflow_run:" not in publisher
+                or "head_repository.full_name == github.repository" not in publisher
+                or "github.event.workflow_run.event == 'push'" not in publisher
+                or "git ls-remote origin refs/heads/main" not in publisher):
+                raise AssertionError("v1.4 release lost exact-main, scoped CLIENT or publicity guards")
     elif release_version != "1.1.0":
         raise AssertionError("release version unauthorized or no scoped CLIENT decision")
     verifier = subprocess.run(

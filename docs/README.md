@@ -1,11 +1,12 @@
 # Documentation index — ArquitecturaRepo
 
-This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. The latest published release is **v1.3.0**; the v1.4 consolidation branch remains an unreleased engineering candidate.
+This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. Version 1.4.0 is available as a release only when its [immutable GitHub tag and assets](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) actually exist. Untagged branches remain candidates; v1.3.0 stays an immutable previous release.
 
 ## Start here — ordinary adopter
 
 - [README](../README.md): product, capabilities, quick start, profiles and status.
-- [v1.4 candidate first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, honest limits, privacy and recovery. Not a published release.
+- [v1.4.0 first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, published-artifact identity, honest limits, privacy and recovery.
+- [v1.4.0 release notes and upgrade boundaries](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md): versioned capabilities, published package verification and deliberate non-upgrade of existing governed state.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
 - [Spanish FAQ](FAQ_ES.md) and [language translations](i18n/README_en.md).
 - [Architecture overview](00_ARCHITECTURE_OVERVIEW.md), [minimum profile](05_MINIMUM_VIABLE_PROFILE.md), [scaling profiles](06_SCALING_PROFILES.md), [project modes](27_PROJECT_MODES_AND_STACK_SELECTION.md).

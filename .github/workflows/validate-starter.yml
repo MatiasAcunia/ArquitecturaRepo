@@ -128,6 +128,26 @@ jobs:
         run: python tools/selftest_v13_installed_lifecycle.py
       - name: Verify explicit v1.3 release and upgrade boundaries
         run: python tools/selftest_v13_release_contract.py
+      - name: Verify exact v1.4 publication and safety contract
+        run: python tools/selftest_v14_release_contract.py
+      - name: Build v1.4 public ZIP and exercise container from ZIP only
+        shell: bash
+        run: |
+          set -euo pipefail
+          public="$RUNNER_TEMP/v14-public-candidate"
+          context="$RUNNER_TEMP/v14-image-context"
+          python tools/package_v14_release.py --build --directory "$public"
+          python tools/package_v14_release.py --verify --directory "$public"
+          mkdir -p "$context"
+          unzip -q "$public/ArquitecturaRepo-v1.4.0-portable.zip" -d "$context"
+          source="$context/ArquitecturaRepo-v1.4.0"
+          test ! -e "$source/.git"
+          docker build --pull -f packaging/v1_4/Dockerfile -t arquitecturarepo-v14-prepublish:local "$source"
+          docker run --rm --entrypoint sh arquitecturarepo-v14-prepublish:local -c 'test ! -e /opt/architecturarepo/.git && test ! -e /opt/architecturarepo/private'
+          docker run --rm arquitecturarepo-v14-prepublish:local --help >/dev/null
+          mkdir -p "$RUNNER_TEMP/v14-container-adopter"
+          docker run --rm -v "$RUNNER_TEMP/v14-container-adopter:/workspace" arquitecturarepo-v14-prepublish:local --target /workspace/demo --profile SMALL --product-id "V14_CI_DEMO" --language es --no-feedback-workflow
+          test -f "$RUNNER_TEMP/v14-container-adopter/demo/.agentic-sdlc/state/PRODUCT_STATE_CURRENT.json"
 
   windows-compatibility-smoke:
     name: Windows portable-core smoke (not Codex Desktop acceptance)
@@ -195,6 +215,8 @@ jobs:
         run: python tools/selftest_v13_installed_lifecycle.py
       - name: Verify v1.3 manual release and support contract on Windows
         run: python tools/selftest_v13_release_contract.py
+      - name: Verify exact v1.4 publication and safety contract on Windows
+        run: python tools/selftest_v14_release_contract.py
       - name: Verify cross-process plan and external-effect restart
         run: python tools/selftest_v12_longitudinal.py
       - name: Verify SQLite WAL logical currentness under Windows file locks

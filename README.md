@@ -11,7 +11,7 @@ GitHub shows a **static** repository README and does not auto-select the viewer'
 
 A forkable, Git-repository-based system for developing software with human decisions and optional AI agents. Its main job is to keep product intent, ownership, code/currentness, evidence and the next permitted action **reconstructible after a chat or agent loses context**. GitHub holds durable decisions; Python scripts support validation and recovery. They do not replace the source of truth or grant agents permissions.
 
-**New here?** Follow the [runnable quick start](#quick-start) or the [v1.4 candidate first-user guide and support matrix](docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md). If a project already has its own governance, use the [read-only attachment path](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). The current Git branch is an **unreleased v1.4 candidate**; for stable installation use [v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0). No provider credentials or native agent automation are bundled.
+**New here?** Follow the [runnable quick start](#quick-start) or the [v1.4 first-user guide and support matrix](docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md). If a project already has its own governance, use the [read-only attachment path](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). Source version is **1.4.0**; only the immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) and its downloadable assets, when present, constitute the published version. An untagged branch is not a release. No provider credentials or native agent automation are bundled.
 
 The core idea:
 
@@ -38,7 +38,13 @@ This repository is not a prompt collection. It is an operating architecture for 
 
 The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or use the reviewed migration/adoption path when a governed control layer already exists.
 
-## v1.3.0 — published portable framework
+## v1.4.0 — consolidated public starter
+
+v1.4 consolidates the public governance contract and Python implementation; makes Git/source currentness and continuation checks explicit; improves maintainability and proportionate installation into new or existing **ungoverned** projects; and verifies source-bound archive extraction, real onboarding commands and non-destructive recovery on Linux and Windows. Existing **governed** projects use a read-only attachment preflight, not an automatic state migration. Optional native agent hosts and provider integrations remain unverified unless separately tested and authorized. [Release notes and source-bound support limits](docs/47_V1_4_RELEASE_NOTES_AND_UPGRADE.md).
+
+For a released build, download the [v1.4.0 portable ZIP](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip) and verify its accompanying `.sha256` file before installing. The `ghcr.io/matiasacunia/arquitecturarepo:1.4.0` package is a separately verified optional installer; anonymous registry access depends on GitHub Packages visibility settings. Always check that the exact release/tag/assets exist before calling a build published.
+
+## v1.3.0 — previous published portable framework
 
 v1.3 strengthens the portable Goal/Plan/campaign lifecycle, physically revalidates frozen independent review evidence, binds controlled work-unit starts to the active actor/run/lease, and refuses shadow Product State creation in already governed projects. A deterministic installed-framework lifecycle regression now runs in Linux and Windows CI. **v1.3.0 is published** at the immutable, manually authorized [tag and GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0); subsequent untagged work on `main` is not automatically part of that release. No native Codex Desktop operations are claimed. Upgrading an existing governed v1.2 control layer is **not automatic**; preserve existing state and use the documented read-only attachment/side-by-side route. [Release notes, supported scope and upgrade/rollback](docs/43_V1_3_RELEASE_NOTES_AND_UPGRADE.md).
 
@@ -154,7 +160,7 @@ python tools/scaffold_project.py \
 
 Generated control layers carry their own schemas, validator and validation dependency declaration.
 
-New scaffolds generate a **monthly**, strictly allowlisted metadata report in their own GitHub Actions artifacts, enabled by default. The outbound preference is opt-out **if a verified collector URL is configured**; this candidate has no collector and cannot claim external delivery.
+New scaffolds generate a **monthly**, strictly allowlisted metadata report in their own GitHub Actions artifacts, enabled by default. The outbound preference is opt-out **if a verified collector URL is configured**; the public starter has no bundled collector and cannot claim external delivery.
 
 Disable scheduling at install time with:
 
@@ -296,7 +302,7 @@ See `docs/14_CANONICAL_OWNERSHIP.md`.
 
 `tools/reconstruct_context.py` validates a control layer first and then emits one deterministic current posture from durable evidence only. It refuses to summarize through invalid currentness, duplicate owners or pending recovery state.
 
-The v1.4 candidate also emits **derived, read-only local Git evidence** (`git_currentness` and `continuation_preflight`): actual HEAD and branch; clean/changed working tree; exact, ancestor-only, missing or symbolic Product State code reference; and local upstream-tracking relation. It never fetches, changes repository state, or treats Git author/commit movement as actor identity. `EXACT_TRACKING_SNAPSHOT` is **not proof of the live GitHub/remote HEAD**. An immutable `current_code_ref` may legitimately be an ancestor if later commits only changed declarative state files under `.agentic-sdlc/state/`; changes to scripts, configuration or application source require reconciliation. Where currentness is unresolved, the continuation preflight says so even if a legacy execution-authority record remains marked ACTIVE. Git evidence does not itself authorize native execution or release.
+The v1.4 source also emits **derived, read-only local Git evidence** (`git_currentness` and `continuation_preflight`): actual HEAD and branch; clean/changed working tree; exact, ancestor-only, missing or symbolic Product State code reference; and local upstream-tracking relation. It never fetches, changes repository state, or treats Git author/commit movement as actor identity. `EXACT_TRACKING_SNAPSHOT` is **not proof of the live GitHub/remote HEAD**. An immutable `current_code_ref` may legitimately be an ancestor if later commits only changed declarative state files under `.agentic-sdlc/state/`; changes to scripts, configuration or application source require reconciliation. Where currentness is unresolved, the continuation preflight says so even if a legacy execution-authority record remains marked ACTIVE. Git evidence does not itself authorize native execution or release.
 
 Run `python .agentic-sdlc/tools/reconstruct_context.py --root .agentic-sdlc` in an installed project, then explicitly compare the intended live remote before remote-sensitive writes. No second CURRENT state or global database is produced.
 

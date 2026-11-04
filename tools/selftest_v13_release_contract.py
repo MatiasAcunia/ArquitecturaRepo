@@ -4,9 +4,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-assert (ROOT/'VERSION').read_text().strip() == '1.3.0'
+version = (ROOT/'VERSION').read_text().strip()
+assert version in {'1.3.0', '1.4.0'}
 manifest = json.loads((ROOT/'state/STARTER_MANIFEST.json').read_text())
-assert manifest['version'] == '1.3.0' and manifest['status'] == 'PUBLIC_STARTER_STABLE'
+assert manifest['version'] == version and manifest['status'] == 'PUBLIC_STARTER_STABLE'
 manual = (ROOT/'.github/workflows/publish-v1-3-manual.yml').read_text()
 auto = (ROOT/'.github/workflows/publish-version-release.yml').read_text()
 ci = (ROOT/'.github/workflows/validate-starter.yml').read_text()
