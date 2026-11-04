@@ -1,4 +1,4 @@
-# Agentic SDLC Starter Architecture
+# ArquitecturaRepo — Agentic SDLC starter
 
 **Documentation languages / Idiomas / Langues / Sprachen / Lingue / 言語 / 语言:**
 
@@ -10,6 +10,8 @@ GitHub shows a **static** repository README and does not auto-select the viewer'
 
 
 A forkable, Git-repository-based system for developing software with human decisions and optional AI agents. Its main job is to keep product intent, ownership, code/currentness, evidence and the next permitted action **reconstructible after a chat or agent loses context**. GitHub holds durable decisions; Python scripts support validation and recovery. They do not replace the source of truth or grant agents permissions.
+
+**New here?** Follow the [runnable quick start](#quick-start) or the [v1.4 candidate first-user guide and support matrix](docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md). If a project already has its own governance, use the [read-only attachment path](docs/32_EXISTING_GOVERNED_ATTACHMENT.md). The current Git branch is an **unreleased v1.4 candidate**; for stable installation use [v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0). No provider credentials or native agent automation are bundled.
 
 The core idea:
 
@@ -32,7 +34,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 - [Manual completo en español (capítulos 00–07), revisado para v1.3.0](docs/manual/ES/README.md).
 - [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
 - [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
-- [Current contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). This is engineering work in progress, **not** the public release or proof of native agent execution.
+- [Historical contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). These historical plans are **not** the published release contract or proof of native agent execution.
 
 The scaffold refuses destructive overwrites with `--force`. Install into a fresh directory or use the reviewed migration/adoption path when a governed control layer already exists.
 

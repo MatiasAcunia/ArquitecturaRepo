@@ -72,6 +72,18 @@ class StructurePolicyTests(unittest.TestCase):
             "docs/README.md": "BEGIN " + "PRIVATE KEY",
         })))
 
+    def test_public_release_links_are_not_private_project_markers(self):
+        for link in validate_structure.PUBLIC_REPOSITORY_LINKS:
+            with self.subTest(link=link):
+                self.assertEqual(self.check({"docs/manual/README.md": f"Public release: [official]({link})"}), [])
+        for bad in (
+            "https://github.com/MatiasAcunia/private-repository",
+            "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/private-branch",
+            validate_structure.PUBLIC_REPOSITORY_LINKS[0] + "/private",
+        ):
+            with self.subTest(bad=bad):
+                self.assertTrue(any("project-specific" in err for err in self.check({"docs/manual/README.md": bad})))
+
 
 if __name__ == "__main__":
     unittest.main()

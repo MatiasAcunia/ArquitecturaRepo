@@ -106,6 +106,7 @@ REQUIRED_PATHS = [
     "docs/18_RELEASE_CANDIDATE_HARDENING.md",
     "docs/19_V1_RELEASE.md",
     "docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md",
+    "docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md",
     "examples/minimal/PRODUCT_STATE_CURRENT.json",
     "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
     "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
@@ -116,6 +117,7 @@ REQUIRED_PATHS = [
     "tools/selftest_adoption.py",
     "tools/selftest_contracts.py",
     "tools/selftest_hardening.py",
+    "tools/selftest_v14_public_readiness.py",
     "tools/repo_delta.py",
     "tools/commit_guard.py",
     "tools/workspace_gc.py",
@@ -141,6 +143,14 @@ TOKEN_HINT_RE = re.compile(
 MD_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|G007|G010|MatiasAcunia)\b|TRO/RED")
 SYNTHETIC_EMAIL_SUFFIXES = (".test", ".invalid")
+PUBLIC_REPOSITORY_LINKS = (
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/actions/workflows/publish-ghcr-package.yml",
+)
+PUBLIC_REPOSITORY_LINK_RE = re.compile(
+    "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"
+)
 
 
 def synthetic_fixture_email(email: str, rel: Path) -> bool:
@@ -291,6 +301,11 @@ def validate_structure_only(errors: list[str]) -> None:
             fail(f"possible personal email in public starter: {rel}", errors)
         # The public starter can demonstrate arbitrary project categories,
         # never identify the maintainer's own active product workstreams.
+        # The first-party author's real public release links are legitimate
+        # attribution, not a maintainer's private portfolio/source identity.
+        # Only exact allowlisted URLs are exempt; arbitrary owner-owned repos,
+        # branch names or private paths remain forbidden in public policies.
+        public_context = PUBLIC_REPOSITORY_LINK_RE.sub("<canonical-public-release-link>", text)
         if (
             (
                 path.suffix.lower() == ".md"
@@ -298,7 +313,7 @@ def validate_structure_only(errors: list[str]) -> None:
                      or rel.parts[0] in {"docs", "prompts", "protocols"})
             )
             or (path.suffix.lower() == ".json" and rel.parts[0] == "templates")
-        ) and PUBLIC_PROJECT_MARKER_RE.search(text):
+        ) and PUBLIC_PROJECT_MARKER_RE.search(public_context):
             fail(f"project-specific source name in public documentation: {rel}", errors)
         # Official immutable action pins are supply-chain controls, not
         # project/source identity. Exception is limited to these two CI YAML

@@ -5,6 +5,7 @@ This index separates the **public installable product** from **maintainer engine
 ## Start here — ordinary adopter
 
 - [README](../README.md): product, capabilities, quick start, profiles and status.
+- [v1.4 candidate first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, honest limits, privacy and recovery. Not a published release.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
 - [Spanish FAQ](FAQ_ES.md) and [language translations](i18n/README_en.md).
 - [Architecture overview](00_ARCHITECTURE_OVERVIEW.md), [minimum profile](05_MINIMUM_VIABLE_PROFILE.md), [scaling profiles](06_SCALING_PROFILES.md), [project modes](27_PROJECT_MODES_AND_STACK_SELECTION.md).

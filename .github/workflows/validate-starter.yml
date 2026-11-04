@@ -42,6 +42,18 @@ jobs:
         run: python tools/selftest_scaffold.py
       - name: Exercise actual first-time adopter commands, privacy and refusal paths
         run: python tools/selftest_adopter_first_steps.py
+      - name: Build, read back and install exact public source ZIP on Linux
+        run: python tools/selftest_v14_public_readiness.py
+      - name: Execute documented Bash onboarding in a disposable project
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="$RUNNER_TEMP/primer proyecto con espacios"
+          python "tools/scaffold_project.py" --target "$target" --profile "SMALL" --product-id "BASH_DEMO" --objective "A test-only app" --language "es" --no-feedback-workflow
+          cd "$target"
+          python ".agentic-sdlc/tools/project_status.py" --control-root ".agentic-sdlc" > /dev/null
+          python ".agentic-sdlc/tools/discover_project.py" --project-root "." > /dev/null
+          python ".agentic-sdlc/tools/reconstruct_context.py" --root ".agentic-sdlc" > /dev/null
       - name: Exercise schema migrations
         run: python tools/selftest_migrations.py
       - name: Exercise canonical ownership graph
@@ -140,6 +152,25 @@ jobs:
         run: python tools/selftest_scaffold.py
       - name: Exercise first-time adopter commands and refusal paths on Windows
         run: python tools/selftest_adopter_first_steps.py
+      - name: Build, read back and install exact public source ZIP on Windows
+        run: python tools/selftest_v14_public_readiness.py
+      - name: Execute documented PowerShell onboarding in a disposable project
+        shell: pwsh
+        run: |
+          $target = Join-Path $env:RUNNER_TEMP "primer proyecto con espacios"
+          python "tools\scaffold_project.py" --target "$target" --profile "SMALL" --product-id "POWERSHELL_DEMO" --objective "A test-only app" --language "es" --no-feedback-workflow
+          if ($LASTEXITCODE -ne 0) { throw "PowerShell scaffold failed" }
+          Push-Location "$target"
+          try {
+            python ".agentic-sdlc\tools\project_status.py" --control-root ".agentic-sdlc" | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "PowerShell project status failed" }
+            python ".agentic-sdlc\tools\discover_project.py" --project-root "." | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "PowerShell project discovery failed" }
+            python ".agentic-sdlc\tools\reconstruct_context.py" --root ".agentic-sdlc" | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "PowerShell context reconstruction failed" }
+          } finally {
+            Pop-Location
+          }
       - name: Physically falsify Git currentness on Windows
         run: python tools/selftest_git_currentness.py
       - name: Recover and reject tampered journals on Windows
