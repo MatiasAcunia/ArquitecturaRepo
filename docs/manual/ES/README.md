@@ -1,5 +1,7 @@
 # Manual de ArquitecturaRepo v1.3.0 — Colección 00–07 (español)
 
+> Edición **histórica de v1.3.0**. Para instalaciones actuales de v1.4.0, usá el [manual práctico v1.4 en español](../../i18n/MANUAL_es.md) o [su índice de ocho idiomas](../../../README.md). Los comandos e imágenes de contenedor de abajo describen exclusivamente la versión antigua; **no** los tomes como la versión publicada más reciente.
+
 Guía pública para personas que quieren aplicar ArquitecturaRepo a un proyecto propio. Esta edición revisa el texto de la colección original del 22/09/2026 y solo modifica o añade las instrucciones necesarias para reflejar el release **v1.3.0** publicado el 17/10/2026.
 
 **Fuente canónica del software**: [release v1.3.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0), commit `9c00e19b74d1`. La rama `main` puede contener documentación y procesos posteriores, pero el paquete versionado se construye desde el tag.

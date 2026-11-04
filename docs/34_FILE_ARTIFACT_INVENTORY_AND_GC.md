@@ -115,8 +115,12 @@ unknown file, symlink and Git-tracked file protected; SQL/SQLite protected;
 expired permission only; repeated GC idempotent; prior workspace takeover
 blocked; interrupted-L3 reconciliation and disk recovery check on Windows.
 
-This capability remains candidate-only pending exact Linux/Windows CI and
-actual L3 adoption. The v1.2 release and governed-project transfer remain HOLD.
+Historical qualification note: this GC design was once candidate-only pending
+cross-OS checks and real L3 adoption. The portable mechanisms are now included
+in the published v1.4.0 source and covered by Linux/Windows CI; this does **not**
+certify native L3 host integration, arbitrary production-disk deletion or
+automatic transfer into an already governed project. Those physical/adoption
+gates remain separate. See the [v1.4 current support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md).
 
 Portable output filenames with Unicode letters and spaces are supported. Windows device-name aliases and trailing-dot/space paths remain invalid. Every file entry must match the registered root owner and campaign or the ledger fails closed.
 

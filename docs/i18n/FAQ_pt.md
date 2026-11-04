@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (pt)
 
-[PT guide](README_pt.md) · [Main README](../../README.md)
+[PT guide](README_pt.md) · [Manual prático v1.4](MANUAL_pt.md) · [Main README](../../README.md)
 
 ### 1. O que é Agentic SDLC?
 
@@ -24,7 +24,7 @@ O CLIENT mantém decisões de produto, aceitação subjetiva, publicação, cust
 
 ### 6. Goals e Codex Desktop já funcionam automaticamente?
 
-Ainda não. v1.2 oferece controles opcionais de integridade de Goal e Plan, mas a integração física por invocação ainda precisa ser provada.
+Não automaticamente. v1.4 inclui controles portáteis de Goal, Plan e autorização; a integração nativa por invocação com Codex Desktop/Goals ainda requer provas físicas separadas.
 
 ### 7. Gemini é obrigatório ou pago por padrão?
 
@@ -32,7 +32,7 @@ Não. O caminho I4 fica desativado até autorização, credenciais, cota e priva
 
 ### 8. O starter pode reiniciar ou apagar chats Codex?
 
-Não por si só. Codex Daily Control 2.0.2 é uma referência independente, ainda sem adaptador de host aceito em v1.2.
+Não. O starter não reinicia, gerencia nem apaga chats nativos do Codex. Qualquer adaptador de host requer autorização e evidência adicionais; v1.4 não certifica esse ciclo de vida.
 
 ### 9. Que feedback está ativado por padrão?
 
@@ -44,7 +44,7 @@ Código, conversas, nomes de projetos/repositórios, caminhos, credenciais, iden
 
 ### 11. Como alterar idioma ou desligar o feedback?
 
-Use --language auto|en|es|pt|fr|de|it|ja|zh. Para desligar relatórios, defina enabled=false ou instale com --no-feedback-workflow. O README no GitHub é estático.
+Use --language auto|en|es|pt|fr|de|it|ja|zh. Para desligar todos os relatórios, defina enabled=false; --no-feedback-workflow só desativa o agendamento. O README no GitHub é estático.
 
 ### 12. O que foi testado e como relatar problemas?
 
@@ -56,4 +56,4 @@ Sim, são dimensões de configuração. A execução exige host, autoridade, rec
 
 ---
 
-[PT guide](README_pt.md)
+[PT guide](README_pt.md) · [Manual prático v1.4](MANUAL_pt.md)

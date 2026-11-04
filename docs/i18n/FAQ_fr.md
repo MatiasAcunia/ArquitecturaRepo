@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (fr)
 
-[FR guide](README_fr.md) · [Main README](../../README.md)
+[FR guide](README_fr.md) · [Manuel pratique v1.4](MANUAL_fr.md) · [Main README](../../README.md)
 
 ### 1. Qu'est-ce qu'Agentic SDLC ?
 
@@ -24,7 +24,7 @@ Le CLIENT conserve les décisions produit, l'acceptation subjective, la publicat
 
 ### 6. Les Goals et Codex Desktop sont-ils intégrés ?
 
-Pas encore. La v1.2 contient des contrôles facultatifs Goal/Plan, mais l'intégration physique à chaque invocation doit être prouvée.
+Pas automatiquement. La v1.4 inclut des contrôles portables Goal/Plan et d'autorité, mais l'intégration native de Codex Desktop/Goals à chaque invocation exige des preuves physiques distinctes.
 
 ### 7. Gemini est-il obligatoire ou payant par défaut ?
 
@@ -32,7 +32,7 @@ Non. La voie I4 reste désactivée tant que consentement, identifiants, quota et
 
 ### 8. Peut-il relancer ou effacer mes conversations Codex ?
 
-Pas à lui seul. Codex Daily Control 2.0.2 est une référence séparée, sans adaptateur hôte accepté dans la v1.2.
+Non. Le starter ne redémarre, n'administre ni ne supprime les conversations natives de Codex. Tout adaptateur hôte exige une autorisation et des preuves séparées ; v1.4 ne certifie pas ce cycle de vie.
 
 ### 9. Quel retour d'information est activé ?
 
@@ -44,7 +44,7 @@ Code, conversations, noms des dépôts/projets, chemins, secrets, identifiants p
 
 ### 11. Comment changer de langue ou désactiver le feedback ?
 
-Utilisez --language auto|en|es|pt|fr|de|it|ja|zh. Pour désactiver : enabled=false ou --no-feedback-workflow. Le README GitHub reste statique.
+Utilisez --language auto|en|es|pt|fr|de|it|ja|zh. Pour arrêter tous les rapports, réglez enabled=false ; --no-feedback-workflow désactive uniquement la programmation. Le README GitHub reste statique.
 
 ### 12. Quels tests et comment signaler une erreur ?
 
@@ -56,4 +56,4 @@ Oui, comme dimensions de configuration. Leur exécution exige un hôte réel, de
 
 ---
 
-[FR guide](README_fr.md)
+[FR guide](README_fr.md) · [Manuel pratique v1.4](MANUAL_fr.md)

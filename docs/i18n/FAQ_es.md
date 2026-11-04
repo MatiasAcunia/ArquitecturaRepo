@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (es)
 
-[ES guide](README_es.md) · [Main README](../../README.md)
+[ES guide](README_es.md) · [Manual práctico v1.4](MANUAL_es.md) · [Main README](../../README.md)
 
 ### 1. ¿Qué es Agentic SDLC?
 
@@ -24,7 +24,7 @@ El CLIENT conserva decisiones de producto, aceptación subjetiva, publicación, 
 
 ### 6. ¿Ya funcionan automáticamente los Goals y Codex Desktop?
 
-Todavía no. v1.2 incorpora controles optativos de Goal y Plan, pero la integración física en cada invocación sigue pendiente de pruebas.
+No automáticamente. v1.4 incluye controles portátiles de Goal, Plan y autoridad, pero la integración nativa de Codex Desktop/Goals en cada invocación necesita pruebas físicas separadas.
 
 ### 7. ¿Gemini es obligatorio o genera gastos por defecto?
 
@@ -32,7 +32,7 @@ No. I4 está desactivado hasta verificar consentimiento, credenciales, cuota y p
 
 ### 8. ¿Puede reiniciar o borrar mis chats de Codex?
 
-El starter no lo hace. Codex Daily Control 2.0.2 es una referencia separada; su adaptador seguro aún no está aceptado en v1.2.
+No. El starter no reinicia, administra ni borra chats nativos de Codex. Cualquier adaptador del host exige autorización y evidencia independientes; v1.4 no certifica ese ciclo de vida.
 
 ### 9. ¿Qué feedback viene activado?
 
@@ -44,7 +44,7 @@ Código, conversaciones, nombres de proyectos o repositorios, rutas, credenciale
 
 ### 11. ¿Cómo cambio de idioma o desactivo el feedback?
 
-Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el idioma elegido. Para el feedback, poné enabled=false en la configuración o usá --no-feedback-workflow. El README de GitHub es estático.
+Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el idioma elegido. Para desactivar todo reporte, poné enabled=false en la configuración; --no-feedback-workflow solo desactiva la programación. El README de GitHub es estático.
 
 ### 12. ¿Qué está probado y cómo reporto errores?
 
@@ -56,4 +56,4 @@ Sí, se combinan como dimensiones, sin crear agentes de más. Para ejecutar hace
 
 ---
 
-[ES guide](README_es.md)
+[ES guide](README_es.md) · [Manual práctico v1.4](MANUAL_es.md)

@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (ja)
 
-[JA guide](README_ja.md) · [Main README](../../README.md)
+[JA guide](README_ja.md) · [v1.4 実践マニュアル](MANUAL_ja.md) · [Main README](../../README.md)
 
 ### 1. Agentic SDLC とは何ですか？
 
@@ -24,7 +24,7 @@
 
 ### 6. Goals と Codex Desktop は自動連携していますか？
 
-まだです。v1.2 には Goal/Plan の検査コードがありますが、実際のホスト呼び出しごとの連携は未検証です。
+自動では連携しません。v1.4 には移植可能な Goal/Plan・権限チェックがありますが、Codex Desktop/Goals の呼び出し単位のネイティブ連携には別の実機検証が必要です。
 
 ### 7. Gemini は必須・標準課金ですか？
 
@@ -32,7 +32,7 @@
 
 ### 8. Codex のチャットを再開・削除しますか？
 
-starter 単体では行いません。Codex Daily Control 2.0.2 は別の参照実装で、v1.2 のホスト連携は未受入れです。
+いいえ。starter 自体は Codex のネイティブチャットを再開、管理、削除しません。ホスト用アダプターには独立した許可と証拠が必要で、v1.4 はこの機能を認証していません。
 
 ### 9. 既定のフィードバックは何ですか？
 
@@ -44,7 +44,7 @@ starter 単体では行いません。Codex Daily Control 2.0.2 は別の参照�
 
 ### 11. 言語変更と無効化の方法は？
 
---language auto|en|es|pt|fr|de|it|ja|zh を使います。フィードバックは enabled=false または --no-feedback-workflow で停止できます。GitHub の README は静的です。
+--language auto|en|es|pt|fr|de|it|ja|zh を使います。全レポートの停止には enabled=false を設定します。--no-feedback-workflow はスケジュールだけを無効にします。GitHub の README は静的です。
 
 ### 12. 何が検証済みで、問題はどこへ報告しますか？
 
@@ -56,4 +56,4 @@ starter 単体では行いません。Codex Daily Control 2.0.2 は別の参照�
 
 ---
 
-[JA guide](README_ja.md)
+[JA guide](README_ja.md) · [v1.4 実践マニュアル](MANUAL_ja.md)

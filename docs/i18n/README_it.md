@@ -1,5 +1,7 @@
 # Agentic SDLC — Guida introduttiva
 
+[Manuale pratico v1.4 (otto temi)](MANUAL_it.md) · [FAQ](FAQ_it.md)
+
 Architettura riutilizzabile basata sul repository per sviluppare software con agenti. Offre ruoli, stato persistente, pianificazione, ripristino e verifiche. Non costruisce automaticamente ogni applicazione né sostituisce le decisioni del responsabile del prodotto.
 
 ## Installare in un progetto
@@ -18,7 +20,7 @@ Il CLIENT decide il prodotto e autorizza operazioni sensibili; I2 cura strategia
 
 Per impostazione predefinita, ogni nuovo scaffold genera un piccolo rapporto mensile di metadati come artifact GitHub Actions del progetto. Serve a migliorare la struttura e organizzare i problemi. Non viene inviato automaticamente al manutentore. Non contiene codice, conversazioni, nomi di progetti, percorsi, identificatori o credenziali.
 
-Per disabilitare: enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, eliminare .github/workflows/agentic-sdlc-feedback.yml oppure installare con --no-feedback-workflow.
+Per fermare tutti i report, imposta enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Eliminare .github/workflows/agentic-sdlc-feedback.yml o usare --no-feedback-workflow disabilita solo la pianificazione, non il generatore locale.
 
 ## Sicurezza e versioni
 
@@ -28,4 +30,4 @@ Questo codice sorgente è alla versione 1.4.0. **La pubblicazione è effettiva s
 
 L'installazione rileva la lingua del sistema oppure accetta --language it. La documentazione è offline. Il README principale di GitHub è statico: seleziona la lingua tramite i collegamenti.
 
-[FAQ](FAQ_it.md) · [GitHub README](../../README.md)
+[Manuale pratico v1.4](MANUAL_it.md) · [FAQ](FAQ_it.md) · [GitHub README](../../README.md)

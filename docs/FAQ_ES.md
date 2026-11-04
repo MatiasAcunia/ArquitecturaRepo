@@ -2,6 +2,8 @@
 
 Una guía breve para quienes quieren **probar el starter en un proyecto real**. Esta página orienta la adopción; los contratos, herramientas y límites vigentes están documentados en el [README](../README.md) y en las guías técnicas enlazadas abajo.
 
+Para la versión actual consultá el [manual práctico v1.4 en español (00–07)](i18n/MANUAL_es.md) y la [guía de inicio v1.4](46_V1_4_PUBLIC_START_AND_SUPPORT.md). El [manual español extenso v1.3](manual/ES/README.md) queda como referencia histórica. Los otros siete idiomas tienen manual y FAQ desde el [README principal](../README.md).
+
 ## Empezar a usarlo
 
 ### 1. ¿Qué es ArquitecturaRepo?
@@ -98,7 +100,7 @@ También sirven experiencias de adopción: qué te aportó, qué te complicó y 
 
 Sí: el código y la documentación originales se publican bajo [licencia MIT](../LICENSE), con las condiciones indicadas allí. El material de terceros no queda automáticamente cubierto por esa licencia.
 
-### 19. ¿Qué modos y proyectos admite v1.2?
+### 19. ¿Qué modos y tipos de proyectos admite el framework? (capacidad iniciada en v1.2)
 
 Podés describir proyectos CRUD, API, web, móviles, datos, automatización, videojuegos, infraestructura y tareas de IA no dedicadas a programación. La configuración es por dimensiones: síncrono/asíncrono/híbrido, solo/equipo y software/no-código/mixto. No habilita ejecución autónoma por sí sola; se exige host, autoridad, permisos, recovery y evidencia física. Consultá [modos y tecnología](27_PROJECT_MODES_AND_STACK_SELECTION.md).
 

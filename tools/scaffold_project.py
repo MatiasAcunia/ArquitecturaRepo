@@ -213,10 +213,26 @@ def _populate_staging_project(
                        work_scope=work_scope, project_type=project_type)
     write_json(control / "configuration" / "OPERATING_PREFERENCES.json", preferences)
     for lang_code in SUPPORTED:
-        for kind in ("README", "FAQ"):
+        for kind in ("README", "FAQ", "MANUAL"):
             name = f"{kind}_{lang_code}.md"
-            copy_file(ROOT / "docs" / "i18n" / name,
-                      control / "docs" / "i18n" / name)
+            source = ROOT / "docs" / "i18n" / name
+            destination = control / "docs" / "i18n" / name
+            if kind == "README":
+                # The two public technical links resolve in the source tree,
+                # but these reference docs are not installed into the local
+                # control layer. Keep installed guides navigable without
+                # bundling maintainer/reference documentation as project state.
+                content = source.read_text(encoding="utf-8")
+                for doc in ("46_V1_4_PUBLIC_START_AND_SUPPORT.md",
+                            "32_EXISTING_GOVERNED_ATTACHMENT.md"):
+                    content = content.replace(
+                        f"(../{doc})",
+                        "(https://github.com/MatiasAcunia/ArquitecturaRepo/"
+                        f"blob/v1.4.0/docs/{doc})",
+                    )
+                write_text(destination, content)
+            else:
+                copy_file(source, destination)
     write_json(control / "docs" / "LANGUAGE_SELECTION.json", {
         "schema_version": "starter-language-selection-v1",
         "language": selected_lang,
@@ -1040,6 +1056,8 @@ Do not claim installation success until the fresh-context probe has been exercis
         localized = (control / "docs" / "i18n" / f"README_{selected_lang}.md").read_text(encoding="utf-8")
         localized = localized.replace(f"(FAQ_{selected_lang}.md)",
                                       f"(docs/i18n/FAQ_{selected_lang}.md)")
+        localized = localized.replace(f"(MANUAL_{selected_lang}.md)",
+                                      f"(docs/i18n/MANUAL_{selected_lang}.md)")
         localized = localized.replace("(../../README.md)", "(README.md)")
         readme = localized + "\n---\n\n" + readme
     write_text(control / "README.md", readme)

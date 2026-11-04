@@ -80,11 +80,13 @@ def main() -> int:
         parser.exit(2, "LANGUAGE HOLD: " + str(exc) + "\n")
     docs = args.docs_root.resolve()
     paths = {"readme": docs / ("README_" + language + ".md"),
-             "faq": docs / ("FAQ_" + language + ".md")}
+             "faq": docs / ("FAQ_" + language + ".md"),
+             "manual": docs / ("MANUAL_" + language + ".md")}
     if any(not path.is_file() or not path.resolve().is_relative_to(docs) for path in paths.values()):
         parser.exit(2, "LANGUAGE HOLD: missing localized docs\n")
     output = {"language": language, "source": source,
-              "readme": str(paths["readme"]), "faq": str(paths["faq"])}
+              "readme": str(paths["readme"]), "faq": str(paths["faq"]),
+              "manual": str(paths["manual"])}
     print(json.dumps(output, ensure_ascii=False, indent=2) if args.json else
           language + " (" + source + ") " + str(paths["readme"]))
     return 0

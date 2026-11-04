@@ -1,5 +1,7 @@
 # Agentic SDLC — Getting started
 
+[Practical v1.4 manual (eight topics)](MANUAL_en.md) · [FAQ](FAQ_en.md)
+
 A reusable, repository-first architecture for agent-assisted software development. It provides roles, durable state, planning, recovery and verification. It does not autonomously build arbitrary software or remove product-owner decisions.
 
 ## Install in an existing project
@@ -18,7 +20,7 @@ The CLIENT owns product and sensitive approvals; I2 owns strategy and acceptance
 
 New scaffolds generate a small monthly metadata-only report in the project's own GitHub Actions artifacts. Enabled by default, it helps improve starter structure and categorize failures. It is not sent to the starter maintainer automatically. No code, conversations, project names, paths, identifiers or credentials are included.
 
-Disable feedback by setting enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, by removing .github/workflows/agentic-sdlc-feedback.yml or by installing with --no-feedback-workflow.
+To disable all reporting, set enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Removing .github/workflows/agentic-sdlc-feedback.yml or installing with --no-feedback-workflow disables only the scheduler, not the local generator.
 
 ## Safety and release status
 
@@ -28,4 +30,4 @@ This source tree is version 1.4.0. It is a **published release only when the imm
 
 The installer detects your OS language (or accepts --language es, for example). Documentation is available offline. GitHub's top-level README is static, so select a language from its links.
 
-[FAQ](FAQ_en.md) · [GitHub README](../../README.md)
+[Practical v1.4 manual](MANUAL_en.md) · [FAQ](FAQ_en.md) · [GitHub README](../../README.md)
