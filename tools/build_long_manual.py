@@ -77,6 +77,16 @@ LOCALE_LABELS = {
         "byline": "An den Quellen des ArquitecturaRepo-Starters geprüfte Anleitung.",
         "contents": "Inhaltsverzeichnis", "date": "4. November 2026", "version": "VERSION", "footer_date": "NOVEMBER 2026",
     },
+    "it": {
+        "title": "Manuale completo per l'utente", "code": "ITALIANO", "lang": "it-IT",
+        "chapter": "CAPITOLO", "header": "MANUALE COMPLETO · v1.4",
+        "eyebrow": "INGEGNERIA DEL SOFTWARE / GUIDE PER L'UTENTE",
+        "summary1": "Otto capitoli: introduzione, installazione, adozione, operatività,",
+        "summary2": "modifiche, recupero, accettazione e un esempio guidato.",
+        "byline": "Documentazione verificata sulle fonti dello starter ArquitecturaRepo.",
+        "contents": "Indice", "date": "4 novembre 2026", "version": "VERSIONE", "footer_date": "NOVEMBRE 2026",
+        "fontsize": "12pt",
+    },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 
@@ -219,7 +229,7 @@ def main() -> int:
             "--metadata", f"lang:{labels['lang']}",
             "--metadata", f"toc-title:{labels['contents']}",
             "--variable", "documentclass=scrreprt", "--variable", "classoption=oneside",
-            "--variable", "papersize=a4", "--variable", "fontsize=11pt",
+            "--variable", "papersize=a4", "--variable", f"fontsize={labels.get('fontsize', '11pt')}",
             "--variable", "mainfont=DejaVu Serif", "--variable", "sansfont=DejaVu Sans",
             "--variable", "monofont=DejaVu Sans Mono",
             "--variable", "geometry:margin=22mm",
