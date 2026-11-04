@@ -6,6 +6,8 @@
 
 **v1.4 practical manuals / Manuales prácticos v1.4 (00–07):** [EN](docs/i18n/MANUAL_en.md) · [ES](docs/i18n/MANUAL_es.md) · [PT](docs/i18n/MANUAL_pt.md) · [FR](docs/i18n/MANUAL_fr.md) · [DE](docs/i18n/MANUAL_de.md) · [IT](docs/i18n/MANUAL_it.md) · [JA](docs/i18n/MANUAL_ja.md) · [ZH](docs/i18n/MANUAL_zh.md).
 
+These eight manuals are **post-release documentation on `main`**. The already published, immutable v1.4.0 ZIP and GHCR image cannot be updated in place and **do not contain these later manuals**. The documentation in `main` remains useful for v1.4 adoption; an offline package containing the new manuals requires a separately versioned future distribution.
+
 [FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
 
 GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **no data can reach a maintainer until a verified collector endpoint is configured**; after that, minimal outbound reporting defaults ON with a conspicuous opt-out. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).

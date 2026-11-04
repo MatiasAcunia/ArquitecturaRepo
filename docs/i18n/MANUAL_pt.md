@@ -2,6 +2,8 @@
 
 Este guia cobre oito etapas (00–07) para utilizar a versão **v1.4.0** em um projeto real. É um **guia prático novo**, não a tradução integral do manual histórico em espanhol da v1.3. A fonte de distribuição é o [Release imutável v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 continua disponível como versão anterior.
 
+Este manual foi acrescentado à branch `main` **depois** da publicação v1.4.0. O ZIP e o contêiner imutáveis originais **não** o incluem. Para disponibilizá-lo offline, será necessária uma futura distribuição com outra versão.
+
 ## 00 · Antes de começar
 
 O ArquitecturaRepo é uma camada de coordenação **local ao repositório** para requisitos, decisões, estado atual, responsabilidades, campanhas, evidências e recuperação. Não gera automaticamente uma aplicação nem substitui Codex.

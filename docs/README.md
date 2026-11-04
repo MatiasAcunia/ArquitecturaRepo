@@ -7,6 +7,7 @@ This index separates the **public installable product** from **maintainer engine
 - [README](../README.md): product, capabilities, quick start, profiles and status.
 - [v1.4.0 first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, published-artifact identity, honest limits, privacy and recovery.
 - [v1.4.0 practical manual in eight languages](i18n/MANUAL_en.md): substantive 00–07 walkthroughs, installation commands and recovery boundaries; [ES](i18n/MANUAL_es.md), [PT](i18n/MANUAL_pt.md), [FR](i18n/MANUAL_fr.md), [DE](i18n/MANUAL_de.md), [IT](i18n/MANUAL_it.md), [JA](i18n/MANUAL_ja.md), [ZH](i18n/MANUAL_zh.md). These are new concise manuals, not literal translations of the historical long Spanish edition.
+- The eight manuals were written **after** the immutable v1.4.0 release. They are available in the `main` source tree and in installations produced from that updated tree, **not** in the original v1.4.0 ZIP/container. Future offline distribution of these documents needs its own versioned release.
 - [v1.4.0 release notes and upgrade boundaries](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md): versioned capabilities, published package verification and deliberate non-upgrade of existing governed state.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
 - [Spanish FAQ](FAQ_ES.md) and [language translations](i18n/README_en.md).

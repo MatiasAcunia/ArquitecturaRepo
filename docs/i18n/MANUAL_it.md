@@ -2,6 +2,8 @@
 
 Questa guida descrive otto passaggi (00–07) per adottare **v1.4.0** in un progetto reale. È una **guida pratica nuova**, non la traduzione completa del precedente manuale spagnolo v1.3, conservato nel repository sorgente. La distribuzione verificabile è la [release immutabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 resta disponibile come versione precedente.
 
+Questo manuale è stato aggiunto a `main` **dopo** la pubblicazione della v1.4.0. Lo ZIP e il container originali e immutabili v1.4.0 **non lo includono**. Una futura distribuzione offline richiederà una nuova versione distinta.
+
 ## 00 · Prima di iniziare
 
 ArquitecturaRepo è un livello di coordinamento **locale al repository** per requisiti, decisioni, responsabilità, stato corrente, campagne, prove e recupero dopo interruzioni. Non è un generatore automatico di applicazioni né sostituisce Codex.
