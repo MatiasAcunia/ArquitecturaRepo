@@ -29,7 +29,7 @@ O framework é neutro quanto ao modelo de IA. Este manual não instala nem autor
 ## Edições e versões
 
 - **Português v1.4:** esta edição completa, separada do miniguia.
-- **Espanhol, inglês e francês v1.4:** edições extensas independentes, com PDFs e fontes próprias.
+- **Outras sete línguas v1.4:** edições completas independentes, cada uma com fontes e PDF próprio. O [índice canónico](../../../../README.md) mantém as ligações às oito edições.
 - **Espanhol v1.3:** livro original histórico, conservado sem reescrever a versão antiga.
 - **Miniguias v1.4:** resumos breves nos oito idiomas suportados pela navegação do starter.
 

@@ -29,7 +29,7 @@ ArquitecturaRepo non installa un LLM, non autorizza spese o pubblicazioni e non 
 ## Edizioni e limiti
 
 - Italiano v1.4: otto capitoli completi e PDF autonomo.
-- Inglese, spagnolo, portoghese, francese e tedesco v1.4: altre edizioni lunghe con fonti e PDF propri.
+- Altre sette lingue v1.4: edizioni complete indipendenti, ognuna con fonti e PDF propri. L'[indice canonico](../../../../README.md) collega tutte e otto le edizioni senza duplicare elenchi destinati a diventare obsoleti.
 - Spagnolo v1.3: manuale storico conservato, non riscritto per simulare v1.4.
 - Mini guide e FAQ: otto introduzioni brevi, localizzate, non traduzioni lunghe.
 
