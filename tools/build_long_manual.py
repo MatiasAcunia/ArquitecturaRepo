@@ -105,7 +105,7 @@ LOCALE_LABELS = {
         "summary2": "变更请求、故障恢复、能力验收以及俱乐部实例。",
         "byline": "依据ArquitecturaRepo公开源代码核对的用户文档。",
         "contents": "目录", "date": "2026年11月4日", "version": "版本", "footer_date": "2026年11月",
-        "fontsize": "16pt", "cjk": "zh",
+        "fontsize": "17pt", "cjk": "zh",
     },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")

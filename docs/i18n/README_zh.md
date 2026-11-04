@@ -1,8 +1,8 @@
 # Agentic SDLC — 入门指南
 
-[v1.4 迷你指南](MINI_GUIDE_zh.md) · [FAQ](FAQ_zh.md)
+[v1.4 完整用户手册（八章）](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/zh/README.md) · [完整 PDF](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Complete_Manual_v1.4_ZH.pdf) · [v1.4 迷你指南](MINI_GUIDE_zh.md) · [FAQ](FAQ_zh.md)
 
-[完整的八章详细手册](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md)位于**源代码仓库内，目前只有西班牙语**，属于**历史 v1.3 版本**，不会复制到已安装的控制层。本页面是 v1.4 的简要入门，并非全文翻译。当前操作命令请查阅 [v1.4 安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)。
+现在已有[简体中文 v1.4 完整八章手册](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/zh/README.md)和独立 PDF。[旧西班牙语 v1.3 手册](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md)仍作为历史原版保留。本页面只是一份简要入门；当前操作命令请查阅 [v1.4 安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)。完整版在 v1.4.0 发行之后添加到 main，不包含在原始发行 ZIP 中。
 
 一种以代码仓库为中心、可复用的智能体软件开发架构，包含职责分工、持久状态、规划、恢复和验证机制。它不能自动完成任意软件，也不能替代产品负责人的决策。
 
@@ -32,4 +32,4 @@ CLIENT 负责产品决策和敏感操作授权；I2 负责战略和验收；I3 �
 
 安装工具自动检测操作系统语言，也支持 --language zh。文档可离线阅读。GitHub 的主 README 是静态页面，请通过语言链接选择。
 
-[v1.4 迷你指南](MINI_GUIDE_zh.md) · [FAQ](FAQ_zh.md) · [GitHub README](../../README.md)
+[v1.4 完整手册](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/zh/README.md) · [v1.4 迷你指南](MINI_GUIDE_zh.md) · [FAQ](FAQ_zh.md) · [GitHub README](../../README.md)
