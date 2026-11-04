@@ -4,7 +4,7 @@ Status: framework operating contract. Applies to the portable software developme
 
 ## Why
 
-A generic capability charter can be strategically correct and operationally unusable. If the Planner states only “qualify 420 media files”, and an inexpensive I3 model then invents engines, platform checks, provider requests and new gates, it can consume hours producing advisory output without delivering the requested collection. Logs, tests, tokens, worktrees and checkpoints are not customer outcomes.
+A generic capability charter can be strategically correct and operationally unusable. If the Planner states only “import the required source files”, an execution controller without a bounded work order may invent extra engines, platform checks, provider requests and new gates, consuming hours on advisory output without delivering the requested import. Logs, tests, tokens, worktrees and checkpoints are not customer outcomes.
 
 The failure must be repaired at the causal planning/execution interface—not by asking I3 to “think harder”, adding another Planner round, or forcing paid model evaluations on simple source processing.
 
