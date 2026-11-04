@@ -1,5 +1,7 @@
 # Agentic SDLC — Getting started
 
+[Practical v1.4 manual (eight topics)](MANUAL_en.md) · [FAQ](FAQ_en.md)
+
 A reusable, repository-first architecture for agent-assisted software development. It provides roles, durable state, planning, recovery and verification. It does not autonomously build arbitrary software or remove product-owner decisions.
 
 ## Install in an existing project
@@ -28,4 +30,4 @@ This source tree is version 1.4.0. It is a **published release only when the imm
 
 The installer detects your OS language (or accepts --language es, for example). Documentation is available offline. GitHub's top-level README is static, so select a language from its links.
 
-[FAQ](FAQ_en.md) · [GitHub README](../../README.md)
+[Practical v1.4 manual](MANUAL_en.md) · [FAQ](FAQ_en.md) · [GitHub README](../../README.md)

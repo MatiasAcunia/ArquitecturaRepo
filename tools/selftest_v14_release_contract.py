@@ -49,6 +49,12 @@ def main() -> int:
         "docker image rm",
         "docker logout ghcr.io",
         "docker pull",
+        "tagged_source_gate:",
+        "needs: tagged_source_gate",
+        "needs.tagged_source_gate.outputs.should_publish == 'true'",
+        "gh release view v1.4.0",
+        "should_publish=false",
+        "IMMUTABLE_TAG_WITHOUT_RELEASE_HOLD",
         "needs: release",
         "v1.4.0",
     ):

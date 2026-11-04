@@ -4,6 +4,8 @@
 
 [English](docs/i18n/README_en.md) · [Español](docs/i18n/README_es.md) · [Português](docs/i18n/README_pt.md) · [Français](docs/i18n/README_fr.md) · [Deutsch](docs/i18n/README_de.md) · [Italiano](docs/i18n/README_it.md) · [日本語](docs/i18n/README_ja.md) · [中文](docs/i18n/README_zh.md)
 
+**v1.4 practical manuals / Manuales prácticos v1.4 (00–07):** [EN](docs/i18n/MANUAL_en.md) · [ES](docs/i18n/MANUAL_es.md) · [PT](docs/i18n/MANUAL_pt.md) · [FR](docs/i18n/MANUAL_fr.md) · [DE](docs/i18n/MANUAL_de.md) · [IT](docs/i18n/MANUAL_it.md) · [JA](docs/i18n/MANUAL_ja.md) · [ZH](docs/i18n/MANUAL_zh.md).
+
 [FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
 
 GitHub shows a **static** repository README and does not auto-select the viewer's language. Local installation auto-detects the OS language (or accepts \`--language es\`, etc.) and keeps all eight guides available offline. The default monthly metadata feedback is generated in the adopter's own GitHub Actions artifacts; **no data can reach a maintainer until a verified collector endpoint is configured**; after that, minimal outbound reporting defaults ON with a conspicuous opt-out. [Privacy and opt-out](docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md).
@@ -31,7 +33,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 [Documentation index](docs/README.md) distinguishes **adopter guidance**, supported technical reference, and contributor-only QA/research material. Historical maintainer execution logs and private pilot materials are **not** installation instructions, runtime authority, or distributed starter files.
 
 - [Install/adapt the SDLC](prompts/INSTALL_THIS_SDLC.md) and [FAQ](docs/FAQ_ES.md).
-- [Manual completo en español (capítulos 00–07), revisado para v1.3.0](docs/manual/ES/README.md).
+- [Manuales prácticos actuales v1.4.0 (capítulos 00–07, ocho idiomas)](docs/i18n/MANUAL_es.md); la [edición española extensa v1.3.0](docs/manual/ES/README.md) se conserva únicamente como referencia histórica, no como instrucciones actuales de instalación.
 - [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
 - [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
 - [Historical contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). These historical plans are **not** the published release contract or proof of native agent execution.
@@ -407,7 +409,7 @@ The **installable starter** contains reusable structure, generic mechanisms and 
 
 ## Status
 
-`v1.2.0 — LATEST PUBLISHED STABLE RELEASE`
+`v1.4.0 — LATEST PUBLISHED STABLE RELEASE`
 
 v1.1 added a pre-campaign product-discovery baseline plus privacy-preserving recurring architecture feedback: explicit requirements confirmation, persistent technical/security/network stack frame, dated delivery planning, derived status tracking, project-local operating-review evidence and opt-out metadata-only feedback artifacts.
 
@@ -416,6 +418,6 @@ v1.1 added a pre-campaign product-discovery baseline plus privacy-preserving rec
 The original source code and documentation in this repository are licensed under the [MIT License](LICENSE). You may use, adapt and redistribute them under its terms, including retention of the copyright and permission notice. Third-party assets or materials, if any, retain their own terms; this license does not grant rights to material not owned by the copyright holder.
 
 
-## v1.2.0 release scope
+## v1.2.0 release scope (historical)
 
 The MIT-licensed v1.2.0 source is a general-purpose starter. Its scaffolder installs project-local configuration and tools for the adopter's own codebase; no maintainer test project, private automation, third-party service or specific repository is a prerequisite. The optional Daily Control adapter inspects a user-provided package without executing it. As with any extension, enabling native host actions or external services requires separate setup and authorization.

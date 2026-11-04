@@ -1,5 +1,7 @@
 # Agentic SDLC — Erste Schritte
 
+[Praxishandbuch v1.4 (acht Themen)](MANUAL_de.md) · [FAQ](FAQ_de.md)
+
 Eine wiederverwendbare, repositorybasierte Architektur für Softwareentwicklung mit Agenten. Sie bietet Rollen, dauerhaften Zustand, Planung, Wiederaufnahme und Prüfungen. Sie entwickelt nicht automatisch jede Software und ersetzt keine Produktentscheidungen.
 
 ## In einem Projekt installieren
@@ -28,4 +30,4 @@ Dieser Quellcode hat Version 1.4.0. **Eine Veröffentlichung liegt nur vor, wenn
 
 Das Installationswerkzeug erkennt die Systemsprache oder akzeptiert --language de. Die Dokumentation funktioniert offline. GitHub zeigt ein statisches Haupt-README; wählen Sie die Sprache über die Links.
 
-[FAQ](FAQ_de.md) · [GitHub README](../../README.md)
+[Praxishandbuch v1.4](MANUAL_de.md) · [FAQ](FAQ_de.md) · [GitHub README](../../README.md)

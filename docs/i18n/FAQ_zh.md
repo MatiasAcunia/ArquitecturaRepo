@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (zh)
 
-[ZH guide](README_zh.md) · [Main README](../../README.md)
+[ZH guide](README_zh.md) · [v1.4 实用手册](MANUAL_zh.md) · [Main README](../../README.md)
 
 ### 1. Agentic SDLC 是什么？
 
@@ -56,4 +56,4 @@ starter 本身不会。Codex Daily Control 2.0.2 是独立参考；v1.2 的主�
 
 ---
 
-[ZH guide](README_zh.md)
+[ZH guide](README_zh.md) · [v1.4 实用手册](MANUAL_zh.md)

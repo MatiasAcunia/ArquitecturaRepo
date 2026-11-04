@@ -6,13 +6,14 @@ This index separates the **public installable product** from **maintainer engine
 
 - [README](../README.md): product, capabilities, quick start, profiles and status.
 - [v1.4.0 first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, published-artifact identity, honest limits, privacy and recovery.
+- [v1.4.0 practical manual in eight languages](i18n/MANUAL_en.md): substantive 00–07 walkthroughs, installation commands and recovery boundaries; [ES](i18n/MANUAL_es.md), [PT](i18n/MANUAL_pt.md), [FR](i18n/MANUAL_fr.md), [DE](i18n/MANUAL_de.md), [IT](i18n/MANUAL_it.md), [JA](i18n/MANUAL_ja.md), [ZH](i18n/MANUAL_zh.md). These are new concise manuals, not literal translations of the historical long Spanish edition.
 - [v1.4.0 release notes and upgrade boundaries](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md): versioned capabilities, published package verification and deliberate non-upgrade of existing governed state.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
 - [Spanish FAQ](FAQ_ES.md) and [language translations](i18n/README_en.md).
 - [Architecture overview](00_ARCHITECTURE_OVERVIEW.md), [minimum profile](05_MINIMUM_VIABLE_PROFILE.md), [scaling profiles](06_SCALING_PROFILES.md), [project modes](27_PROJECT_MODES_AND_STACK_SELECTION.md).
 - [Existing repository attachment preflight](32_EXISTING_GOVERNED_ATTACHMENT.md) and [adoption guide](16_TRANSFER_ADOPTION.md).
 - [Project requirements and baseline](21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md).
-- [Current portable v1.2 capabilities and limits](23_OPERATIONAL_AGENTIC_SDLC_V1_2.md); [Spanish version](24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md).
+- [Historical portable v1.2 capabilities and limits](23_OPERATIONAL_AGENTIC_SDLC_V1_2.md); [Spanish version](24_OPERATIONAL_AGENTIC_SDLC_V1_2_ES.md). Consult the v1.4 support matrix above for current release scope.
 - [Privacy/feedback controls](22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md) and [safe artifact GC](34_FILE_ARTIFACT_INVENTORY_AND_GC.md).
 - [Public roadmap](ROADMAP.md), [security](../SECURITY.md), [contributing](../CONTRIBUTING.md), [license](../LICENSE).
 
@@ -30,6 +31,7 @@ The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference 
 - [Historical v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
 - The historical v1.3 route also mentioned **M7** as optional subsequent package/plugin absorption. It is not a prerequisite for first-time adoption, a claim of completed support, or an E4 authorization.
 - [Historical v1.3 portable support/release qualification](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md) and [published v1.3.0 release notes](43_V1_3_RELEASE_NOTES_AND_UPGRADE.md). Historical candidate status does not supersede its subsequent release.
+- [Historical full Spanish v1.3 manual](manual/ES/README.md), preserved for version-specific archaeology; not the current v1.4 installation guide.
 
 These are auditable design and QA inputs, not additional installation contracts, external-platform guarantees, private-controller dependencies or instructions for users to run personal pilot Goals. Any resumed engineering must remain within its existing authorized campaign and receive independent terminal review.
 

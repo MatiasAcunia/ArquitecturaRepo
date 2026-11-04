@@ -1,5 +1,7 @@
 # Agentic SDLC — 入门指南
 
+[v1.4 实用手册（八章）](MANUAL_zh.md) · [FAQ](FAQ_zh.md)
+
 一种以代码仓库为中心、可复用的智能体软件开发架构，包含职责分工、持久状态、规划、恢复和验证机制。它不能自动完成任意软件，也不能替代产品负责人的决策。
 
 ## 在项目中安装
@@ -28,4 +30,4 @@ CLIENT 负责产品决策和敏感操作授权；I2 负责战略和验收；I3 �
 
 安装工具自动检测操作系统语言，也支持 --language zh。文档可离线阅读。GitHub 的主 README 是静态页面，请通过语言链接选择。
 
-[FAQ](FAQ_zh.md) · [GitHub README](../../README.md)
+[v1.4 实用手册](MANUAL_zh.md) · [FAQ](FAQ_zh.md) · [GitHub README](../../README.md)

@@ -14,9 +14,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  tagged_source_gate:
+    name: Preserve immutable v1.4.0 when main advances after publication
+    if: >-
+      github.repository == 'MatiasAcunia/ArquitecturaRepo' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      should_publish: ${{ steps.tag.outputs.should_publish }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Check existing tag and release without changing either
+        id: tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          prior="$(git ls-remote origin refs/tags/v1.4.0 | cut -f1)"
+          if [ -z "$prior" ] || [ "$prior" = "$EXPECTED_SHA" ]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          elif gh release view v1.4.0 --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Immutable v1.4.0 is already published at $prior; skip publication for newer main source."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "IMMUTABLE_TAG_WITHOUT_RELEASE_HOLD: requires manual reconciliation"
+            exit 1
+          fi
+
   release:
     name: Publish exact v1.4.0 tag, public ZIP and checksum
+    needs: tagged_source_gate
     if: >-
+      needs.tagged_source_gate.outputs.should_publish == 'true' &&
       github.repository == 'MatiasAcunia/ArquitecturaRepo' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&

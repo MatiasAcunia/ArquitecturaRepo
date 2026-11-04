@@ -1,5 +1,7 @@
 # Agentic SDLC — Guida introduttiva
 
+[Manuale pratico v1.4 (otto temi)](MANUAL_it.md) · [FAQ](FAQ_it.md)
+
 Architettura riutilizzabile basata sul repository per sviluppare software con agenti. Offre ruoli, stato persistente, pianificazione, ripristino e verifiche. Non costruisce automaticamente ogni applicazione né sostituisce le decisioni del responsabile del prodotto.
 
 ## Installare in un progetto
@@ -28,4 +30,4 @@ Questo codice sorgente è alla versione 1.4.0. **La pubblicazione è effettiva s
 
 L'installazione rileva la lingua del sistema oppure accetta --language it. La documentazione è offline. Il README principale di GitHub è statico: seleziona la lingua tramite i collegamenti.
 
-[FAQ](FAQ_it.md) · [GitHub README](../../README.md)
+[Manuale pratico v1.4](MANUAL_it.md) · [FAQ](FAQ_it.md) · [GitHub README](../../README.md)

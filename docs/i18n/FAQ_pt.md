@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (pt)
 
-[PT guide](README_pt.md) · [Main README](../../README.md)
+[PT guide](README_pt.md) · [Manual prático v1.4](MANUAL_pt.md) · [Main README](../../README.md)
 
 ### 1. O que é Agentic SDLC?
 
@@ -56,4 +56,4 @@ Sim, são dimensões de configuração. A execução exige host, autoridade, rec
 
 ---
 
-[PT guide](README_pt.md)
+[PT guide](README_pt.md) · [Manual prático v1.4](MANUAL_pt.md)
