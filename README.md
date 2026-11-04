@@ -4,9 +4,11 @@
 
 [English](docs/i18n/README_en.md) · [Español](docs/i18n/README_es.md) · [Português](docs/i18n/README_pt.md) · [Français](docs/i18n/README_fr.md) · [Deutsch](docs/i18n/README_de.md) · [Italiano](docs/i18n/README_it.md) · [日本語](docs/i18n/README_ja.md) · [中文](docs/i18n/README_zh.md)
 
-**v1.4 practical manuals / Manuales prácticos v1.4 (00–07):** [EN](docs/i18n/MANUAL_en.md) · [ES](docs/i18n/MANUAL_es.md) · [PT](docs/i18n/MANUAL_pt.md) · [FR](docs/i18n/MANUAL_fr.md) · [DE](docs/i18n/MANUAL_de.md) · [IT](docs/i18n/MANUAL_it.md) · [JA](docs/i18n/MANUAL_ja.md) · [ZH](docs/i18n/MANUAL_zh.md).
+**v1.4 mini guides / Miniguías v1.4 (00–07):** [EN](docs/i18n/MINI_GUIDE_en.md) · [ES](docs/i18n/MINI_GUIDE_es.md) · [PT](docs/i18n/MINI_GUIDE_pt.md) · [FR](docs/i18n/MINI_GUIDE_fr.md) · [DE](docs/i18n/MINI_GUIDE_de.md) · [IT](docs/i18n/MINI_GUIDE_it.md) · [JA](docs/i18n/MINI_GUIDE_ja.md) · [ZH](docs/i18n/MINI_GUIDE_zh.md).
 
-These eight manuals are **post-release documentation on `main`**. The already published, immutable v1.4.0 ZIP and GHCR image cannot be updated in place and **do not contain these later manuals**. The documentation in `main` remains useful for v1.4 adoption; an offline package containing the new manuals requires a separately versioned future distribution.
+**Full-length manual / Manual extenso (eight chapters / ocho capítulos):** [Spanish complete edition](docs/manual/ES/README.md). This is the complete, historical v1.3 manual (00–07), not an abbreviated guide. Full translations into the other seven languages are not yet published; use the v1.4 release notes and mini guides for current commands.
+
+These eight mini guides are **post-release documentation on `main`**. The already published v1.4.0 ZIP and GHCR image are fixed to their release commit and **do not contain these later mini guides**. The documentation in `main` remains useful for v1.4 adoption; an offline package containing the new guides requires a separately versioned future distribution.
 
 [FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
 
@@ -35,7 +37,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 [Documentation index](docs/README.md) distinguishes **adopter guidance**, supported technical reference, and contributor-only QA/research material. Historical maintainer execution logs and private pilot materials are **not** installation instructions, runtime authority, or distributed starter files.
 
 - [Install/adapt the SDLC](prompts/INSTALL_THIS_SDLC.md) and [FAQ](docs/FAQ_ES.md).
-- [Manuales prácticos actuales v1.4.0 (capítulos 00–07, ocho idiomas)](docs/i18n/MANUAL_es.md); la [edición española extensa v1.3.0](docs/manual/ES/README.md) se conserva únicamente como referencia histórica, no como instrucciones actuales de instalación.
+- [Miniguías actuales v1.4.0 (ocho idiomas)](docs/i18n/MINI_GUIDE_es.md); el [manual completo de ocho capítulos en español](docs/manual/ES/README.md) es la edición extensa original de v1.3.0. Su narrativa sigue siendo útil, pero sus instrucciones de instalación deben contrastarse con v1.4.
 - [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
 - [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
 - [Historical contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). These historical plans are **not** the published release contract or proof of native agent execution.

@@ -1,8 +1,8 @@
-# ArquitecturaRepo — Manuale pratico v1.4.0 (italiano)
+# ArquitecturaRepo — Mini guida v1.4.0 (italiano)
 
-Questa guida descrive otto passaggi (00–07) per adottare **v1.4.0** in un progetto reale. È una **guida pratica nuova**, non la traduzione completa del precedente manuale spagnolo v1.3, conservato nel repository sorgente. La distribuzione verificabile è la [release immutabile v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 resta disponibile come versione precedente.
+Questa mini guida descrive otto passaggi (00–07) per adottare **v1.4.0** in un progetto reale. È una **guida breve**, non la traduzione completa del precedente manuale spagnolo v1.3, conservato nel repository sorgente. La distribuzione verificabile è la [release v1.4.0 con versione fissata](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 resta disponibile come versione precedente.
 
-Questo manuale è stato aggiunto a `main` **dopo** la pubblicazione della v1.4.0. Lo ZIP e il container originali e immutabili v1.4.0 **non lo includono**. Una futura distribuzione offline richiederà una nuova versione distinta.
+Questa mini guida è stata aggiunta a `main` **dopo** la pubblicazione della v1.4.0. Lo ZIP e il container originali della v1.4.0 **non la includono**. Una futura distribuzione offline richiederà una nuova versione distinta.
 
 ## 00 · Prima di iniziare
 

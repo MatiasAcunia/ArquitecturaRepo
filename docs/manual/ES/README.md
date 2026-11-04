@@ -1,6 +1,6 @@
 # Manual de ArquitecturaRepo v1.3.0 — Colección 00–07 (español)
 
-> Edición **histórica de v1.3.0**. Para instalaciones actuales de v1.4.0, usá el [manual práctico v1.4 en español](../../i18n/MANUAL_es.md) o [su índice de ocho idiomas](../../../README.md). Los comandos e imágenes de contenedor de abajo describen exclusivamente la versión antigua; **no** los tomes como la versión publicada más reciente.
+> Edición **completa histórica de v1.3.0**, con ocho capítulos extensos. Para instalaciones actuales de v1.4.0, usá la [miniguía v1.4 en español](../../i18n/MINI_GUIDE_es.md) o [su índice de ocho idiomas](../../../README.md). Los comandos e imágenes de contenedor de abajo describen exclusivamente la versión antigua; **no** los tomes como la versión publicada más reciente. Las otras siete traducciones del manual extenso aún no están disponibles.
 
 Guía pública para personas que quieren aplicar ArquitecturaRepo a un proyecto propio. Esta edición revisa el texto de la colección original del 22/09/2026 y solo modifica o añade las instrucciones necesarias para reflejar el release **v1.3.0** publicado el 17/10/2026.
 

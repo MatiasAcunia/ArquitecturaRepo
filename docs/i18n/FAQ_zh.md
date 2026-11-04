@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (zh)
 
-[ZH guide](README_zh.md) · [v1.4 实用手册](MANUAL_zh.md) · [Main README](../../README.md)
+[ZH guide](README_zh.md) · [v1.4 迷你指南](MINI_GUIDE_zh.md) · [Main README](../../README.md)
 
 ### 1. Agentic SDLC 是什么？
 
@@ -56,4 +56,4 @@
 
 ---
 
-[ZH guide](README_zh.md) · [v1.4 实用手册](MANUAL_zh.md)
+[ZH guide](README_zh.md) · [v1.4 迷你指南](MINI_GUIDE_zh.md)

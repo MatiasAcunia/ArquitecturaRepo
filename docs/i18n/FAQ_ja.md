@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (ja)
 
-[JA guide](README_ja.md) · [v1.4 実践マニュアル](MANUAL_ja.md) · [Main README](../../README.md)
+[JA guide](README_ja.md) · [v1.4 ミニガイド](MINI_GUIDE_ja.md) · [Main README](../../README.md)
 
 ### 1. Agentic SDLC とは何ですか？
 
@@ -56,4 +56,4 @@
 
 ---
 
-[JA guide](README_ja.md) · [v1.4 実践マニュアル](MANUAL_ja.md)
+[JA guide](README_ja.md) · [v1.4 ミニガイド](MINI_GUIDE_ja.md)

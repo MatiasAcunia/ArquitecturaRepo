@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (en)
 
-[EN guide](README_en.md) · [Practical v1.4 manual](MANUAL_en.md) · [Main README](../../README.md)
+[EN guide](README_en.md) · [Mini guide v1.4](MINI_GUIDE_en.md) · [Main README](../../README.md)
 
 ### 1. What is Agentic SDLC?
 
@@ -56,4 +56,4 @@ Yes, as configuration dimensions. Only a real authorized host and proven leases,
 
 ---
 
-[EN guide](README_en.md) · [Practical v1.4 manual](MANUAL_en.md)
+[EN guide](README_en.md) · [Mini guide v1.4](MINI_GUIDE_en.md)

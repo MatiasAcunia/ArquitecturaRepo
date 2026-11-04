@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (es)
 
-[ES guide](README_es.md) · [Manual práctico v1.4](MANUAL_es.md) · [Main README](../../README.md)
+[ES guide](README_es.md) · [Miniguía v1.4](MINI_GUIDE_es.md) · [Main README](../../README.md)
 
 ### 1. ¿Qué es Agentic SDLC?
 
@@ -56,4 +56,4 @@ Sí, se combinan como dimensiones, sin crear agentes de más. Para ejecutar hace
 
 ---
 
-[ES guide](README_es.md) · [Manual práctico v1.4](MANUAL_es.md)
+[ES guide](README_es.md) · [Miniguía v1.4](MINI_GUIDE_es.md)

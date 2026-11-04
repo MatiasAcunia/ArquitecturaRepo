@@ -73,12 +73,12 @@ def main() -> int:
     for code in SUPPORTED:
         readme = docs / f"README_{code}.md"
         faq = docs / f"FAQ_{code}.md"
-        manual = docs / f"MANUAL_{code}.md"
-        check(readme.is_file() and faq.is_file() and manual.is_file(), "missing localized documents: " + code)
+        mini_guide = docs / f"MINI_GUIDE_{code}.md"
+        check(readme.is_file() and faq.is_file() and mini_guide.is_file(), "missing localized documents: " + code)
         readme_text = readme.read_text(encoding="utf-8")
         faq_text = faq.read_text(encoding="utf-8")
-        manual_text = manual.read_text(encoding="utf-8")
-        for localized_path in (readme, faq, manual):
+        manual_text = mini_guide.read_text(encoding="utf-8")
+        for localized_path in (readme, faq, mini_guide):
             check_local_links(localized_path)
         minimum = 700 if code in {"ja", "zh"} else 1000
         check(len(readme_text) > minimum and len(faq_text) > minimum,
@@ -87,10 +87,10 @@ def main() -> int:
               "FAQ coverage parity broken: " + code)
         check("enabled=false" in readme_text + faq_text, "feedback opt-out missing: " + code)
         check("--language" in readme_text + faq_text, "language option missing: " + code)
-        check(f"(MANUAL_{code}.md)" in readme_text and f"(MANUAL_{code}.md)" in faq_text,
-              "localized manual is not linked from guide and FAQ: " + code)
+        check(f"(MINI_GUIDE_{code}.md)" in readme_text and f"(MINI_GUIDE_{code}.md)" in faq_text,
+              "localized mini guide is not linked from guide and FAQ: " + code)
         check(all(re.search(rf"^## 0{section} ", manual_text, flags=re.M) for section in range(8)),
-              "practical manual missing one of the eight sections: " + code)
+              "mini guide missing one of the eight topic headings: " + code)
         check("--no-feedback-workflow" in manual_text and "enabled=false" in manual_text,
               "manual feedback-scheduler/report distinction missing: " + code)
         check("EXISTING_CONTROL_PRESERVED" in manual_text and "UNTRUSTED_CONTEXT" in manual_text,
@@ -98,7 +98,7 @@ def main() -> int:
         check("https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0" in manual_text,
               "manual release source missing: " + code)
         check(len(manual_text) >= (2500 if code in {"ja", "zh"} else 3500),
-              "localized practical manual unexpectedly thin: " + code)
+              "localized mini guide unexpectedly thin: " + code)
         for label, content in (("readme", readme_text), ("faq", faq_text)):
             check("1.4.0" in content and "v1.3.0" in content,
                   f"published/source version lineage missing in {code} {label}")
@@ -120,15 +120,15 @@ def main() -> int:
         for code in SUPPORTED:
             installed_faq = control / "docs" / "i18n" / f"FAQ_{code}.md"
             installed_readme = control / "docs" / "i18n" / f"README_{code}.md"
-            installed_manual = control / "docs" / "i18n" / f"MANUAL_{code}.md"
+            installed_manual = control / "docs" / "i18n" / f"MINI_GUIDE_{code}.md"
             check(installed_faq.is_file(),
                   "offline post-install language switch unavailable: " + code)
             check(installed_manual.is_file(),
-                  "offline post-install manual unavailable: " + code)
+                  "offline post-install mini guide unavailable: " + code)
             for installed_path in (installed_readme, installed_faq, installed_manual):
                 check_local_links(installed_path)
-        check("(docs/i18n/MANUAL_ja.md)" in (control / "README.md").read_text(encoding="utf-8"),
-              "installed root README manual link was not rebased")
+        check("(docs/i18n/MINI_GUIDE_ja.md)" in (control / "README.md").read_text(encoding="utf-8"),
+              "installed root README mini guide link was not rebased")
         installed_source_guide = (control / "docs" / "i18n" / "README_ja.md").read_text(encoding="utf-8")
         check("(../46_V1_4_PUBLIC_START_AND_SUPPORT.md)" not in installed_source_guide,
               "installed source-only documentation reference is broken")
@@ -151,7 +151,8 @@ def main() -> int:
         check(cmd.returncode == 0, "portable locale documentation tool failed")
         selected_docs = json.loads(cmd.stdout)
         check(selected_docs["language"] == "fr" and Path(selected_docs["faq"]).is_file()
-              and Path(selected_docs["manual"]).is_file(),
+              and Path(selected_docs["mini_guide"]).is_file()
+              and selected_docs["manual"] == selected_docs["mini_guide"],
               "switching docs offline did not work")
 
     print("I18N SELF-TEST PASSED — 8 locales, 13 FAQ topics each, auto, override, fallback, offline install")

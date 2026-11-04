@@ -213,7 +213,7 @@ def _populate_staging_project(
                        work_scope=work_scope, project_type=project_type)
     write_json(control / "configuration" / "OPERATING_PREFERENCES.json", preferences)
     for lang_code in SUPPORTED:
-        for kind in ("README", "FAQ", "MANUAL"):
+        for kind in ("README", "FAQ", "MINI_GUIDE"):
             name = f"{kind}_{lang_code}.md"
             source = ROOT / "docs" / "i18n" / name
             destination = control / "docs" / "i18n" / name
@@ -1056,8 +1056,8 @@ Do not claim installation success until the fresh-context probe has been exercis
         localized = (control / "docs" / "i18n" / f"README_{selected_lang}.md").read_text(encoding="utf-8")
         localized = localized.replace(f"(FAQ_{selected_lang}.md)",
                                       f"(docs/i18n/FAQ_{selected_lang}.md)")
-        localized = localized.replace(f"(MANUAL_{selected_lang}.md)",
-                                      f"(docs/i18n/MANUAL_{selected_lang}.md)")
+        localized = localized.replace(f"(MINI_GUIDE_{selected_lang}.md)",
+                                      f"(docs/i18n/MINI_GUIDE_{selected_lang}.md)")
         localized = localized.replace("(../../README.md)", "(README.md)")
         readme = localized + "\n---\n\n" + readme
     write_text(control / "README.md", readme)
