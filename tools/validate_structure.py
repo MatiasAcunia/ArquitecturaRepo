@@ -164,6 +164,8 @@ PUBLIC_REPOSITORY_LINKS = (
     # Verified first-party full-length v1.4 manual, maintained on main.
     # The tagged v1.4.0 portable ZIP predates this documentation addition.
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/en/README.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/es/README.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manual_Completo_v1.4_ES.pdf",
 )
 PUBLIC_REPOSITORY_LINK_RE = re.compile(
     "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"
