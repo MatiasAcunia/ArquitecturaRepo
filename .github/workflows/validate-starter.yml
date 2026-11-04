@@ -84,6 +84,10 @@ jobs:
         run: python tools/selftest_operational_v12.py
       - name: Verify localized installer, FAQ and eight offline languages
         run: python tools/selftest_i18n.py
+      - name: Verify complete published long-form manuals and their reference integrity
+        run: |
+          python tools/selftest_long_manual.py --available
+          python tools/selftest_manual_references.py
       - name: Exercise privacy-gated collector and hash-receipt rejection tests
         run: python tools/selftest_feedback_submit.py
       - name: Verify v1.2 security and exact release gates stay fail closed

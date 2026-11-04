@@ -61,8 +61,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--language", choices=LOCALES, default="en")
     parser.add_argument("--require-all", action="store_true", help="Enforce eight complete localized books")
+    parser.add_argument("--available", action="store_true", help="Check every published long-form directory, without treating the remaining locales as published")
     args = parser.parse_args()
-    requested = LOCALES if args.require_all else (args.language,)
+    if args.require_all:
+        requested = LOCALES
+    elif args.available:
+        requested = tuple(locale for locale in LOCALES if (MANUAL_ROOT / locale).is_dir())
+        if not requested:
+            parser.error("No long-form manual editions found")
+    else:
+        requested = (args.language,)
     failures = 0
     for locale in requested:
         count, _ = verify(locale)
