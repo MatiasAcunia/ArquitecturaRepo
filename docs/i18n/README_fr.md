@@ -1,6 +1,6 @@
 # Agentic SDLC — Guide de démarrage
 
-[Manuel pratique v1.4 (huit thèmes)](MANUAL_fr.md) · [FAQ](FAQ_fr.md)
+[Mini-guide v1.4](MINI_GUIDE_fr.md) · [FAQ](FAQ_fr.md)
 
 Une architecture réutilisable, fondée sur le dépôt, pour le développement logiciel avec des agents. Elle fournit des rôles, un état durable, la planification, la reprise et la vérification. Elle ne construit pas automatiquement tout logiciel et ne remplace pas les décisions du responsable produit.
 
@@ -30,4 +30,4 @@ Ce code source correspond à la version 1.4.0. **Elle n'est publiée que lorsque
 
 L'installateur détecte la langue système ou accepte --language fr. Les guides sont disponibles hors ligne. Le README de GitHub est statique : utilisez les liens de langue.
 
-[Manuel pratique v1.4](MANUAL_fr.md) · [FAQ](FAQ_fr.md) · [GitHub README](../../README.md)
+[Mini-guide v1.4](MINI_GUIDE_fr.md) · [FAQ](FAQ_fr.md) · [GitHub README](../../README.md)

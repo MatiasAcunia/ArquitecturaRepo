@@ -81,12 +81,15 @@ def main() -> int:
     docs = args.docs_root.resolve()
     paths = {"readme": docs / ("README_" + language + ".md"),
              "faq": docs / ("FAQ_" + language + ".md"),
-             "manual": docs / ("MANUAL_" + language + ".md")}
+             "mini_guide": docs / ("MINI_GUIDE_" + language + ".md")}
     if any(not path.is_file() or not path.resolve().is_relative_to(docs) for path in paths.values()):
         parser.exit(2, "LANGUAGE HOLD: missing localized docs\n")
     output = {"language": language, "source": source,
               "readme": str(paths["readme"]), "faq": str(paths["faq"]),
-              "manual": str(paths["manual"])}
+              "mini_guide": str(paths["mini_guide"]),
+              # Backward-compatible key for consumers of the existing v1.4 CLI.
+              # This is a mini guide, NOT the eight-chapter long-form manual.
+              "manual": str(paths["mini_guide"])}
     print(json.dumps(output, ensure_ascii=False, indent=2) if args.json else
           language + " (" + source + ") " + str(paths["readme"]))
     return 0

@@ -1,8 +1,8 @@
-# ArquitecturaRepo — Praxishandbuch v1.4.0 (Deutsch)
+# ArquitecturaRepo — Kurzleitfaden v1.4.0 (Deutsch)
 
-Dieses Handbuch führt in acht Schritten (00–07) durch die Nutzung von **v1.4.0** im eigenen Projekt. Es ist ein **neuer praxisorientierter Leitfaden**, keine vollständige Übersetzung des archivierten spanischen v1.3-Handbuchs. Verbindliche veröffentlichte Quellen sind das unveränderliche [v1.4.0-Release und seine Dateien](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 bleibt als ältere Version verfügbar.
+Dieser Kurzleitfaden führt in acht Schritten (00–07) durch die Nutzung von **v1.4.0** im eigenen Projekt. Er ist **eine neue kompakte Einführung**, keine vollständige Übersetzung des archivierten spanischen v1.3-Handbuchs. Die veröffentlichte Referenz ist das versionierte [v1.4.0-Release mit seinen Dateien](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 bleibt als ältere Version verfügbar.
 
-Dieses Handbuch wurde **nach** der Veröffentlichung von v1.4.0 zu `main` hinzugefügt. Das ursprüngliche unveränderliche v1.4.0-ZIP/Container-Image **enthält es nicht**. Für ein neues Offline-Paket ist eine spätere, separat versionierte Veröffentlichung erforderlich.
+Dieser Kurzleitfaden wurde **nach** der Veröffentlichung von v1.4.0 zu `main` hinzugefügt. Das ursprüngliche v1.4.0-ZIP/Container-Image **enthält ihn nicht**. Für ein neues Offline-Paket ist eine spätere, separat versionierte Veröffentlichung erforderlich.
 
 ## 00 · Zweck und Grenzen
 

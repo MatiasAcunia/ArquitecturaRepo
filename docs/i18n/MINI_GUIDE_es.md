@@ -1,8 +1,8 @@
-# ArquitecturaRepo — Manual práctico de v1.4.0 (español)
+# ArquitecturaRepo — Miniguía v1.4.0 (español)
 
-Esta guía es para empezar a usar la versión **1.4.0** en un proyecto propio. Cubre los ocho temas 00–07 con un recorrido breve y ejecutable. **No es una traducción íntegra del manual histórico v1.3**: ese manual extenso se conserva en `docs/manual/ES/README.md` del repositorio fuente. Las afirmaciones de compatibilidad corresponden únicamente al alcance probado de la [release inmutable v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). La v1.3.0 sigue disponible como versión anterior.
+Esta miniguía es para empezar a usar la versión **1.4.0** en un proyecto propio. Cubre los ocho temas 00–07 con un recorrido breve y ejecutable. **No es una traducción íntegra del manual histórico v1.3**: sus ocho capítulos completos se conservan en `docs/manual/ES/README.md` del repositorio fuente. Las afirmaciones de compatibilidad corresponden únicamente al alcance probado de la [release v1.4.0](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0). La v1.3.0 sigue disponible como versión anterior.
 
-Este manual se añadió a `main` **después** de publicar la release 1.4.0: el ZIP y el contenedor 1.4.0 originales no lo incluyen. Está disponible en el repositorio actualizado; para distribuirlo offline hará falta una publicación posterior con otra versión.
+Esta miniguía se añadió a `main` **después** de publicar la release 1.4.0: el ZIP y el contenedor 1.4.0 originales no la incluyen. Está disponible en el repositorio actualizado; para distribuirla offline hará falta una publicación posterior con otra versión.
 
 ## 00 · Antes de empezar: qué hace y qué no hace
 

@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (de)
 
-[DE guide](README_de.md) · [Praxishandbuch v1.4](MANUAL_de.md) · [Main README](../../README.md)
+[DE guide](README_de.md) · [Kurzleitfaden v1.4](MINI_GUIDE_de.md) · [Main README](../../README.md)
 
 ### 1. Was ist Agentic SDLC?
 
@@ -56,4 +56,4 @@ Ja, als Konfigurationsdimensionen. Tatsächliche Ausführung benötigt einen gep
 
 ---
 
-[DE guide](README_de.md) · [Praxishandbuch v1.4](MANUAL_de.md)
+[DE guide](README_de.md) · [Kurzleitfaden v1.4](MINI_GUIDE_de.md)

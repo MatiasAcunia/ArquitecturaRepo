@@ -1,6 +1,6 @@
 # Agentic SDLC FAQ (fr)
 
-[FR guide](README_fr.md) · [Manuel pratique v1.4](MANUAL_fr.md) · [Main README](../../README.md)
+[FR guide](README_fr.md) · [Mini-guide v1.4](MINI_GUIDE_fr.md) · [Main README](../../README.md)
 
 ### 1. Qu'est-ce qu'Agentic SDLC ?
 
@@ -56,4 +56,4 @@ Oui, comme dimensions de configuration. Leur exécution exige un hôte réel, de
 
 ---
 
-[FR guide](README_fr.md) · [Manuel pratique v1.4](MANUAL_fr.md)
+[FR guide](README_fr.md) · [Mini-guide v1.4](MINI_GUIDE_fr.md)

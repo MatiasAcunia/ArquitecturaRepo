@@ -1,8 +1,8 @@
-# ArquitecturaRepo — Practical v1.4.0 manual (English)
+# ArquitecturaRepo — Mini guide v1.4.0 (English)
 
-This is an actionable eight-topic (00–07) guide for adopting **v1.4.0** in your own project. It is **not** a full translation of the archived v1.3 Spanish manual. Historical chapters remain in the source repository under `docs/manual/ES/`. Release claims refer to the verified, immutable [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 remains available as the previous version.
+This is an actionable eight-topic (00–07) mini guide for adopting **v1.4.0** in your own project. It is **not** a full translation of the archived v1.3 Spanish manual. All eight long chapters remain in the source repository under `docs/manual/ES/`. Release claims refer to the versioned [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 remains available as the previous version.
 
-This manual was added to `main` **after** v1.4.0 was published; the original immutable v1.4.0 ZIP/container does **not** contain it. It is available in the updated repository; packaging it offline requires a separately versioned future release.
+This mini guide was added to `main` **after** v1.4.0 was published; the original release ZIP/container does **not** contain it. It is available in the updated repository; packaging it offline requires a separately versioned future release.
 
 ## 00 · Before starting: purpose and limits
 

@@ -2,7 +2,7 @@
 
 Una guía breve para quienes quieren **probar el starter en un proyecto real**. Esta página orienta la adopción; los contratos, herramientas y límites vigentes están documentados en el [README](../README.md) y en las guías técnicas enlazadas abajo.
 
-Para la versión actual consultá el [manual práctico v1.4 en español (00–07)](i18n/MANUAL_es.md) y la [guía de inicio v1.4](46_V1_4_PUBLIC_START_AND_SUPPORT.md). El [manual español extenso v1.3](manual/ES/README.md) queda como referencia histórica. Los otros siete idiomas tienen manual y FAQ desde el [README principal](../README.md).
+Para la versión actual consultá la [miniguía v1.4 en español (00–07)](i18n/MINI_GUIDE_es.md) y la [guía de inicio v1.4](46_V1_4_PUBLIC_START_AND_SUPPORT.md). El [manual completo de ocho capítulos en español](manual/ES/README.md) es la edición extensa histórica v1.3. Los otros siete idiomas tienen miniguías y FAQ desde el [README principal](../README.md); todavía no tienen traducción integral del manual extenso.
 
 ## Empezar a usarlo
 
