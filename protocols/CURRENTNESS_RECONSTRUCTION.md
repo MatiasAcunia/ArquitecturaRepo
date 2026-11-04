@@ -42,6 +42,8 @@ For such a transition:
 4. bind exact authority identity/evidence;
 5. run a fresh-context reconstruction falsifier.
 
+For Git-backed projects, the reconstruction output has a separate `git_currentness` observation. The canonical Product State code reference and the physical local `HEAD` must be reconciled; do not claim verified source from two matching JSON declarations alone. An immutable code commit can precede later commits limited to declarative files under the control layer's `state/` directory (the Product State cannot embed the SHA of the commit containing itself). Commits changing control scripts/configuration or application code still require reconciliation. Track dirty/untracked files and local branch/upstream divergence separately. Upstream tracking refs are snapshots, not live remote proof; compare live remote explicitly before writes depending on remote currentness. No Git snapshot proves actor identity, lease, native host access or release approval. If local source verification fails, use `continuation_preflight.effective_posture` and `next_safe_action` to hold source-sensitive execution while allowing read-only reconciliation. Older `posture` remains a canonical-record summary for compatibility.
+
 ## Fresh-context probe
 
 A new context must recover:

@@ -278,6 +278,10 @@ See `docs/14_CANONICAL_OWNERSHIP.md`.
 
 `tools/reconstruct_context.py` validates a control layer first and then emits one deterministic current posture from durable evidence only. It refuses to summarize through invalid currentness, duplicate owners or pending recovery state.
 
+The v1.4 candidate also emits **derived, read-only local Git evidence** (`git_currentness` and `continuation_preflight`): actual HEAD and branch; clean/changed working tree; exact, ancestor-only, missing or symbolic Product State code reference; and local upstream-tracking relation. It never fetches, changes repository state, or treats Git author/commit movement as actor identity. `EXACT_TRACKING_SNAPSHOT` is **not proof of the live GitHub/remote HEAD**. An immutable `current_code_ref` may legitimately be an ancestor if later commits only changed declarative state files under `.agentic-sdlc/state/`; changes to scripts, configuration or application source require reconciliation. Where currentness is unresolved, the continuation preflight says so even if a legacy execution-authority record remains marked ACTIVE. Git evidence does not itself authorize native execution or release.
+
+Run `python .agentic-sdlc/tools/reconstruct_context.py --root .agentic-sdlc` in an installed project, then explicitly compare the intended live remote before remote-sensitive writes. No second CURRENT state or global database is produced.
+
 `examples/stateful_backend/` is the first physical transfer fixture: a real SQLite note store with idempotency, rollback, restart persistence and concurrent replay tests, bound to a separate Agentic SDLC control layer. CI requires application behavior, control validation and reconstruction to pass together.
 
 See `docs/15_STATEFUL_REFERENCE_AND_TRANSFER.md`.
