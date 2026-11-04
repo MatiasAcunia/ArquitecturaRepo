@@ -11,7 +11,7 @@ This index separates the **public installable product** from **maintainer engine
 - The eight mini guides were written **after** the v1.4.0 release. They are available in the `main` source tree and in installations produced from that updated tree, **not** in the original v1.4.0 ZIP/container. Future offline distribution of these documents needs its own versioned release.
 - [v1.4.0 release notes and upgrade boundaries](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md): versioned capabilities, published package verification and deliberate non-upgrade of existing governed state.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
-- [Spanish FAQ](FAQ_ES.md), [full Spanish v1.4 manual (60-page PDF)](manual/v1.4/es/README.md), [full English v1.4 manual (59-page PDF)](manual/v1.4/en/README.md), and [eight localized mini guides](i18n/README_en.md).
+- [Spanish FAQ](FAQ_ES.md), [full Spanish v1.4 manual (60 pages)](manual/v1.4/es/README.md), [full English v1.4 manual (59 pages)](manual/v1.4/en/README.md), [full Portuguese v1.4 manual (57 pages)](manual/v1.4/pt/README.md), and [eight localized mini guides](i18n/README_en.md).
 - [Architecture overview](00_ARCHITECTURE_OVERVIEW.md), [minimum profile](05_MINIMUM_VIABLE_PROFILE.md), [scaling profiles](06_SCALING_PROFILES.md), [project modes](27_PROJECT_MODES_AND_STACK_SELECTION.md).
 - [Existing repository attachment preflight](32_EXISTING_GOVERNED_ATTACHMENT.md) and [adoption guide](16_TRANSFER_ADOPTION.md).
 - [Project requirements and baseline](21_PRODUCT_DISCOVERY_REQUIREMENTS_STACK_AND_DELIVERY.md).

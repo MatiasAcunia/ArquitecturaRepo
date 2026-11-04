@@ -39,7 +39,7 @@ LOCALE_LABELS = {
         "summary1": "Eight full chapters: discovery, installation, adoption, operation,",
         "summary2": "changes, recovery, acceptance and a worked product example.",
         "byline": "Source-backed documentation for the public ArquitecturaRepo framework.",
-        "contents": "Contents", "date": "4 November 2026",
+        "contents": "Contents", "date": "4 November 2026", "version": "VERSION", "footer_date": "NOVEMBER 2026",
     },
     "es": {
         "title": "Manual completo de uso", "code": "ESPAÑOL", "lang": "es-ES",
@@ -48,7 +48,16 @@ LOCALE_LABELS = {
         "summary1": "Ocho capítulos extensos: descubrimiento, instalación, adopción,",
         "summary2": "operación, cambios, recuperación, aceptación y ejemplo guiado.",
         "byline": "Documentación contrastada con las fuentes de ArquitecturaRepo.",
-        "contents": "Índice general", "date": "4 de noviembre de 2026",
+        "contents": "Índice general", "date": "4 de noviembre de 2026", "version": "VERSIÓN", "footer_date": "NOVIEMBRE DE 2026",
+    },
+    "pt": {
+        "title": "Manual completo de utilização", "code": "PORTUGUÊS", "lang": "pt-PT",
+        "chapter": "CAPÍTULO", "header": "MANUAL COMPLETO · v1.4",
+        "eyebrow": "SISTEMAS DE ENGENHARIA / GUIAS DE UTILIZAÇÃO",
+        "summary1": "Oito capítulos completos: descoberta, instalação, adoção, operação,",
+        "summary2": "mudanças, recuperação, aceitação e um exemplo guiado de produto.",
+        "byline": "Documentação verificada com o código-fonte do ArquitecturaRepo.",
+        "contents": "Índice geral", "date": "4 de novembro de 2026", "version": "VERSÃO", "footer_date": "NOVEMBRO DE 2026",
     },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
@@ -173,11 +182,11 @@ def main() -> int:
             "COMPLETE USER MANUAL · v1.4": labels["header"],
             "ENGINEERING SYSTEMS / USER GUIDES": labels["eyebrow"],
             "The Complete User Manual": labels["title"],
-            "VERSION 1.4 / ENGLISH": f"VERSIÓN 1.4 / {labels['code']}" if args.language == "es" else "VERSION 1.4 / ENGLISH",
+            "VERSION 1.4 / ENGLISH": f"{labels['version']} 1.4 / {labels['code']}",
             "Eight full chapters: discovery, installation, adoption, operation,": labels["summary1"],
             "changes, recovery, acceptance and a worked product example.": labels["summary2"],
             "Source-backed documentation for the public ArquitecturaRepo framework.": labels["byline"],
-            "MATÍAS ACUÑA  ·  NOVEMBER 2026": "MATÍAS ACUÑA  ·  NOVIEMBRE DE 2026" if args.language == "es" else "MATÍAS ACUÑA  ·  NOVEMBER 2026",
+            "MATÍAS ACUÑA  ·  NOVEMBER 2026": f"MATÍAS ACUÑA  ·  {labels['footer_date']}",
         }
         for old, new in replacements.items():
             latex = latex.replace(old, new)
