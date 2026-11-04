@@ -2,7 +2,7 @@
 
 [Mini-guide v1.4](MINI_GUIDE_fr.md) · [FAQ](FAQ_fr.md)
 
-Le [manuel complet en huit chapitres](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) est disponible **dans le dépôt source, uniquement en espagnol**, dans une **édition historique v1.3** ; il n'est pas copié dans le projet installé. Ce guide est une introduction abrégée à v1.4, pas une traduction intégrale ; consultez le [guide d'installation v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) pour les commandes actuelles.
+Le [manuel français complet v1.4 en huit chapitres](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/fr/README.md) est disponible dans le dépôt source, avec un [PDF de 57 pages](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manuel_Complet_v1.4_FR.pdf). Le [manuel espagnol historique v1.3](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) est conservé séparément. L'archive v1.4.0 a été publiée avant ces documents et ne les contient pas. Ce guide et le miniguide sont courts ; consultez le livre complet pour les détails et le [guide v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) pour les commandes actuelles.
 
 Une architecture réutilisable, fondée sur le dépôt, pour le développement logiciel avec des agents. Elle fournit des rôles, un état durable, la planification, la reprise et la vérification. Elle ne construit pas automatiquement tout logiciel et ne remplace pas les décisions du responsable produit.
 

@@ -168,6 +168,8 @@ PUBLIC_REPOSITORY_LINKS = (
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manual_Completo_v1.4_ES.pdf",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/pt/README.md",
     "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manual_Completo_v1.4_PT.pdf",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/fr/README.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manuel_Complet_v1.4_FR.pdf",
 )
 PUBLIC_REPOSITORY_LINK_RE = re.compile(
     "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"
