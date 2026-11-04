@@ -6,9 +6,9 @@
 
 **v1.4 mini guides / Miniguías v1.4 (00–07):** [EN](docs/i18n/MINI_GUIDE_en.md) · [ES](docs/i18n/MINI_GUIDE_es.md) · [PT](docs/i18n/MINI_GUIDE_pt.md) · [FR](docs/i18n/MINI_GUIDE_fr.md) · [DE](docs/i18n/MINI_GUIDE_de.md) · [IT](docs/i18n/MINI_GUIDE_it.md) · [JA](docs/i18n/MINI_GUIDE_ja.md) · [ZH](docs/i18n/MINI_GUIDE_zh.md).
 
-**Full-length manual / Manual extenso (eight chapters / ocho capítulos):** [Spanish complete edition](docs/manual/ES/README.md). This is the complete, historical v1.3 manual (00–07), not an abbreviated guide. Full translations into the other seven languages are not yet published; use the v1.4 release notes and mini guides for current commands.
+**Full-length manuals / Manuales extensos (eight chapters / ocho capítulos):** [English v1.4 complete edition](docs/manual/v1.4/en/README.md) ([59-page PDF](output/pdf/ArquitecturaRepo_Complete_Manual_v1.4_EN.pdf)) · [Spanish historical v1.3 complete edition](docs/manual/ES/README.md). Both are full-length, unlike the eight short mini guides. The remaining long-form translations are **not yet available**; do not mistake a mini guide for a 60-page translation. Use the v1.4 public start guide for current installation commands when reading historical material.
 
-These eight mini guides are **post-release documentation on `main`**. The already published v1.4.0 ZIP and GHCR image are fixed to their release commit and **do not contain these later mini guides**. The documentation in `main` remains useful for v1.4 adoption; an offline package containing the new guides requires a separately versioned future distribution.
+These eight mini guides and the new English long-form edition are **post-release documentation on `main`**. The already published v1.4.0 ZIP and GHCR image are fixed to their release commit and **do not contain these later additions**. The documentation in `main` remains useful for v1.4 adoption; an offline package containing the new manuals requires a separately versioned future distribution.
 
 [FAQ EN](docs/i18n/FAQ_en.md) · [FAQ ES](docs/FAQ_ES.md) · [FAQ PT](docs/i18n/FAQ_pt.md) · [FAQ FR](docs/i18n/FAQ_fr.md) · [FAQ DE](docs/i18n/FAQ_de.md) · [FAQ IT](docs/i18n/FAQ_it.md) · [FAQ JA](docs/i18n/FAQ_ja.md) · [FAQ ZH](docs/i18n/FAQ_zh.md)
 
@@ -37,7 +37,7 @@ This repository is not a prompt collection. It is an operating architecture for 
 [Documentation index](docs/README.md) distinguishes **adopter guidance**, supported technical reference, and contributor-only QA/research material. Historical maintainer execution logs and private pilot materials are **not** installation instructions, runtime authority, or distributed starter files.
 
 - [Install/adapt the SDLC](prompts/INSTALL_THIS_SDLC.md) and [FAQ](docs/FAQ_ES.md).
-- [Miniguías actuales v1.4.0 (ocho idiomas)](docs/i18n/MINI_GUIDE_es.md); el [manual completo de ocho capítulos en español](docs/manual/ES/README.md) es la edición extensa original de v1.3.0. Su narrativa sigue siendo útil, pero sus instrucciones de instalación deben contrastarse con v1.4.
+- [Miniguías actuales v1.4.0 (ocho idiomas)](docs/i18n/MINI_GUIDE_es.md); [manual extenso inglés actualizado a v1.4](docs/manual/v1.4/en/README.md) y [manual extenso español histórico v1.3](docs/manual/ES/README.md). Para instalación vigente, contrastar siempre con la guía v1.4.
 - [Architecture and profiles](docs/00_ARCHITECTURE_OVERVIEW.md), [project modes](docs/27_PROJECT_MODES_AND_STACK_SELECTION.md), and [existing-repository read-only preflight](docs/32_EXISTING_GOVERNED_ATTACHMENT.md).
 - [Artifact inventory and safe GC](docs/34_FILE_ARTIFACT_INVENTORY_AND_GC.md), including the [cleangarbage skill](.agents/skills/cleangarbage/SKILL.md). Native slash-command registration is not guaranteed.
 - [Historical contributor-only v1.3 verification and milestone design](docs/41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md). These historical plans are **not** the published release contract or proof of native agent execution.

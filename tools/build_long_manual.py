@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""Build a source-backed, typeset PDF from a complete eight-chapter manual.
+
+No translation, language model, provider API, or network access is used.
+Only editions with all eight real chapter files and valid repository-local links
+can be built. This script must not be used to relabel a mini guide as a book.
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from urllib.parse import quote
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MANUAL_ROOT = ROOT / "docs" / "manual" / "v1.4"
+REPO_BLOB = "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/"
+CHAPTERS = [
+    "00_before_you_begin.md",
+    "01_installation.md",
+    "02_planner_and_adoption.md",
+    "03_daily_operation.md",
+    "04_requesting_changes.md",
+    "05_errors_and_recovery.md",
+    "06_closing_capabilities.md",
+    "07_worked_club_example.md",
+]
+EXPECTED_TITLES = {"en": "The Complete User Manual"}
+LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
+
+
+def resolve_link(chapter: Path, raw: str) -> str:
+    if raw.startswith(("https://", "http://", "mailto:", "#")):
+        return raw
+    target, sep, fragment = raw.partition("#")
+    if not target:
+        return raw
+    resolved = (chapter.parent / target).resolve()
+    try:
+        relative = resolved.relative_to(ROOT)
+    except ValueError as exc:
+        raise ValueError(f"Link escapes the repository: {chapter}: {raw}") from exc
+    if not resolved.is_file():
+        raise ValueError(f"Broken file link: {chapter.relative_to(ROOT)} → {raw}")
+    link = REPO_BLOB + quote(relative.as_posix(), safe="/")
+    if sep:
+        link += "#" + quote(fragment, safe="-")
+    return link
+
+
+def collect(locale: str) -> str:
+    source = MANUAL_ROOT / locale
+    missing = [name for name in CHAPTERS if not (source / name).is_file()]
+    if missing:
+        raise ValueError(f"Incomplete {locale} long manual: missing {', '.join(missing)}")
+    chapters = []
+    for name in CHAPTERS:
+        chapter = source / name
+        content = chapter.read_text(encoding="utf-8")
+        if len(content.split()) < 1100:
+            raise ValueError(f"Not a full-length chapter: {chapter.relative_to(ROOT)}")
+        # In the PDF, repository-local references must link to the repository,
+        # not to nonexistent neighboring files at the PDF download location.
+        def rewrite(match: re.Match[str]) -> str:
+            return match.group("prefix") + resolve_link(chapter, match.group("url")) + match.group("suffix")
+
+        chapters.append(LINK.sub(rewrite, content))
+    return "\n\n".join(chapters) + "\n"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--language", default="en", help="Completed long-form locale")
+    parser.add_argument("--output", type=Path, required=True, help="PDF output path")
+    args = parser.parse_args()
+    if args.language not in EXPECTED_TITLES:
+        parser.error(f"No verified PDF typography settings for locale {args.language!r}")
+    if not shutil.which("pandoc") or not shutil.which("xelatex"):
+        parser.error("PDF generation requires local pandoc and xelatex")
+
+    try:
+        source = collect(args.language)
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    output = args.output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="arquitecturarepo-manual-") as tmp:
+        temp_dir = Path(tmp)
+        rendered = temp_dir / "manual.md"
+        rendered.write_text(source, encoding="utf-8")
+        preamble = temp_dir / "preamble.tex"
+        preamble.write_text(
+            r"""\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{etoolbox}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\definecolor{ARdark}{HTML}{13243A}
+\definecolor{ARaccent}{HTML}{176F87}
+\definecolor{ARmuted}{HTML}{63788C}
+\hypersetup{colorlinks=true,linkcolor=ARdark,urlcolor=ARaccent,citecolor=ARaccent}
+\titleformat{\chapter}[display]{\normalfont\sffamily\bfseries\color{ARdark}}
+{\fontsize{15}{18}\selectfont CHAPTER \thechapter}{10pt}{\fontsize{21}{26}\selectfont}
+\titlespacing*{\chapter}{0pt}{-10pt}{22pt}
+\titleformat{\section}{\Large\sffamily\bfseries\color{ARaccent}}{\thesection}{9pt}{}
+\titleformat{\subsection}{\large\sffamily\bfseries\color{ARdark}}{\thesubsection}{9pt}{}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{ARmuted} ARQUITECTURAREPO}
+\fancyhead[R]{\small\sffamily\color{ARmuted} COMPLETE USER MANUAL · v1.4}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\headheight}{15pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{titlepage}
+  \thispagestyle{empty}
+  \vspace*{28mm}
+  {\sffamily\bfseries\color{ARaccent}\large ENGINEERING SYSTEMS / USER GUIDES\par}
+  \vspace{12mm}
+  {\color{ARaccent}\rule{43mm}{2.5pt}\par}
+  \vspace{21mm}
+  {\sffamily\bfseries\color{ARdark}\fontsize{34}{41}\selectfont ArquitecturaRepo\par}
+  \vspace{8mm}
+  {\sffamily\color{ARdark}\fontsize{20}{26}\selectfont The Complete User Manual\par}
+  \vspace{3mm}
+  {\sffamily\color{ARmuted}\Large VERSION 1.4 / ENGLISH\par}
+  \vspace{15mm}
+  {\sffamily\large Eight full chapters: discovery, installation, adoption, operation,\par}
+  {\sffamily\large changes, recovery, acceptance and a worked product example.\par}
+  \vfill
+  {\color{ARaccent}\rule{\textwidth}{0.5pt}\par}
+  \vspace{5mm}
+  {\sffamily\small MATÍAS ACUÑA  ·  NOVEMBER 2026\par}
+  {\sffamily\small Source-backed documentation for the public ArquitecturaRepo framework.\par}
+  \end{titlepage}
+}
+\makeatother
+""",
+            encoding="utf-8",
+        )
+        command = [
+            "pandoc", str(rendered), "--standalone", "--toc", "--toc-depth=2",
+            "--top-level-division=chapter", "--pdf-engine=xelatex",
+            "--metadata", "title:ArquitecturaRepo",
+            "--metadata", f"subtitle:{EXPECTED_TITLES[args.language]} · v1.4 · English",
+            "--metadata", "author:Matías Acuña",
+            "--metadata", "date:4 November 2026",
+            "--variable", "documentclass=scrreprt", "--variable", "classoption=oneside",
+            "--variable", "papersize=a4", "--variable", "fontsize=11pt",
+            "--variable", "mainfont=DejaVu Serif", "--variable", "sansfont=DejaVu Sans",
+            "--variable", "monofont=DejaVu Sans Mono",
+            "--variable", "geometry:margin=22mm",
+            "--include-in-header", str(preamble),
+            "--output", str(output),
+        ]
+        subprocess.run(command, check=True)
+    print(f"Built {output} ({output.stat().st_size:,} bytes) from eight complete source chapters")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

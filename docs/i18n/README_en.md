@@ -1,8 +1,8 @@
 # Agentic SDLC — Getting started
 
-[Mini guide v1.4](MINI_GUIDE_en.md) · [FAQ](FAQ_en.md)
+[Mini guide v1.4](MINI_GUIDE_en.md) · [Complete v1.4 English manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/en/README.md) · [FAQ](FAQ_en.md)
 
-The [complete eight-chapter manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) is available in the **source repository, in Spanish only**, as a **historical v1.3 edition**; it is not copied into installed control layers. This English guide is a short v1.4 introduction, not a full translation; use the [v1.4 installation guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) for current commands.
+The [complete eight-chapter English manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/en/README.md) is available in the **source repository**, updated for v1.4. The [historical full-length Spanish v1.3 manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) is preserved separately. Neither long-form manual is copied into installed control layers by the v1.4.0 release installer. This introductory guide and the mini guide are **short**; use the complete manual for depth and the [v1.4 installation guide](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) for authoritative commands.
 
 A reusable, repository-first architecture for agent-assisted software development. It provides roles, durable state, planning, recovery and verification. It does not autonomously build arbitrary software or remove product-owner decisions.
 
@@ -32,4 +32,4 @@ To disable all reporting, set enabled=false in .agentic-sdlc/feedback/ARCHITECTU
 
 The installer detects your OS language (or accepts --language es, for example). Documentation is available offline. GitHub's top-level README is static, so select a language from its links.
 
-[Mini guide v1.4](MINI_GUIDE_en.md) · [FAQ](FAQ_en.md) · [GitHub README](../../README.md)
+[Mini guide v1.4](MINI_GUIDE_en.md) · [Complete eight-chapter manual](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/en/README.md) · [FAQ](FAQ_en.md) · [GitHub README](../../README.md)
