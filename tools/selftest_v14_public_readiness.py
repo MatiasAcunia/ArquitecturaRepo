@@ -69,19 +69,21 @@ def enforce_public_path(name: str) -> None:
 
 
 def test_archive(source_zip: Path) -> tuple[Path, int]:
-    require(invoke("git", "-C", SOURCE, "archive", "--format=zip", f"--prefix={PREFIX}", "-o", source_zip, "HEAD"), "git archive")
-    files = require(invoke("git", "-C", SOURCE, "ls-files", "--cached"), "tracked files").splitlines()
-    tracked = set(files)
-    staged_modes = require(invoke("git", "-C", SOURCE, "ls-files", "--stage"), "tracked modes")
+    require(invoke("git", "-C", SOURCE, "-c", "core.autocrlf=false", "archive", "--format=zip", f"--prefix={PREFIX}", "-o", source_zip, "HEAD"), "git archive")
+    # The released object is HEAD, not the platform-dependent checkout index.
+    # On Windows autocrlf/configuration may affect working-tree presentation;
+    # bind the archive independently to committed Git TREE blob identities.
+    committed_tree = require(invoke("git", "-C", SOURCE, "ls-tree", "-r", "HEAD"), "committed source tree")
     tracked_blobs: dict[str, str] = {}
-    for entry in staged_modes.splitlines():
+    for entry in committed_tree.splitlines():
         metadata, path = entry.split("\t", 1)
-        mode, blob_sha, stage = metadata.split()
+        mode, kind, blob_sha = metadata.split()
         if mode == "120000":
             raise AssertionError("public source distribution contains a tracked symlink")
-        if stage != "0" or mode not in {"100644", "100755"}:
-            raise AssertionError(f"unsupported Git index entry in portable distribution: {path}")
+        if kind != "blob" or mode not in {"100644", "100755"}:
+            raise AssertionError(f"unsupported committed Git tree entry in portable distribution: {path}")
         tracked_blobs[path] = blob_sha
+    tracked = set(tracked_blobs)
     with zipfile.ZipFile(source_zip) as archive:
         if archive.testzip() is not None:
             raise AssertionError("candidate ZIP failed CRC/readback")
@@ -103,7 +105,11 @@ def test_archive(source_zip: Path) -> tuple[Path, int]:
             blob_sha = hashlib.sha1(raw_header + payload).hexdigest()
             relative = name.removeprefix(PREFIX)
             if blob_sha != tracked_blobs.get(relative):
-                raise AssertionError(f"archive bytes differ from the Git-index blob: {relative}")
+                raise AssertionError(
+                    f"archive bytes differ from the committed Git HEAD blob: {relative} "
+                    f"actual={blob_sha} expected={tracked_blobs.get(relative)} "
+                    f"crlf={payload.count(bytes((13, 10)))} lf={payload.count(bytes((10,)))}"
+                )
         if source_zip.stat().st_size > 12 * 1024 * 1024:
             raise AssertionError("portable starter unexpectedly exceeds 12 MiB distribution budget")
         extracted = source_zip.parent / "extracted"
