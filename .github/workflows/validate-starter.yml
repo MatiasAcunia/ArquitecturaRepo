@@ -20,6 +20,8 @@ jobs:
           python-version: "3.12"
       - name: Install validation dependency
         run: python -m pip install --disable-pip-version-check -r requirements-validation.txt
+      - name: Falsify structure-only privacy and source-pin exemptions
+        run: python tools/selftest_structure_policy.py
       - name: Validate repository structure
         run: python tools/validate_structure.py
       - name: Validate starter manifest contract

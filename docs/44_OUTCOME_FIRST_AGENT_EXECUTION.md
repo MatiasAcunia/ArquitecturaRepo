@@ -32,16 +32,16 @@ It must include all of the following, in practical language:
 
 **Progress** is a delta in delivered/certified user outcomes against baseline with evidence; time spent/commits/reviews/provider tokens cannot substitute. `tools/work_order_guard.py assess` emits a *decision aid* (continue, budget stop, zero-output stop, review-ready), never an external authorization or automatic acceptance. No user-facing release PASS is granted by the guard.
 
-## Operator example — batch media assets (G010 pattern)
+## Operator example — generic batch import (synthetic)
 
-Input: there are already 300 backgrounds and 120 music files, source IDs/hashes are enumerated, and CLIENT accepts the set for **collection/selection**. Do not decide that “0 engine GOOD” means “0 files delivered.”
+Input: a project needs a collection of 40 source files imported and indexed. A trusted inventory already identifies 35 present, hash-verified files; five entries remain missing or invalid. The acceptance gate is **collection delivery**, not downstream transformation or public distribution.
 
-- Phase 1: inspect the existing bounded 420-file manifest and check hashes and actual file presence; don't copy verified assets or rescan drives without a narrow evidence need.
-- Phase 2: for missing, corrupt or unusable inputs only, run `yt-dlp` using already known URLs and `ffprobe` technical metadata in batches; stop/mark only those failing IDs. Do not purchase Gemini quota or invent multimodal selection engines for a deterministic presence/hash requirement.
-- Phase 3: persist the accepted collection identity/manifest, category assignment, process speed when specified, and CLIENT acceptance readback. If the legitimate human quality gate is already satisfied, mark **collection delivery accepted**.
-- Phase 4: treat eventual reuse/current G007/C5 catalog/selector, publication rights and global fatigue as separate downstream operational gates. They may block **future production/publication**, not retroactively erase a completed collection delivery. Legally material restrictions remain actual restrictions, but missing excessive documentation is not itself proof of a ban.
+- Phase 1: read the existing bounded inventory and confirm the 35 valid files; do not download, rescan or duplicate them.
+- Phase 2: acquire or repair only the five remaining files using the project's already-authorized sources, then verify identity, content hashes and readable format. Never invent a model-based grading engine for a deterministic presence/hash check.
+- Phase 3: persist the one accepted 40-file manifest, measured source evidence and the genuine CLIENT acceptance if the human gate was required and actually occurred.
+- Phase 4: keep later conversion, quality preferences, publishing rights and production readiness as distinct downstream gates. An unresolved downstream gate cannot erase a genuinely finished collection gate or excuse an actual rights violation.
 
-No guarantee that this always takes “10 minutes”: duration depends on actual bytes, network and failures. The enforceable principle is that once the 420 files are physically present and CLIENT accepted, **more evaluator passes do not constitute progress on that deliverable**.
+Elapsed time depends on the environment and actual bytes. The principle is to credit physically verified delivered files, while allowing separate later gates to remain UNKNOWN or HOLD.
 
 ## Simple bounded loop (operator)
 
@@ -57,6 +57,6 @@ A high-level charter remains concise and capability-owned; a work order for a co
 
 ## Project rollout
 
-For each existing product, independently reconstruct its **actual** latest canonical repository, DB, Goal/lease, Planner and I3 run, artifacts and source ownership before applying anything. Do not assume applying an improved framework to one repo automatically repairs active, dirty projects or historic agent chats. Map each long-running Goal to deliverables and bounded work orders, identify already completed sub-deliverables, and preserve human approvals. Always choose read-only assessment first; plan/source mutation in four production projects requires exact live state and scoped authority. If the source/daypack for one is missing, mark only that project unknown and do not invent its work status.
+For each existing product, independently reconstruct its **actual** latest canonical repository, DB, Goal/lease, Planner and I3 run, artifacts and source ownership before applying anything. Do not assume applying an improved framework to one repo automatically repairs active, dirty projects or historical chats. Map each long-running Goal to deliverables and bounded work orders, identify already completed sub-deliverables, and preserve human approvals. Start with read-only assessment; any production mutation needs exact live state and scoped authority. If a source or handoff package is missing, mark only that project unknown and do not invent its work status.
 
 Acceptance is observed increase in completed, physically verified deliverables per unit of work, fewer repeat loops and less unnecessary provider spend—measured against each project's own pre-change baseline, not counted as extra architecture documents.

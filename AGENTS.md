@@ -1,10 +1,5 @@
 # Agentic SDLC Starter — Root Agent Instructions
 
-## CLIENT portfolio LiteLLM integration (2026-10-25)
-
-For this CLIENT's managed portfolio (OWNER + RED/TRO, CTR, ROBLOX, MUSIC), read the CURRENT single OWNER standard `MatiasAcunia/owner@main/state/CLIENT_PORTFOLIO_STRATEGY_CURRENT.md#CPS-010` and `#CPS-011` at relevant I2/I3 model-provider entry. Use **LiteLLM** as the default abstraction for new/materially touched LLM model calls, preferably the SDK in Python, only where actual model/provider compatibility and lawful zero-additional-charge operation are verified on the local host. The existing `tools/cognitive_i4.py` Gemini-only direct transport is NOT evidence of LiteLLM adoption; migration belongs to its current canonical adapter owner with backward-compatible synthetic tests and real guarded host proof. Do not silently change this public starter's semantics for unrelated projects, ship a new proxy/server by default, treat credentials as verified, pass secrets to Git/logs, or relax rights/quota/privacy/billing gates. This is a navigation note to the CLIENT portfolio owner and does not change PUBLIC_STARTER_STABLE release/product acceptance.
-
-
 Status: public starter root policy.
 
 This repository is an architecture template. Do not treat its example state as the truth of the target project.
@@ -29,7 +24,7 @@ The CLIENT is external.
 
 I1 is optional as a separately active role for small single-project installations. Reviewers, architects, researchers and specialists are bounded I4 subroles unless the adapted project physically requires another independently planned project/workstream boundary.
 
-**Role/model split (current):** CLIENT selects the L3 model/effort for the whole Goal; I2/L2 may recommend low/medium, not choose. L3 controls an evolving long Goal with N-invocation Cycles and selects a verified available economical high-effort coding model for L4, not a hardcoded codename. L4 is a portfolio resource with one managed writer globally, not an OpenAI model identity. L2 consumes the project daypack + durable L3 Goal ZIP, engineers deeply offline through multiple sessions, and emits a source-complete SIP ZIP via `tools/engineering_packet.py`; L3 consumes SIP + Goal ZIP. Tool `tools/gemini_keyfile.py` reads an explicitly chosen local Gemini text key only where configured; free provider billing/quota and export authority remain independent hard gates. `tools/artifact_ledger.py` is the one file-level L3-generated-artifact JSON/GC owner. Product engines produce high-volume outputs, not LLMs selecting each individual asset.
+**Optional execution:** Model/provider selection, cost limits, host access, actor leases and concurrency belong to the *installed project*, not to this public starter or a maintainer-wide default. The optional runtime, source-engineering packet and cognitive adapter tools require explicit installation and actual permissions. Portable source records do not certify native desktop execution, external provider cost or acceptance. Read the selected project's current authority before acting.
 
 ## Read order
 
@@ -146,6 +141,6 @@ Read `docs/27_PROJECT_MODES_AND_STACK_SELECTION.md` before recommending async/mi
 
 Read `docs/28_LONGITUDINAL_L3_TEST_PROTOCOL.md` for the isolated longitudinal CRUD pilot; never ship a test project's Product State as a user template. Abnormal agent behavior is investigated by causal owner and evidence, not by opening microcampaigns/branches. Repository CLIENT theory must be durable, accurately versioned and internally consistent before any material route.
 
-## 2026-10-19 durable product engines / free Gemini / role-neutral L2-L3-L4
+## Optional engineering controls
 
-The reusable starter is subordinate to installed product/OWNER authority. `engines/catalog.json` locates code-linked `arquitectura.portable-goal-engineering` design and contract; `tools/engine_registry.py` validates actual source links and release receipts. `tools/cognitive_i4.py` and the existing cognitive ledger support source-bound Gemini engineering proposals (code, tests, design, review), fail-closed without actual USD 0 provider admission and PUBLIC_OR_SYNTHETIC export. OWNER owns shared L4 admission and Goal ZIP lifecycle; this portable repo does not govern or prove native Desktop sessions. L3 directs tactical Cycles and L4 implements code. A manifest in DEFINED state has no accepted product release.
+`engines/catalog.json` describes source-linked, not automatically released or adopted, optional engines. `tools/engine_registry.py` validates engine source history; `tools/engineering_packet.py` supports bounded, source-pinned technical handoffs; `tools/cognitive_i4.py` is an optional guarded provider adapter. None implies credentials, free quota, model choice or native-host admission. Actual release, rights, authority, provider billing, and runtime evidence remain independent gates.

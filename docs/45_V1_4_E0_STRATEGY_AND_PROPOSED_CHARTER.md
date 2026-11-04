@@ -1,6 +1,6 @@
 # ArquitecturaRepo v1.4 — E0 strategic reconstruction and proposed engineering charter
 
-Status: **E0 STRATEGIC AUDIT COMPLETE; CHARTER PROPOSED / NOT YET AUTHORIZED**. This file is the single v1.4 E0 decision proposal, not an implementation PASS, an active campaign record, or a release authorization. Date: 2026-11-04 (UTC). Scope is the generic public starter, not the maintainer's private portfolio. A new explicit CLIENT authorization is required before E1 material execution; release/publication requires its own authorization and exact evidence.
+Status: **E0 STRATEGIC AUDIT COMPLETE; E1 EXECUTION AUTHORIZED BY CLIENT (2026-11-04)**. This file records the original E0 proposal and the subsequent limited authorization, not a release PASS. Scope is the generic public starter, not the maintainer's private portfolio. The CLIENT's explicit E1 instruction authorized execution inside the proposed consolidation charter on the existing integration branch; it did not approve E2–E6 execution, merging or release/publication.
 
 ## 1. Product destination and CLIENT intent
 
@@ -73,7 +73,7 @@ Adversarial verdict: **GO for a narrowly bounded v1.4 consolidation charter prop
 
 ## 5. Proposed unified Engineering Campaign Charter
 
-**Provisional ID:** `AR-V14-CONSOLIDATE` (not active until approved). **Capability:** a truthful, transferable, maintainable Git-repository-based Agentic SDLC starter, replacing the inconsistent post-v1.3 main candidate. **Authority:** CLIENT product intent and release approval; I2 strategic scope and terminal audit; one continuous I3 implementation, tests, refactors, integration, recovery and in-envelope QA; independent reviewer verifies exact candidate. Keep one integration branch/PR, not one branch or charter per defect.
+**ID:** `AR-V14-CONSOLIDATE` (E1 scope authorized; subsequent execution stages require CLIENT go-ahead). **Capability:** a truthful, transferable, maintainable Git-repository-based Agentic SDLC starter, replacing the inconsistent post-v1.3 main candidate. **Authority:** CLIENT product intent and release approval; I2 strategic scope and terminal audit; one continuous I3 implementation, tests, refactors, integration, recovery and in-envelope QA; independent reviewer verifies exact candidate. Keep one integration branch/PR, not one branch or charter per defect.
 
 **In scope:** known CI defect repair; public/private governance separation; core/optional/profile classification; canonical currentness and handoff ergonomics; code modularity/refactoring where warranted; compatible schema/CLI and explicit migrations; safe adoption into fresh/existing repositories; docs and packaging truth; A+B physical framework tests, cross-OS smoke and exact release qualification.
 
@@ -113,4 +113,4 @@ These are execution-review milestones inside **one** continuous I3 authority aft
 
 ## 7. E0 handoff and decision boundary
 
-E0 has produced a pinned PASS1, independent PASS2, critical-path map, capability/owner/support boundary, concrete falsifiers and one proposed charter. It **has not** proven full installed-framework behavior, fixed source, granted E1 write authority, merged a branch or released v1.4. The one material CLIENT decision remaining is whether to authorize `AR-V14-CONSOLIDATE` with the stated scope and protected boundaries; normal implementation details and bug recovery are not CLIENT decisions. Before E1, I3 must check fresh remote HEAD, open branch/PR state and known dirty/runtime owners; if source advanced, inspect the delta and reconcile rather than silently using this 2026-11-04 baseline.
+At the E0 closeout, no source was fixed, and no release approval existed. Subsequently the CLIENT explicitly instructed full E1 execution. I3 verified the unchanged integration head, PR and baseline and accepted the existing charter envelope for E1 only. This does not retroactively make the E0 audit an implementation PASS or authorize E2–E6. Preserve the charter's same-campaign failure/rework ownership and all distinct final gates.

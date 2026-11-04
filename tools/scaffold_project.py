@@ -218,12 +218,6 @@ def _populate_staging_project(
     copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
     copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
     copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
-    copy_file(ROOT / "tools" / "engineering_packet.py", control / "tools" / "engineering_packet.py")
-    copy_file(ROOT / "tools" / "engine_registry.py", control / "tools" / "engine_registry.py")
-    copy_file(ROOT / "tools" / "gemini_keyfile.py", control / "tools" / "gemini_keyfile.py")
-    # Copies are capabilities, not paid-provider opt-in or installed host authority.
-    copy_file(ROOT / "tools" / "cognitive_i4.py", control / "tools" / "cognitive_i4.py")
-    copy_file(ROOT / "tools" / "cognitive_ledger.py", control / "tools" / "cognitive_ledger.py")
     copy_file(ROOT / ".agents" / "skills" / "cleangarbage" / "SKILL.md", control / "skills" / "cleangarbage" / "SKILL.md")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
     copy_file(ROOT / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md", control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md")
@@ -281,7 +275,14 @@ def _populate_staging_project(
             ROOT / "tools" / "campaignctl.py",
             control / "tools" / "campaignctl.py",
         )
-        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py", "host_dispatch.py", "tool_port.py", "candidate_manifest.py"):
+        # Optional source-engineering and provider adapters must never appear
+        # in a no-runtime SMALL (or any other no-runtime) installation.
+        # Their presence is not authorization to use a paid/native host.
+        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py",
+                     "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py",
+                     "evidence_decision.py", "host_dispatch.py", "tool_port.py",
+                     "candidate_manifest.py", "engineering_packet.py",
+                     "engine_registry.py", "gemini_keyfile.py"):
             copy_file(ROOT / "tools" / tool, control / "tools" / tool)
     if with_runtime:
         for filename in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",

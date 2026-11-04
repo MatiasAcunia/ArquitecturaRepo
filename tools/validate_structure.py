@@ -140,6 +140,66 @@ TOKEN_HINT_RE = re.compile(
 )
 MD_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|MatiasAcunia)\b|TRO/RED")
+SYNTHETIC_EMAIL_SUFFIXES = (".test", ".invalid")
+
+
+def synthetic_fixture_email(email: str, rel: Path) -> bool:
+    """Reserved-TLD addresses are safe only in synthetic test source files."""
+    return (
+        len(rel.parts) == 2
+        and rel.parts[0] == "tools"
+        and rel.name.startswith(("test_", "selftest_"))
+        and rel.suffix == ".py"
+        and email.lower().endswith(SYNTHETIC_EMAIL_SUFFIXES)
+    )
+
+
+def strip_approved_source_pins(text: str, rel: Path) -> str:
+    """Mask only first-party immutable engine history and pinned official actions.
+
+    These source receipts are not project data. Other 40-hex values still fail,
+    even in the same files. Engine pin integrity is checked by engine_registry.
+    """
+    if rel.as_posix() in {
+        ".github/workflows/validate-starter.yml",
+        ".github/workflows/publish-version-release.yml",
+        ".github/workflows/publish-v1-3-manual.yml",
+        ".github/workflows/publish-ghcr-package.yml",
+        ".github/workflows/package-v1-3-release-asset.yml",
+        "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
+    }:
+        text = re.sub(
+            r"(?m)^\s*(?:-\s*)?uses:\s*actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
+            "",
+            text,
+        )
+    if rel.as_posix() == "engines/portable-goal/engine.json":
+        text = re.sub(
+            r'(?m)^(\s*"source_commit_sha"\s*:\s*")[0-9a-f]{40}("\s*,?\s*)$',
+            r"\1<immutable-engine-commit>\2", text,
+        )
+        # Only the candidate's source-file Git blob identities qualify.
+        # Validate the manifest's data shape rather than trusting arbitrary
+        # similarly named fields in unrelated files.
+        manifest = json.loads((ROOT / rel).read_text(encoding="utf-8"))
+        permitted = {
+            (path, digest)
+            for candidate in manifest.get("candidates", [])
+            for path, digest in candidate.get("source_git_blob_sha1", {}).items()
+        }
+        for path, digest in permitted:
+            if not re.fullmatch(r"tools/[a-zA-Z0-9_./-]+\.py", path):
+                continue
+            if not re.fullmatch(r"[0-9a-f]{40}", digest):
+                continue
+            pattern = rf'(?m)^(\s*"{re.escape(path)}"\s*:\s*"){digest}("\s*,?\s*)$'
+            text = re.sub(pattern, r"\1<immutable-engine-blob>\2", text)
+    elif rel.as_posix() == "engines/portable-goal/CHANGELOG.md":
+        text = re.sub(
+            r"(?m)^(- Exact baseline Git commit: `)[0-9a-f]{40}(`\.)$",
+            r"\1<immutable-engine-commit>\2", text,
+        )
+    return text
 
 
 def fail(message: str, errors: list[str]) -> None:
@@ -217,31 +277,20 @@ def validate_structure_only(errors: list[str]) -> None:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         rel = path.relative_to(ROOT)
-        if EMAIL_RE.search(text):
+        if any(not synthetic_fixture_email(match.group(), rel)
+               for match in EMAIL_RE.finditer(text)):
             fail(f"possible personal email in public starter: {rel}", errors)
         # The public starter can demonstrate arbitrary project categories,
         # never identify the maintainer's own active product workstreams.
         if (path.suffix.lower() == ".md"
-            and rel.parts[0] in {"docs", "prompts", "protocols"}
+            and (rel.as_posix() == "AGENTS.md"
+                 or rel.parts[0] in {"docs", "prompts", "protocols"})
             and PUBLIC_PROJECT_MARKER_RE.search(text)):
             fail(f"project-specific source name in public documentation: {rel}", errors)
         # Official immutable action pins are supply-chain controls, not
         # project/source identity. Exception is limited to these two CI YAML
         # surfaces and three official actions with semver comments.
-        checked = text
-        if rel.as_posix() in {
-            ".github/workflows/validate-starter.yml",
-            ".github/workflows/publish-version-release.yml",
-            ".github/workflows/publish-v1-3-manual.yml",
-            ".github/workflows/publish-ghcr-package.yml",
-            ".github/workflows/package-v1-3-release-asset.yml",
-            "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
-        }:
-            checked = re.sub(
-                r"(?m)^\s*(?:-\s*)?uses:\s*actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
-                "",
-                checked,
-            )
+        checked = strip_approved_source_pins(text, rel)
         if SHA40_RE.search(checked):
             fail(f"40-char commit-like identifier in structure-only starter: {rel}", errors)
         if PRIVATE_KEY_RE.search(text):
