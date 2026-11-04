@@ -29,6 +29,7 @@ El manual es neutral respecto del modelo de IA. No instala un LLM ni habilita pr
 ## Diferencia entre ediciones
 
 - **Español v1.4:** el manual extenso actual, con ocho capítulos completos y fuentes actualizadas.
+- **Inglés y portugués v1.4:** ediciones completas independientes con fuentes y PDF propios.
 - **Español v1.3:** la edición histórica original, que se mantiene sin sobrescribir ni atribuirle características futuras.
 - **Miniguías v1.4:** ocho textos breves en idiomas diferentes, útiles para comenzar, pero no sustituyen manuales de unas 60 páginas.
 

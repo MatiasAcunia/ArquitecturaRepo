@@ -2,7 +2,7 @@
 
 [Miniguia v1.4](MINI_GUIDE_pt.md) · [FAQ](FAQ_pt.md)
 
-O [manual completo de oito capítulos](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) está disponível **no repositório de origem, somente em espanhol**, como **edição histórica v1.3**; ele não é copiado para a instalação local. Este guia é uma introdução breve à v1.4, não a tradução integral; consulte o [guia de instalação v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) para comandos atuais.
+O [manual completo v1.4 em português, com oito capítulos](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/pt/README.md) está disponível no repositório de origem, com um [PDF de 57 páginas](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Manual_Completo_v1.4_PT.pdf). O [livro espanhol histórico v1.3](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md) continua disponível separadamente. A edição extensa não é copiada para a instalação local v1.4.0, cujo ZIP foi publicado anteriormente. Este guia é uma introdução breve e não substitui o livro; consulte o [guia de instalação v1.4](../46_V1_4_PUBLIC_START_AND_SUPPORT.md) para comandos atuais.
 
 Arquitetura reutilizável, baseada no repositório, para desenvolvimento de software com agentes. Oferece papéis, estado durável, planejamento, recuperação e verificação. Não constrói qualquer aplicativo automaticamente nem substitui decisões do responsável pelo produto.
 
