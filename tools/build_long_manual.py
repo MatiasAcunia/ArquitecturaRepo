@@ -68,6 +68,15 @@ LOCALE_LABELS = {
         "byline": "Documentation vérifiée par rapport aux sources d'ArquitecturaRepo.",
         "contents": "Table des matières", "date": "4 novembre 2026", "version": "VERSION", "footer_date": "NOVEMBRE 2026",
     },
+    "de": {
+        "title": "Vollständiges Benutzerhandbuch", "code": "DEUTSCH", "lang": "de-DE",
+        "chapter": "KAPITEL", "header": "BENUTZERHANDBUCH · v1.4",
+        "eyebrow": "SOFTWAREENTWICKLUNG / BENUTZERHANDBÜCHER",
+        "summary1": "Acht Kapitel: Einführung, Installation, Adoption, Betrieb,",
+        "summary2": "Änderungen, Wiederherstellung, Abnahme und Vereinsbeispiel.",
+        "byline": "An den Quellen des ArquitecturaRepo-Starters geprüfte Anleitung.",
+        "contents": "Inhaltsverzeichnis", "date": "4. November 2026", "version": "VERSION", "footer_date": "NOVEMBER 2026",
+    },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 
