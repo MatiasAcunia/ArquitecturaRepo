@@ -28,7 +28,7 @@ ArquitecturaRepo installiert kein Sprachmodell, führt keine eigenmächtigen kos
 
 ## Andere Ausgaben
 
-- Englisch, Spanisch, Portugiesisch und Französisch v1.4: ausführliche achtteilige Handbücher mit eigenständigen PDF-Ausgaben.
+- Sieben weitere Sprachen v1.4: eigenständige vollständige Handbücher mit PDF. Das [zentrale Editionsverzeichnis](../../../../README.md) verlinkt alle acht Ausgaben an einer Stelle.
 - Spanisch v1.3: historisches Original, getrennt aufbewahrt und nicht rückwirkend umgeschrieben.
 - Acht v1.4-Kurzleitfäden und FAQs: knappe Einführungen in allen unterstützten Sprachen; **keine** Ersatzübersetzungen des vollständigen Buches.
 

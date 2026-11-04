@@ -29,7 +29,7 @@ Le framework est indépendant d'un fournisseur d'IA. Ce manuel n'installe pas d'
 ## Éditions et portée
 
 - **Français v1.4 :** ces huit chapitres détaillés et leur PDF.
-- **Anglais, espagnol et portugais v1.4 :** autres livres complets, avec leurs propres sources et PDF.
+- **Sept autres langues v1.4 :** éditions longues indépendantes, avec leurs propres sources et PDF. L'[index canonique](../../../../README.md) référence les huit éditions sans recopier une liste susceptible de devenir obsolète.
 - **Espagnol v1.3 :** édition historique conservée, sans réécriture rétroactive.
 - **Miniguides v1.4 :** huit résumés pratiques distincts, disponibles dans les langues de l'installateur.
 
