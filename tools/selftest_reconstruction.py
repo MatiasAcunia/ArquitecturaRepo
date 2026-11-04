@@ -97,6 +97,13 @@ def main() -> int:
             raise AssertionError("fresh scaffold reconstruction claimed verified currentness")
         if not fresh_state["currentness"]["unresolved"]:
             raise AssertionError("fresh scaffold reconstruction lost unresolved currentness")
+        source = fresh_state["git_currentness"]
+        if source["code_ref_relation"] != "NO_GIT_REPOSITORY":
+            raise AssertionError("non-Git scaffold must not invent a repository HEAD")
+        if fresh_state["continuation_preflight"]["local_source_reconciled"]:
+            raise AssertionError("non-Git scaffold incorrectly passed source preflight")
+        if fresh_state["continuation_preflight"]["remote_source_verified"]:
+            raise AssertionError("reconstruction must not infer live remote freshness")
         owner_concerns = {
             item["concern_id"] for item in fresh_state["current_owners"]
         }
@@ -130,6 +137,10 @@ def main() -> int:
             raise AssertionError("active campaign id not reconstructed")
         if active["execution_authority"]["status"] != "ACTIVE":
             raise AssertionError("active execution authority not reconstructed")
+        if active["continuation_preflight"]["remote_source_verified"]:
+            raise AssertionError("legacy ACTIVE authority cannot certify live remote freshness")
+        if active["continuation_preflight"]["effective_posture"] != "CURRENTNESS_RECONCILIATION_REQUIRED":
+            raise AssertionError("symbolic legacy source must hold effective execution")
 
         terminal = must_reconstruct(
             ROOT / "examples" / "terminal_candidate",
@@ -206,6 +217,7 @@ def main() -> int:
     print("- terminal candidate reconstructs STRATEGIC_RETURN_BOUNDARY")
     print("- duplicate owner fails before reconstruction")
     print("- pending transaction fails before reconstruction")
+    print("- non-Git source remains explicitly unverified")
     return 0
 
 

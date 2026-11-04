@@ -22,7 +22,7 @@ CLIENT 负责产品决策和敏感操作授权；I2 负责战略和验收；I3 �
 
 ## 安全与版本
 
-稳定版本为 1.1.0。1.2 仍处于候选阶段：Codex Desktop Goal、Gemini、外部操作及多项目任务需要真实环境验证。CI 通过不等于产品验收。
+当前源码版本为 1.4.0。**只有在不可变的 [v1.4.0 GitHub Release](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) 及经过验证的 ZIP 和校验文件实际存在时，才能视为已发布**。此前发布的 v1.3.0 仍可使用。新项目或尚未建立治理状态的项目请参考 [v1.4 首次安装指南](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)；已有治理状态的项目须先进行 [只读检查](../32_EXISTING_GOVERNED_ATTACHMENT.md)，不能自动覆盖原有状态。便携式 CI 不能单独证明 Codex Desktop 原生执行、外部 AI 服务或真实外部操作已经通过验收。
 
 ## 语言
 

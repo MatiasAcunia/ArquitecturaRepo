@@ -1,10 +1,12 @@
 # Documentation index — ArquitecturaRepo
 
-This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. The latest release is v1.2.0; v1.3 M0–M6 remain engineering/QA work, and M7 is later optional package/plugin absorption.
+This index separates the **public installable product** from **maintainer engineering and historical evidence**. File visibility on GitHub is public; a file is not private merely because a heading says "maintainer-only". Only explicitly published, source-verified capabilities are supported. Version 1.4.0 is available as a release only when its [immutable GitHub tag and assets](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) actually exist. Untagged branches remain candidates; v1.3.0 stays an immutable previous release.
 
 ## Start here — ordinary adopter
 
 - [README](../README.md): product, capabilities, quick start, profiles and status.
+- [v1.4.0 first-user guide and actual support matrix](46_V1_4_PUBLIC_START_AND_SUPPORT.md): executable installation, published-artifact identity, honest limits, privacy and recovery.
+- [v1.4.0 release notes and upgrade boundaries](47_V1_4_RELEASE_NOTES_AND_UPGRADE.md): versioned capabilities, published package verification and deliberate non-upgrade of existing governed state.
 - [Installation instructions](../prompts/INSTALL_THIS_SDLC.md): adapt a new or existing project with safe discovery.
 - [Spanish FAQ](FAQ_ES.md) and [language translations](i18n/README_en.md).
 - [Architecture overview](00_ARCHITECTURE_OVERVIEW.md), [minimum profile](05_MINIMUM_VIABLE_PROFILE.md), [scaling profiles](06_SCALING_PROFILES.md), [project modes](27_PROJECT_MODES_AND_STACK_SELECTION.md).
@@ -25,8 +27,9 @@ The numbered docs 01–20 cover bootstrap, mechanisms, failure modes, reference 
 ## Contributor / maintainer engineering — NOT adopter prerequisites
 
 - [v1.2 security audit](25_V1_2_SECURITY_HARDENING_AUDIT.md), [Windows physical acceptance scenario](26_L3_WINDOWS_PHYSICAL_ACCEPTANCE.md), [longitudinal fixture protocol](28_LONGITUDINAL_L3_TEST_PROTOCOL.md), [existing-governance transfer pilot](29_EXISTING_REPOSITORY_TRANSFER_PILOT.md).
-- [Current v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
-- [v1.3 portable support and release limits (engineering candidate)](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md): local governance controls, optional host dependencies and unreleased capability matrix.
+- [Historical v1.3 QA scope](38_V1_3_PRODUCT_QUALITY_AND_END_TO_END_PLAN.md), [research review](39_V1_3_AGENT_FRAMEWORKS_AND_AGENTIC_SDLC_RESEARCH_TRANSFER.md), [architecture design](40_V1_3_TARGET_SOFTWARE_ARCHITECTURE_AND_TPP_ENGINEERING.md), [M0–M6 milestones and gates](41_V1_3_EXECUTION_ROUTE_ACCEPTANCE_AND_MILESTONES.md).
+- The historical v1.3 route also mentioned **M7** as optional subsequent package/plugin absorption. It is not a prerequisite for first-time adoption, a claim of completed support, or an E4 authorization.
+- [Historical v1.3 portable support/release qualification](42_V1_3_PORTABLE_SUPPORT_AND_RELEASE_GATES.md) and [published v1.3.0 release notes](43_V1_3_RELEASE_NOTES_AND_UPGRADE.md). Historical candidate status does not supersede its subsequent release.
 
 These are auditable design and QA inputs, not additional installation contracts, external-platform guarantees, private-controller dependencies or instructions for users to run personal pilot Goals. Any resumed engineering must remain within its existing authorized campaign and receive independent terminal review.
 

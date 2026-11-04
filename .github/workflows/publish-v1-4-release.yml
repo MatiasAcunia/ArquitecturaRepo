@@ -1,0 +1,211 @@
+name: Publish approved v1.4.0 portable release and GHCR
+
+on:
+  workflow_run:
+    workflows: ["validate-starter"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arquitecturarepo-v1-4-0-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish exact v1.4.0 tag, public ZIP and checksum
+    if: >-
+      github.repository == 'MatiasAcunia/ArquitecturaRepo' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Enforce source, CLIENT authorization, version and current main
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
+          test "$(tr -d '\r\n' < VERSION)" = "1.4.0"
+          git diff --quiet
+          git diff --cached --quiet
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("state/STARTER_MANIFEST.json").read_text())
+          d=json.loads(Path("state/V1_4_RELEASE_SCOPE_DECISION.json").read_text())
+          assert m["version"] == "1.4.0" and m["status"] == "PUBLIC_STARTER_STABLE"
+          assert d["version"] == "1.4.0"
+          assert d["decision"] == "AUTHORIZE_E6_INTEGRATION_AND_PUBLIC_RELEASE"
+          assert d["historical_git_privacy_certification"] is False
+          assert d["native_codex_desktop_acceptance"] is False
+          PY
+          test -n "$(git ls-remote origin refs/tags/v1.3.0 | cut -f1)"
+      - name: Verify successful Linux and Windows checks for the exact source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GH_REPO/commits/$EXPECTED_SHA/check-runs?per_page=100" --jq '.check_runs | map(select(.conclusion == "success")) | map(.name)' > "$RUNNER_TEMP/verified-checks.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          names = set(json.loads((Path(os.environ["RUNNER_TEMP"]) / "verified-checks.json").read_text()))
+          required = {"validate", "Windows portable-core smoke (not Codex Desktop acceptance)"}
+          assert required <= names, f"exact main-SHA cross-OS checks absent: {names}"
+          PY
+      - name: Independently verify source, contracts and public privacy boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -r requirements-validation.txt
+          python tools/validate_structure.py
+          python tools/verify_v1_release.py
+          python tools/selftest_structure_policy.py
+          python tools/selftest_v13_release_contract.py
+          python tools/selftest_v14_release_contract.py
+          python tools/selftest_v14_public_readiness.py
+      - name: Build public ZIP, checksum and exact Git-blob receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/package_v14_release.py --build --directory dist
+      - name: Publish immutable release without overwriting existing assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
+          tag=v1.4.0
+          prior="$(git ls-remote origin "refs/tags/$tag" | cut -f1)"
+          if [ -n "$prior" ]; then
+            test "$prior" = "$EXPECTED_SHA" || { echo "IMMUTABLE_TAG_CONFLICT"; exit 1; }
+            if ! gh release view "$tag" --repo "$GH_REPO" >/dev/null 2>&1; then
+              gh release create "$tag" --repo "$GH_REPO" --target "$EXPECTED_SHA" --title "ArquitecturaRepo v1.4.0" --notes-file docs/47_V1_4_RELEASE_NOTES_AND_UPGRADE.md --verify-tag=false
+            fi
+          else
+            gh release create "$tag" --repo "$GH_REPO" --target "$EXPECTED_SHA" --title "ArquitecturaRepo v1.4.0" --notes-file docs/47_V1_4_RELEASE_NOTES_AND_UPGRADE.md --verify-tag=false
+          fi
+          assets="$(gh release view "$tag" --repo "$GH_REPO" --json assets --jq '.assets[].name')"
+          for file in dist/ArquitecturaRepo-v1.4.0-portable.zip dist/ArquitecturaRepo-v1.4.0-portable.zip.sha256 dist/ArquitecturaRepo-v1.4.0-release-manifest.json; do
+            name="$(basename "$file")"
+            if ! printf '%s\n' "$assets" | grep -Fqx "$name"; then
+              gh release upload "$tag" "$file" --repo "$GH_REPO"
+            fi
+          done
+      - name: Download published assets, verify exact bytes and anonymous ZIP access
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v14-release-readback"
+          gh release download v1.4.0 --repo "$GH_REPO" --pattern 'ArquitecturaRepo-v1.4.0-*' --dir "$RUNNER_TEMP/v14-release-readback"
+          python tools/package_v14_release.py --verify --directory "$RUNNER_TEMP/v14-release-readback"
+          cmp dist/ArquitecturaRepo-v1.4.0-portable.zip "$RUNNER_TEMP/v14-release-readback/ArquitecturaRepo-v1.4.0-portable.zip"
+          curl --fail --location --silent --show-error --retry 3 \
+            "https://github.com/$GH_REPO/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip" \
+            --output "$RUNNER_TEMP/v14-anonymous-public.zip"
+          cmp dist/ArquitecturaRepo-v1.4.0-portable.zip "$RUNNER_TEMP/v14-anonymous-public.zip"
+          echo "Public downloadable source verified against exact committed Git blobs."
+
+  package:
+    name: Publish and test v1.4.0 GHCR installer from public ZIP only
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Download exact public ZIP and inspect source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin refs/tags/v1.4.0 | cut -f1)" = "$EXPECTED_SHA"
+          python -m pip install --disable-pip-version-check -r requirements-validation.txt
+          mkdir -p "$RUNNER_TEMP/v14-public-source"
+          gh release download v1.4.0 --repo "$GH_REPO" --pattern 'ArquitecturaRepo-v1.4.0-*' --dir "$RUNNER_TEMP/v14-public-source"
+          python tools/package_v14_release.py --verify --directory "$RUNNER_TEMP/v14-public-source"
+          mkdir -p "$RUNNER_TEMP/v14-image-context"
+          unzip -q "$RUNNER_TEMP/v14-public-source/ArquitecturaRepo-v1.4.0-portable.zip" -d "$RUNNER_TEMP/v14-image-context"
+          source_root="$RUNNER_TEMP/v14-image-context/ArquitecturaRepo-v1.4.0"
+          test -f "$source_root/VERSION"
+          test ! -e "$source_root/.git"
+          test ! -e "$source_root/docs/30_"
+          test ! -e "$source_root/private"
+          echo "SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+      - name: Build image, verify no Git history, exercise real mounted installation
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          image="ghcr.io/$owner/arquitecturarepo:1.4.0"
+          docker build --pull \
+            --label "org.opencontainers.image.revision=$EXPECTED_SHA" \
+            -f packaging/v1_4/Dockerfile \
+            -t "$image" "$SOURCE_ROOT"
+          test "$(docker inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}')" = "$EXPECTED_SHA"
+          docker run --rm --entrypoint sh "$image" -c 'test ! -e /opt/architecturarepo/.git && test ! -e /opt/architecturarepo/private && test ! -e /opt/architecturarepo/docs/30_'
+          docker run --rm "$image" --help >/dev/null
+          mkdir -p "$RUNNER_TEMP/v14-mounted-user-project"
+          docker run --rm -v "$RUNNER_TEMP/v14-mounted-user-project:/workspace" "$image" \
+            --target /workspace/demo --profile SMALL --product-id "V14_RELEASE_DEMO" --language es --no-feedback-workflow
+          test -f "$RUNNER_TEMP/v14-mounted-user-project/demo/.agentic-sdlc/state/PRODUCT_STATE_CURRENT.json"
+          echo "IMAGE=$image" >> "$GITHUB_ENV"
+      - name: Publish versioned image and verify registry manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE"
+          docker manifest inspect "$IMAGE" >/dev/null
+      - name: Confirm genuinely anonymous GHCR pull
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker logout ghcr.io
+          docker image rm "$IMAGE"
+          docker pull "$IMAGE"
+          docker run --rm "$IMAGE" --help >/dev/null
+          echo "Public container pull and execution verified without GHCR credentials."

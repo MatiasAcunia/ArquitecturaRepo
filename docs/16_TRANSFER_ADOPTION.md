@@ -1,11 +1,16 @@
 # Transfer and Adoption Workflow
 
-Version 0.8 turns starter installation into a reproducible, fail-closed workflow for unrelated projects.
+The starter supports a reproducible, fail-closed workflow for a brand-new project
+or an existing application **without an established canonical Product State**.
+Already-governed projects must use the separate
+[read-only existing-governance attachment](32_EXISTING_GOVERNED_ATTACHMENT.md);
+installing another control layer would create competing authority. Existing
+v1.2/v1.3 governance is not an implicit in-place upgrade target.
 
 The workflow is:
 
 ```text
-existing project
+empty or existing ungoverned project
     ->
 fail-closed scaffold
     ->
@@ -35,7 +40,8 @@ python tools/scaffold_project.py \
   --target "../project" \
   --profile SMALL \
   --product-id PROJECT_ALPHA \
-  --objective "Initial product objective"
+  --objective "Initial product objective" \
+  --no-feedback-workflow
 ```
 
 The control layer starts:
@@ -46,6 +52,14 @@ The control layer starts:
 - no external authority.
 
 The existing application is not rewritten.
+
+The optional `--no-feedback-workflow` flag prevents installing a scheduled
+feedback workflow. The local metadata exporter remains configured; change
+`feedback/ARCHITECTURE_FEEDBACK_CONFIG.json` `enabled` to `false` to disable
+all reports. No external collector is preconfigured. From the target project
+root, the generated README provides the concrete status, inventory and
+reconstruction commands. The initial `HOLD / UNTRUSTED_CONTEXT` is expected,
+not a failed install or permission to execute a campaign.
 
 ## 2. Read-only project discovery
 
@@ -141,7 +155,7 @@ Before touching canonical current state, the tool:
 
 A candidate that does not validate never reaches canonical state.
 
-If a project already has a matching external Product State, this adoption path fails closed. The scaffold remains `UNTRUSTED_CONTEXT`; it does not claim to attach to that state. Supporting an existing canonical Product State without a second owner requires a separate attachment protocol.
+If a project already has a matching external Product State, this adoption path fails closed. The scaffold remains `UNTRUSTED_CONTEXT`; it does not claim to attach to that state. Use the [existing-governance read-only attachment protocol](32_EXISTING_GOVERNED_ATTACHMENT.md) and reconcile its source and ownership without creating a second Product State.
 
 ## 5. Journaled promotion
 

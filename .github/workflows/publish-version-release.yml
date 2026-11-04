@@ -41,6 +41,11 @@ jobs:
               echo "skip=true" >> "$GITHUB_OUTPUT"
               exit 0
               ;;
+            1.4.0)
+              echo "v1.4.0 is handled only by the exact-source v1.4 release workflow"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
             *) echo "Version $version is not approved for this release workflow"; exit 1 ;;
           esac
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"

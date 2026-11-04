@@ -73,8 +73,13 @@ def main() -> int:
               "FAQ coverage parity broken: " + code)
         check("enabled=false" in readme_text + faq_text, "feedback opt-out missing: " + code)
         check("--language" in readme_text + faq_text, "language option missing: " + code)
-        check("1.1.0" in faq_text and "1.2" in faq_text,
-              "release gates not explained: " + code)
+        for label, content in (("readme", readme_text), ("faq", faq_text)):
+            check("1.4.0" in content and "v1.3.0" in content,
+                  f"published/source version lineage missing in {code} {label}")
+            check("https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0" in content,
+                  f"canonical release URL missing in {code} {label}")
+            check("1.1.0" not in content,
+                  f"stale v1.1 stable-release claim in {code} {label}")
 
     with tempfile.TemporaryDirectory(prefix="agentic-i18n-") as tmp:
         root = Path(tmp)

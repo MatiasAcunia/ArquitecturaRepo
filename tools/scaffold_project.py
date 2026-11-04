@@ -154,76 +154,41 @@ def _populate_staging_project(
     for schema_path in sorted((ROOT / "schemas").glob("*.schema.json")):
         copy_file(schema_path, control / "schemas" / schema_path.name)
 
-    copy_file(
-        ROOT / "prompts" / "FRESH_CONTEXT_PROBE.md",
-        control / "prompts" / "FRESH_CONTEXT_PROBE.md",
+    # One explicit, profile-independent payload. Adding a core dependency
+    # requires listing it here; provider/runtime tools remain strictly opt-in.
+    core_files = (
+        "prompts/FRESH_CONTEXT_PROBE.md",
+        "templates/CAMPAIGN_CHARTER.md",
+        "templates/CAMPAIGN_CHECKPOINT.md",
+        "templates/CAMPAIGN_TERMINAL.md",
+        "templates/WORKSPACE_LIFECYCLE.json",
+        "requirements-validation.txt",
+        "migrations/registry.json",
+        "tools/validate_project.py",
+        "tools/migrate_state.py",
+        "tools/reconstruct_context.py",
+        "tools/git_currentness.py",
+        "tools/state_tx.py",
+        "tools/discover_project.py",
+        "tools/apply_adoption.py",
+        "tools/baseline_guard.py",
+        "tools/project_status.py",
+        "tools/architecture_feedback.py",
+        "tools/feedback_submit.py",
+        "tools/i18n.py",
+        "tools/project_setup.py",
+        "tools/branch_guard.py",
+        "tools/theory_guard.py",
+        "tools/sqlite_currentness.py",
+        "tools/existing_repo_attachment.py",
+        "tools/artifact_ledger.py",
+        "tools/repo_delta.py",
+        "tools/commit_guard.py",
+        "tools/workspace_gc.py",
     )
-    copy_file(
-        ROOT / "templates" / "CAMPAIGN_CHARTER.md",
-        control / "templates" / "CAMPAIGN_CHARTER.md",
-    )
-    copy_file(
-        ROOT / "templates" / "CAMPAIGN_CHECKPOINT.md",
-        control / "templates" / "CAMPAIGN_CHECKPOINT.md",
-    )
-    copy_file(
-        ROOT / "templates" / "CAMPAIGN_TERMINAL.md",
-        control / "templates" / "CAMPAIGN_TERMINAL.md",
-    )
-    copy_file(
-        ROOT / "tools" / "validate_project.py",
-        control / "tools" / "validate_project.py",
-    )
-    copy_file(
-        ROOT / "requirements-validation.txt",
-        control / "requirements-validation.txt",
-    )
-    copy_file(
-        ROOT / "tools" / "migrate_state.py",
-        control / "tools" / "migrate_state.py",
-    )
-    copy_file(
-        ROOT / "tools" / "reconstruct_context.py",
-        control / "tools" / "reconstruct_context.py",
-    )
-    copy_file(
-        ROOT / "tools" / "state_tx.py",
-        control / "tools" / "state_tx.py",
-    )
-    copy_file(
-        ROOT / "tools" / "discover_project.py",
-        control / "tools" / "discover_project.py",
-    )
-    copy_file(
-        ROOT / "tools" / "apply_adoption.py",
-        control / "tools" / "apply_adoption.py",
-    )
-    copy_file(
-        ROOT / "tools" / "baseline_guard.py",
-        control / "tools" / "baseline_guard.py",
-    )
-    copy_file(
-        ROOT / "tools" / "project_status.py",
-        control / "tools" / "project_status.py",
-    )
-    copy_file(
-        ROOT / "tools" / "architecture_feedback.py",
-        control / "tools" / "architecture_feedback.py",
-    )
-    copy_file(ROOT / "tools" / "feedback_submit.py", control / "tools" / "feedback_submit.py")
-    copy_file(ROOT / "tools" / "i18n.py", control / "tools" / "i18n.py")
-    copy_file(ROOT / "tools" / "project_setup.py", control / "tools" / "project_setup.py")
-    copy_file(ROOT / "tools" / "branch_guard.py", control / "tools" / "branch_guard.py")
-    copy_file(ROOT / "tools" / "theory_guard.py", control / "tools" / "theory_guard.py")
-    copy_file(ROOT / "tools" / "sqlite_currentness.py", control / "tools" / "sqlite_currentness.py")
-    copy_file(ROOT / "tools" / "existing_repo_attachment.py", control / "tools" / "existing_repo_attachment.py")
-    copy_file(ROOT / "tools" / "artifact_ledger.py", control / "tools" / "artifact_ledger.py")
-    copy_file(ROOT / "tools" / "engineering_packet.py", control / "tools" / "engineering_packet.py")
-    copy_file(ROOT / "tools" / "engine_registry.py", control / "tools" / "engine_registry.py")
-    copy_file(ROOT / "tools" / "gemini_keyfile.py", control / "tools" / "gemini_keyfile.py")
-    # Copies are capabilities, not paid-provider opt-in or installed host authority.
-    copy_file(ROOT / "tools" / "cognitive_i4.py", control / "tools" / "cognitive_i4.py")
-    copy_file(ROOT / "tools" / "cognitive_ledger.py", control / "tools" / "cognitive_ledger.py")
+    for relative_path in core_files:
+        copy_file(ROOT / relative_path, control / relative_path)
+
     copy_file(ROOT / ".agents" / "skills" / "cleangarbage" / "SKILL.md", control / "skills" / "cleangarbage" / "SKILL.md")
     copy_file(ROOT / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md", control / "docs" / "27_PROJECT_MODES_AND_STACK_SELECTION.md")
     copy_file(ROOT / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md", control / "docs" / "34_FILE_ARTIFACT_INVENTORY_AND_GC.md")
@@ -263,27 +228,16 @@ def _populate_staging_project(
         ROOT / "templates" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
         control / "feedback" / "ARCHITECTURE_FEEDBACK_CONFIG.json",
     )
-    for portable_tool in ("repo_delta.py", "commit_guard.py", "workspace_gc.py"):
-        copy_file(
-            ROOT / "tools" / portable_tool,
-            control / "tools" / portable_tool,
-        )
-    copy_file(
-        ROOT / "templates" / "WORKSPACE_LIFECYCLE.json",
-        control / "templates" / "WORKSPACE_LIFECYCLE.json",
-    )
-    copy_file(
-        ROOT / "migrations" / "registry.json",
-        control / "migrations" / "registry.json",
-    )
     if with_runtime:
-        copy_file(
-            ROOT / "tools" / "campaignctl.py",
-            control / "tools" / "campaignctl.py",
-        )
-        for tool in ("goal_guard.py", "goal_plan.py", "external_effects.py", "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py", "evidence_decision.py", "host_dispatch.py", "tool_port.py", "candidate_manifest.py"):
+        # Optional source-engineering and provider adapters must never appear
+        # in a no-runtime SMALL (or any other no-runtime) installation.
+        # Their presence is not authorization to use a paid/native host.
+        for tool in ("campaignctl.py", "goal_guard.py", "goal_plan.py", "external_effects.py",
+                     "cognitive_i4.py", "cognitive_ledger.py", "fenced_mutator.py",
+                     "evidence_decision.py", "host_dispatch.py", "tool_port.py",
+                     "candidate_manifest.py", "engineering_packet.py",
+                     "engine_registry.py", "gemini_keyfile.py"):
             copy_file(ROOT / "tools" / tool, control / "tools" / tool)
-    if with_runtime:
         for filename in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",
                          "CODEX_DAILY_CONTROL_ADAPTER_CONFIG.json"):
             copy_file(ROOT / "templates" / filename, control / "templates" / filename)
@@ -1007,19 +961,35 @@ Generated from Agentic SDLC starter {version}.
 - product/workstream: {product_id}
 - initial state: HOLD / UNTRUSTED_CONTEXT
 
-Next action: read-only discovery -> currentness reconstruction -> product discovery -> CLIENT requirements confirmation -> technical baseline -> dated delivery plan -> baseline guard.
+Next action: read-only discovery -> currentness reconstruction -> product discovery -> CLIENT requirements confirmation -> technical baseline -> dated delivery plan -> baseline guard. The initial HOLD / UNTRUSTED_CONTEXT is expected; this installation alone grants no campaign authority.
 
 Install the validation dependency:
 
 ```bash
-python -m pip install -r {control_dir_name}/requirements-validation.txt
+python -m pip install -r "{control_dir_name}/requirements-validation.txt"
 ```
 
-Validate this control layer with its copied validator:
+Validate this control layer with its copied validator (`--root` is relative
+to the validator's installed control-layer directory, not your shell's cwd):
 
 ```bash
-python {control_dir_name}/tools/validate_project.py --root .
+python "{control_dir_name}/tools/validate_project.py" --root "."
 ```
+
+First read-only checks, from the project root:
+
+```bash
+python "{control_dir_name}/tools/project_status.py" --control-root "{control_dir_name}"
+python "{control_dir_name}/tools/discover_project.py" --project-root "."
+python "{control_dir_name}/tools/reconstruct_context.py" --root "{control_dir_name}"
+```
+
+An existing ungoverned application's code and workflows remain user-owned. If
+the repository already has a canonical Product State or another control layer,
+stop and use the documented read-only existing-governance attachment instead of
+installing another one. Do not treat an existing v1.2/v1.3 installation as an
+automatically supported in-place upgrade. Confirm the real source, adoption
+boundary and CLIENT requirements before authorizing execution.
 
 ## Operating dimensions
 
@@ -1036,10 +1006,14 @@ python {control_dir_name}/tools/validate_project.py --root .
 The persistent local runtime/ARTIFACT_LIFECYCLE_CURRENT.json records owned
 scratch outputs with owner, campaign, category, hash, retention and delete
 permission. It is NOT a global DB or a second Product State.
-Use python {control_dir_name}/tools/artifact_ledger.py --project .
---control-dir {control_dir_name} init-root --root
-.agentic-sdlc-scratch/campaign --owner I3 --campaign CAMPAIGN to claim a fresh
-output root, then route generators via capture. Reconcile after interruption.
+To claim a fresh output root after an authorized campaign, run:
+
+```bash
+python "{control_dir_name}/tools/artifact_ledger.py" --project "." --control-dir "{control_dir_name}" init-root --root ".agentic-sdlc-scratch/campaign" --owner "I3" --campaign "CAMPAIGN"
+```
+
+Replace the example campaign identity with the authorized one, route generators
+via capture, and reconcile after interruption.
 The gc command is read-only by default; gc --execute only removes exact,
 expired, ignored, owned rebuildables/temporaries, never unknown/DB/source.
 Unwrapped IDE/host writes still need real host integration and Git review.
@@ -1291,7 +1265,12 @@ def main() -> int:
 
     print(f"SCAFFOLD CREATED: {control}")
     print("STATUS: HOLD / UNTRUSTED_CONTEXT")
-    print("NEXT: read-only discovery -> currentness reconstruction -> fresh-context probe")
+    print("NEXT (read-only; these do not authorize execution):")
+    print(f'  python "{control / "tools" / "project_status.py"}" --control-root "{control}"')
+    print(f'  python "{control / "tools" / "discover_project.py"}" --project-root "{Path(args.target).absolute()}"')
+    print(f'  python "{control / "tools" / "reconstruct_context.py"}" --root "{control}"')
+    print("The initial UNTRUSTED_CONTEXT is expected. Establish an explicit product baseline/adoption before engineering execution.")
+    print("If this project already has canonical Product State, stop: use read-only existing-governance attachment, never a second scaffold.")
     workflow = Path(args.target).absolute() / ".github" / "workflows" / "agentic-sdlc-feedback.yml"
     scheduler = "EXISTING_PRESERVED" if args.no_feedback_workflow and workflow.exists() else (
         "DISABLED_BY_INSTALL_OPTION" if args.no_feedback_workflow else (

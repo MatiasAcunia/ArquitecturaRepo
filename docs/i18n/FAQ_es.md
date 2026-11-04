@@ -48,7 +48,7 @@ Usá --language auto|en|es|pt|fr|de|it|ja|zh; la documentación local sigue el i
 
 ### 12. ¿Qué está probado y cómo reporto errores?
 
-1.1.0 es estable; v1.2 sigue siendo una candidata hasta pasar pruebas físicas independientes. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
+El código está en 1.4.0, pero solo cuenta como release cuando se publican y verifican el [tag inmutable v1.4.0, el ZIP y su checksum](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0); v1.3.0 sigue disponible. Las pruebas portátiles en Linux/Windows no certifican hosts de agentes nativos ni usabilidad de terceros. Abrí un Issue con pasos reproducibles y logs sin secretos. El código original usa MIT; los derechos de terceros se evalúan aparte.
 
 ### 13. ¿Puedo combinar modos asíncrono, mixto, equipos y tareas de IA sin programación?
 

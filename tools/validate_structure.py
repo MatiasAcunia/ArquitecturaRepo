@@ -106,6 +106,7 @@ REQUIRED_PATHS = [
     "docs/18_RELEASE_CANDIDATE_HARDENING.md",
     "docs/19_V1_RELEASE.md",
     "docs/20_REPOSITORY_EFFICIENCY_AND_LOCAL_HYGIENE.md",
+    "docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md",
     "examples/minimal/PRODUCT_STATE_CURRENT.json",
     "examples/active_campaign/PRODUCT_STATE_CURRENT.json",
     "examples/terminal_candidate/PRODUCT_STATE_CURRENT.json",
@@ -116,6 +117,13 @@ REQUIRED_PATHS = [
     "tools/selftest_adoption.py",
     "tools/selftest_contracts.py",
     "tools/selftest_hardening.py",
+    "tools/selftest_v14_public_readiness.py",
+    "tools/package_v14_release.py",
+    "tools/selftest_v14_release_contract.py",
+    "docs/47_V1_4_RELEASE_NOTES_AND_UPGRADE.md",
+    "state/V1_4_RELEASE_SCOPE_DECISION.json",
+    ".github/workflows/publish-v1-4-release.yml",
+    "packaging/v1_4/Dockerfile",
     "tools/repo_delta.py",
     "tools/commit_guard.py",
     "tools/workspace_gc.py",
@@ -139,16 +147,109 @@ TOKEN_HINT_RE = re.compile(
     r"(?i)(?:api[_-]?key|secret|access[_-]?token|bearer)\s*[:=]\s*['\"][A-Za-z0-9_\-]{12,}"
 )
 MD_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
-PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|MatiasAcunia)\b|TRO/RED")
+PUBLIC_PROJECT_MARKER_RE = re.compile(r"\b(?:ROBLOX|MUSIC|CTR5|G007|G010|MatiasAcunia)\b|TRO/RED")
+SYNTHETIC_EMAIL_SUFFIXES = (".test", ".invalid")
+PUBLIC_REPOSITORY_LINKS = (
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.3.0",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.3.0/ArquitecturaRepo-v1.3.0-portable.zip",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/actions/workflows/publish-ghcr-package.yml",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/download/v1.4.0/ArquitecturaRepo-v1.4.0-portable.zip",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/46_V1_4_PUBLIC_START_AND_SUPPORT.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/32_EXISTING_GOVERNED_ATTACHMENT.md",
+    "https://github.com/MatiasAcunia/ArquitecturaRepo/blob/v1.4.0/docs/22_PRIVACY_PRESERVING_ARCHITECTURE_FEEDBACK.md",
+)
+PUBLIC_REPOSITORY_LINK_RE = re.compile(
+    "(?:" + "|".join(re.escape(link) for link in PUBLIC_REPOSITORY_LINKS) + r")(?![A-Za-z0-9_./-])"
+)
+
+
+def synthetic_fixture_email(email: str, rel: Path) -> bool:
+    """Reserved-TLD addresses are safe only in synthetic test source files."""
+    return (
+        len(rel.parts) == 2
+        and rel.parts[0] == "tools"
+        and rel.name.startswith(("test_", "selftest_"))
+        and rel.suffix == ".py"
+        and email.lower().endswith(SYNTHETIC_EMAIL_SUFFIXES)
+    )
+
+
+def strip_approved_source_pins(text: str, rel: Path) -> str:
+    """Mask only first-party immutable engine history and pinned official actions.
+
+    These source receipts are not project data. Other 40-hex values still fail,
+    even in the same files. Engine pin integrity is checked by engine_registry.
+    """
+    if rel.as_posix() in {
+        ".github/workflows/validate-starter.yml",
+        ".github/workflows/publish-version-release.yml",
+        ".github/workflows/publish-v1-3-manual.yml",
+        ".github/workflows/publish-ghcr-package.yml",
+        ".github/workflows/package-v1-3-release-asset.yml",
+        ".github/workflows/publish-v1-4-release.yml",
+        "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
+    }:
+        text = re.sub(
+            r"(?m)^\s*(?:-\s*)?uses:\s*actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
+            "",
+            text,
+        )
+    if rel.as_posix() == "engines/portable-goal/engine.json":
+        # Work on the parsed candidate fields, never generic JSON key names.
+        # Malformed JSON remains visible to the independent JSON parser and
+        # privacy scanner; it must not crash source-structure validation.
+        try:
+            manifest = json.loads(text)
+        except json.JSONDecodeError:
+            return text
+        if not isinstance(manifest, dict):
+            return text
+        candidates = manifest.get("candidates", [])
+        if not isinstance(candidates, list):
+            return text
+        for candidate in candidates:
+            if not isinstance(candidate, dict):
+                continue
+            commit = candidate.get("source_commit_sha")
+            if isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit):
+                candidate["source_commit_sha"] = "<immutable-engine-commit>"
+            blobs = candidate.get("source_git_blob_sha1")
+            if not isinstance(blobs, dict):
+                continue
+            for path, digest in blobs.items():
+                if (isinstance(path, str)
+                    and re.fullmatch(r"tools/[a-zA-Z0-9_./-]+\.py", path)
+                    and ".." not in Path(path).parts
+                    and isinstance(digest, str)
+                    and re.fullmatch(r"[0-9a-f]{40}", digest)):
+                    blobs[path] = "<immutable-engine-blob>"
+        text = json.dumps(manifest, ensure_ascii=False)
+    elif rel.as_posix() == "engines/portable-goal/CHANGELOG.md":
+        text = re.sub(
+            r"(?m)^(- Exact baseline Git commit: `)[0-9a-f]{40}(`\.)$",
+            r"\1<immutable-engine-commit>\2", text,
+        )
+    return text
 
 
 def fail(message: str, errors: list[str]) -> None:
     errors.append(message)
 
 
+def is_generated_or_vcs_path(path: Path) -> bool:
+    """Release artifacts are checked by their dedicated byte-bound verifier.
+
+    Never treat ignored dist/build caches as public source policy just because
+    an operator has already run the package generator in this checkout.
+    """
+    relative = path.relative_to(ROOT)
+    return ".git" in relative.parts or (bool(relative.parts) and relative.parts[0] in {"dist", "build"})
+
+
 def parse_json_files(errors: list[str]) -> None:
     for path in ROOT.rglob("*.json"):
-        if ".git" in path.parts:
+        if is_generated_or_vcs_path(path):
             continue
         try:
             json.loads(path.read_text(encoding="utf-8"))
@@ -211,37 +312,35 @@ def validate_required_paths(errors: list[str]) -> None:
 def validate_structure_only(errors: list[str]) -> None:
     text_suffixes = {".md", ".json", ".py", ".yml", ".yaml", ".txt"}
     for path in ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if not path.is_file() or is_generated_or_vcs_path(path):
             continue
         if path.suffix.lower() not in text_suffixes and path.name != "VERSION":
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         rel = path.relative_to(ROOT)
-        if EMAIL_RE.search(text):
+        if any(not synthetic_fixture_email(match.group(), rel)
+               for match in EMAIL_RE.finditer(text)):
             fail(f"possible personal email in public starter: {rel}", errors)
         # The public starter can demonstrate arbitrary project categories,
         # never identify the maintainer's own active product workstreams.
-        if (path.suffix.lower() == ".md"
-            and rel.parts[0] in {"docs", "prompts", "protocols"}
-            and PUBLIC_PROJECT_MARKER_RE.search(text)):
+        # The first-party author's real public release links are legitimate
+        # attribution, not a maintainer's private portfolio/source identity.
+        # Only exact allowlisted URLs are exempt; arbitrary owner-owned repos,
+        # branch names or private paths remain forbidden in public policies.
+        public_context = PUBLIC_REPOSITORY_LINK_RE.sub("<canonical-public-release-link>", text)
+        if (
+            (
+                path.suffix.lower() == ".md"
+                and (rel.as_posix() == "AGENTS.md"
+                     or rel.parts[0] in {"docs", "prompts", "protocols"})
+            )
+            or (path.suffix.lower() == ".json" and rel.parts[0] == "templates")
+        ) and PUBLIC_PROJECT_MARKER_RE.search(public_context):
             fail(f"project-specific source name in public documentation: {rel}", errors)
         # Official immutable action pins are supply-chain controls, not
         # project/source identity. Exception is limited to these two CI YAML
         # surfaces and three official actions with semver comments.
-        checked = text
-        if rel.as_posix() in {
-            ".github/workflows/validate-starter.yml",
-            ".github/workflows/publish-version-release.yml",
-            ".github/workflows/publish-v1-3-manual.yml",
-            ".github/workflows/publish-ghcr-package.yml",
-            ".github/workflows/package-v1-3-release-asset.yml",
-            "templates/AGENTIC_SDLC_FEEDBACK_WORKFLOW.yml",
-        }:
-            checked = re.sub(
-                r"(?m)^\s*(?:-\s*)?uses:\s*actions/(?:checkout|setup-python|upload-artifact)@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+\s*$",
-                "",
-                checked,
-            )
+        checked = strip_approved_source_pins(text, rel)
         if SHA40_RE.search(checked):
             fail(f"40-char commit-like identifier in structure-only starter: {rel}", errors)
         if PRIVATE_KEY_RE.search(text):
@@ -252,7 +351,7 @@ def validate_structure_only(errors: list[str]) -> None:
 
 def validate_internal_links(errors: list[str]) -> None:
     for path in ROOT.rglob("*.md"):
-        if ".git" in path.parts:
+        if is_generated_or_vcs_path(path):
             continue
         text = path.read_text(encoding="utf-8")
         for target in MD_LINK_RE.findall(text):

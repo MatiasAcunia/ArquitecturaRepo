@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+from git_currentness import observe_git_currentness
 
 TOOL_ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = Path(__file__).resolve().parent / "validate_project.py"
@@ -14,16 +17,6 @@ VALIDATOR = Path(__file__).resolve().parent / "validate_project.py"
 
 class ReconstructionError(Exception):
     pass
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception as exc:
-        raise ReconstructionError(f"cannot read JSON {path}: {exc}")
-    if not isinstance(data, dict):
-        raise ReconstructionError(f"expected JSON object: {path}")
-    return data
 
 
 def scan_json(root: Path) -> list[tuple[Path, dict[str, Any]]]:
@@ -38,6 +31,24 @@ def scan_json(root: Path) -> list[tuple[Path, dict[str, Any]]]:
         if isinstance(data, dict):
             out.append((path, data))
     return out
+
+
+def control_json_snapshot(root: Path) -> tuple[tuple[str, str], ...]:
+    """Detect a changing control layer across validation and reconstruction.
+
+    This is a read-only optimistic consistency check, not an execution lease or
+    a substitute for CAS/transaction recovery during subsequent writes.
+    """
+    snapshot: list[tuple[str, str]] = []
+    for path in sorted(root.rglob("*.json")):
+        if "schemas" in path.parts:
+            continue
+        try:
+            content = path.read_bytes()
+        except OSError as exc:
+            raise ReconstructionError(f"control JSON changed or unreadable: {path}: {exc}") from exc
+        snapshot.append((path.relative_to(root).as_posix(), hashlib.sha256(content).hexdigest()))
+    return tuple(snapshot)
 
 
 def one(
@@ -173,12 +184,21 @@ def validate(root: Path) -> None:
     )
     if result.returncode != 0:
         message = (result.stdout + "\n" + result.stderr).strip()
+        if "No module named 'jsonschema'" in message or 'No module named "jsonschema"' in message:
+            raise ReconstructionError(
+                "validation dependency 'jsonschema' is missing. Install the "
+                "declared dependencies with: python -m pip install -r "
+                f'\"{root / "requirements-validation.txt"}\"'
+            )
         raise ReconstructionError("project validation failed before reconstruction:\n" + message)
 
 
 def reconstruct(root: Path) -> dict[str, Any]:
+    before = control_json_snapshot(root)
     validate(root)
     records = scan_json(root)
+    if control_json_snapshot(root) != before:
+        raise ReconstructionError("control JSON changed during validation/reconstruction; retry after writers settle")
 
     product_record = one(records, {"product-state-0.1"}, "Product State")
     if product_record is None:
@@ -225,6 +245,13 @@ def reconstruct(root: Path) -> dict[str, Any]:
     runtime = runtime_records[0][1] if runtime_records else None
 
     currentness = derive_currentness(bootstrap)
+    git_currentness = observe_git_currentness(root, product_state.get("current_code_ref", ""))
+    canonical_posture = posture(product_state, bootstrap, currentness, authority, runtime)
+    tracking_conflict = git_currentness["upstream"]["relation"] in {
+        "LOCAL_BEHIND_TRACKING",
+        "DIVERGED_OR_UNRELATED_TRACKING",
+        "TRACKING_REF_UNRESOLVED",
+    }
     active = product_state.get("active_campaign")
     forbidden = []
     for value in list(product_state.get("forbidden_actions", [])) + list(
@@ -236,7 +263,7 @@ def reconstruct(root: Path) -> dict[str, Any]:
     result = {
         "schema_version": "reconstructed-context-0.1",
         "product_or_workstream": product,
-        "posture": posture(product_state, bootstrap, currentness, authority, runtime),
+        "posture": canonical_posture,
         "product_state": {
             "status": product_state.get("status"),
             "current_code_ref": product_state.get("current_code_ref"),
@@ -260,6 +287,27 @@ def reconstruct(root: Path) -> dict[str, Any]:
             "next_legal_boundary": bootstrap.get("next_legal_boundary"),
         },
         "currentness": currentness,
+        "git_currentness": git_currentness,
+        "continuation_preflight": {
+            "local_source_reconciled": git_currentness["local_source_reconciled"],
+            "remote_source_verified": False,
+            "native_execution_authorized_by_git": False,
+            "effective_posture": (
+                "CURRENTNESS_RECONCILIATION_REQUIRED"
+                if (not git_currentness["local_source_reconciled"] or tracking_conflict)
+                and canonical_posture == "EXECUTION_AUTHORIZED"
+                else canonical_posture
+            ),
+            "next_safe_action": (
+                "RECONCILE_LOCAL_SOURCE_READ_ONLY"
+                if not git_currentness["local_source_reconciled"]
+                else "RECONCILE_TRACKING_CONFLICT_READ_ONLY"
+                if tracking_conflict
+                else "VERIFY_LIVE_REMOTE_AND_SEPARATE_EXECUTION_AUTHORITY"
+            ),
+            "required_reconciliation": git_currentness["reconciliation_required"],
+            "rule": "Canonical authority, local Git evidence, live remote currentness and native host permissions are separate gates.",
+        },
         "current_owners": current_owners(owner_registry),
         "technical_baseline": (
             {
@@ -308,6 +356,11 @@ def reconstruct(root: Path) -> dict[str, Any]:
             "currentness_set": sorted(product_state.get("currentness_set", [])),
         },
     }
+    if control_json_snapshot(root) != before:
+        raise ReconstructionError("control JSON changed during reconstruction; retry after writers settle")
+    git_after = observe_git_currentness(root, product_state.get("current_code_ref", ""))
+    if git_after != git_currentness:
+        raise ReconstructionError("local Git observation changed during reconstruction; reconcile source before proceeding")
     return result
 
 

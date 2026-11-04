@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Regression tests for public-starter source and privacy boundaries."""
+from __future__ import annotations
+
+import json
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import validate_structure
+
+
+class StructurePolicyTests(unittest.TestCase):
+    def check(self, files: dict[str, str]) -> list[str]:
+        with tempfile.TemporaryDirectory(prefix="starter-structure-policy-") as tmp:
+            root = Path(tmp)
+            for relative, content in files.items():
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content, encoding="utf-8")
+            errors: list[str] = []
+            with patch.object(validate_structure, "ROOT", root):
+                validate_structure.validate_structure_only(errors)
+            return errors
+
+    def test_reserved_email_in_test_only(self):
+        self.assertEqual(self.check({"tools/test_fixture.py": "offline@example.test"}), [])
+        self.assertEqual(self.check({"tools/selftest_fixture.py": "offline@example.invalid"}), [])
+        for path, address in (
+            ("tools/test_fixture.py", "owner@" + "example.com"),
+            ("docs/README.md", "offline@example.test"),
+            ("tools/production.py", "offline@example.test"),
+        ):
+            with self.subTest(path=path):
+                self.assertTrue(any("personal email" in error for error in self.check({path: address})))
+
+    def test_first_party_source_history_is_precisely_scoped(self):
+        commit = "a" * 40
+        blob = "b" * 40
+        manifest = {
+            "candidates": [{
+                "source_commit_sha": commit,
+                "source_git_blob_sha1": {"tools/source.py": blob},
+            }],
+        }
+        allowed = {
+            "engines/portable-goal/engine.json": json.dumps(manifest, indent=2),
+            "engines/portable-goal/CHANGELOG.md": f"- Exact baseline Git commit: `{commit}`.\n",
+        }
+        self.assertEqual(self.check(allowed), [])
+        for relative, changed in (
+            ("docs/source.md", f"Unrelated source identity: {commit}"),
+            ("engines/portable-goal/CHANGELOG.md", f"- Arbitrary source: `{commit}`"),
+            ("engines/portable-goal/engine.json", json.dumps({**manifest, "private": commit})),
+            ("engines/portable-goal/engine.json", json.dumps({**manifest, "unrelated": {"source_commit_sha": commit}})),
+            ("engines/portable-goal/engine.json", json.dumps({"candidates": [{
+                "source_commit_sha": commit,
+                "source_git_blob_sha1": {"tools/../private.py": blob},
+            }]})),
+            ("engines/portable-goal/engine.json", '{"candidates": ' + commit),
+        ):
+            with self.subTest(relative=relative):
+                self.assertTrue(any("40-char" in error for error in self.check({**allowed, relative: changed})))
+
+    def test_root_policy_and_credentials_stay_protected(self):
+        self.assertTrue(any("project-specific" in error for error in self.check({"AGENTS.md": "MUSIC"})))
+        self.assertTrue(any("project-specific" in error for error in self.check({
+            "templates/EXAMPLE.json": '{"unrelated_gate":"G007"}',
+        })))
+        self.assertTrue(any("private-key" in error for error in self.check({
+            "docs/README.md": "BEGIN " + "PRIVATE KEY",
+        })))
+
+    def test_public_release_links_are_not_private_project_markers(self):
+        for link in validate_structure.PUBLIC_REPOSITORY_LINKS:
+            with self.subTest(link=link):
+                self.assertEqual(self.check({"docs/manual/README.md": f"Public release: [official]({link})"}), [])
+        for bad in (
+            "https://github.com/MatiasAcunia/private-repository",
+            "https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/private-branch",
+            validate_structure.PUBLIC_REPOSITORY_LINKS[0] + "/private",
+        ):
+            with self.subTest(bad=bad):
+                self.assertTrue(any("project-specific" in err for err in self.check({"docs/manual/README.md": bad})))
+
+    def test_generated_release_manifest_is_not_source_policy(self):
+        full_commit = "a" * 40
+        self.assertEqual(self.check({
+            "dist/ArquitecturaRepo-v1.4.0-release-manifest.json": json.dumps(
+                {"source_commit_sha1": full_commit},
+            ),
+        }), [])
+        self.assertTrue(any("40-char" in err for err in self.check({
+            "state/UNEXPECTED_RELEASE_RECEIPT.json": json.dumps(
+                {"source_commit_sha1": full_commit},
+            ),
+        })))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -100,8 +100,14 @@ def main() -> int:
                 raise AssertionError(f"{profile}: copied migration tool missing")
             if not (control / "tools" / "reconstruct_context.py").exists():
                 raise AssertionError(f"{profile}: copied reconstruction tool missing")
+            if (
+                (control / "tools" / "git_currentness.py").read_bytes()
+                != (ROOT / "tools" / "git_currentness.py").read_bytes()
+            ):
+                raise AssertionError(f"{profile}: Git currentness probe differs from source")
             for portable_tool in (
                 "state_tx.py",
+                "git_currentness.py",
                 "discover_project.py",
                 "apply_adoption.py",
                 "repo_delta.py",
@@ -186,6 +192,14 @@ def main() -> int:
                 )
             if (control / "tools" / "campaignctl.py").exists():
                 raise AssertionError(f"{profile}: campaign runtime installed without --with-runtime")
+            for optional_tool in (
+                "cognitive_i4.py", "cognitive_ledger.py", "engineering_packet.py",
+                "engine_registry.py", "gemini_keyfile.py", "host_dispatch.py",
+            ):
+                if (control / "tools" / optional_tool).exists():
+                    raise AssertionError(
+                        f"{profile}: unrequested optional runtime/provider tool: {optional_tool}"
+                    )
 
         small = base / "small" / ".agentic-sdlc"
         if (small / "protocols" / "MASTER_OWNER_OS.md").exists():
@@ -247,7 +261,9 @@ def main() -> int:
             raise AssertionError("runtime-enabled scaffold did not record runtime_enabled=true")
         for item in ("goal_guard.py", "goal_plan.py", "cognitive_i4.py",
                      "cognitive_ledger.py", "external_effects.py", "fenced_mutator.py",
-                     "evidence_decision.py", "host_dispatch.py", "tool_port.py", "candidate_manifest.py"):
+                     "evidence_decision.py", "host_dispatch.py", "tool_port.py",
+                     "candidate_manifest.py", "engineering_packet.py",
+                     "engine_registry.py", "gemini_keyfile.py"):
             if not (runtime_control / "tools" / item).is_file():
                 raise AssertionError("v1.2 optional runtime tool missing: " + item)
         for item in ("GOAL_CONTRACT_TEMPLATE.json", "TACTICAL_PLAN_TEMPLATE.json",

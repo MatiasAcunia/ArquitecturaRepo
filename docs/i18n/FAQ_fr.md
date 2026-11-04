@@ -48,7 +48,7 @@ Utilisez --language auto|en|es|pt|fr|de|it|ja|zh. Pour désactiver : enabled=fal
 
 ### 12. Quels tests et comment signaler une erreur ?
 
-1.1.0 est stable ; v1.2 reste candidate avant validation physique indépendante. Ouvrez une Issue avec étapes reproductibles et journaux expurgés. Le contenu original est sous MIT.
+Le code source est en version 1.4.0, mais la release n'existe qu'une fois publiés et vérifiés le [tag immuable v1.4.0, le ZIP et sa somme de contrôle](https://github.com/MatiasAcunia/ArquitecturaRepo/releases/tag/v1.4.0) ; v1.3.0 reste disponible. Les tests portables Linux/Windows ne certifient ni les hôtes d'agents natifs ni l'utilisabilité par des tiers. Ouvrez une Issue avec étapes reproductibles et journaux expurgés. Le contenu original est sous MIT.
 
 ### 13. Puis-je combiner l'asynchrone, les équipes et l'IA sans programmation ?
 
