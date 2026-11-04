@@ -24,7 +24,7 @@
 
 ### 6. Goals 和 Codex Desktop 已自动集成了吗？
 
-尚未。v1.2 有可选 Goal/Plan 检查代码，但每次调用的真实主机集成仍需物理测试。
+不会自动集成。v1.4 提供便携式 Goal/Plan 和权限检查，但 Codex Desktop/Goals 的原生逐次调用仍需独立的真实环境验收。
 
 ### 7. Gemini 默认启用或收费吗？
 
@@ -32,7 +32,7 @@
 
 ### 8. 它会重启或删除我的 Codex 会话吗？
 
-starter 本身不会。Codex Daily Control 2.0.2 是独立参考；v1.2 的主机适配器尚未完成验收。
+不会。starter 本身不重启、管理或删除 Codex 原生聊天。主机适配器需要单独的授权与实证；v1.4 未认证该聊天生命周期功能。
 
 ### 9. 默认启用什么反馈？
 
@@ -44,7 +44,7 @@ starter 本身不会。Codex Daily Control 2.0.2 是独立参考；v1.2 的主�
 
 ### 11. 如何切换语言或关闭反馈？
 
-使用 --language auto|en|es|pt|fr|de|it|ja|zh。关闭反馈可设置 enabled=false 或使用 --no-feedback-workflow。GitHub 的 README 是静态的。
+使用 --language auto|en|es|pt|fr|de|it|ja|zh。彻底关闭报告应设置 enabled=false；--no-feedback-workflow 只关闭定时计划。GitHub 的 README 是静态的。
 
 ### 12. 哪些功能通过测试，如何报告问题？
 

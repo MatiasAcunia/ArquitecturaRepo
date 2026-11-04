@@ -20,7 +20,7 @@ CLIENT 负责产品决策和敏感操作授权；I2 负责战略和验收；I3 �
 
 新建项目默认每月在本项目的 GitHub Actions artifacts 中生成一份最小元数据报告，用于改进 starter 结构和整理问题。报告不会自动发送给维护者，不包含代码、对话、项目名称、路径、标识符或密钥。
 
-关闭方法：在 .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json 中设置 enabled=false，删除 .github/workflows/agentic-sdlc-feedback.yml，或安装时加 --no-feedback-workflow。
+要彻底关闭所有报告，请在 .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json 中设置 enabled=false。删除 .github/workflows/agentic-sdlc-feedback.yml 或安装时使用 --no-feedback-workflow 只关闭定时执行，不会删除本地生成器。
 
 ## 安全与版本
 

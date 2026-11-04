@@ -24,7 +24,7 @@ The CLIENT retains product, subjective acceptance, publication, cost and sensiti
 
 ### 6. Are Goal planning and Codex Desktop supported automatically?
 
-Not yet. v1.2 has optional Goal/Plan integrity code, but real per-invocation host integration is a separate physical acceptance gate.
+Not automatically. v1.4 includes portable Goal/Plan and authority checks, but native per-invocation Codex Desktop/Goals integration is a separate, unverified physical acceptance gate.
 
 ### 7. Is Gemini required or charged by default?
 
@@ -32,7 +32,7 @@ No. The I4 provider path is optional and disabled until explicit permission, cre
 
 ### 8. Can it restart or delete my Codex chats?
 
-Not from the starter itself. Codex Daily Control 2.0.2 is a separately tested reference; a safe real-host adapter is not yet accepted in v1.2.
+No. The starter itself does not restart, manage or delete native Codex chats. Any host adapter requires separate evidence and permission; no native chat lifecycle is certified by v1.4.
 
 ### 9. What feedback is enabled by default?
 
@@ -44,7 +44,7 @@ Code, conversations, project and repository names, paths, credentials, personal 
 
 ### 11. How do I change language or disable feedback?
 
-Use --language auto|en|es|pt|fr|de|it|ja|zh; offline documentation follows the selected locale. Set enabled=false in the feedback config or use --no-feedback-workflow. GitHub's README remains static.
+Use --language auto|en|es|pt|fr|de|it|ja|zh; offline documentation follows the selected locale. For all reporting, set enabled=false in the feedback config; --no-feedback-workflow only disables scheduling. GitHub's README remains static.
 
 ### 12. What is tested, and how do I report a problem?
 

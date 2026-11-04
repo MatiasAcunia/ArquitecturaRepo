@@ -20,7 +20,7 @@ The CLIENT owns product and sensitive approvals; I2 owns strategy and acceptance
 
 New scaffolds generate a small monthly metadata-only report in the project's own GitHub Actions artifacts. Enabled by default, it helps improve starter structure and categorize failures. It is not sent to the starter maintainer automatically. No code, conversations, project names, paths, identifiers or credentials are included.
 
-Disable feedback by setting enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, by removing .github/workflows/agentic-sdlc-feedback.yml or by installing with --no-feedback-workflow.
+To disable all reporting, set enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Removing .github/workflows/agentic-sdlc-feedback.yml or installing with --no-feedback-workflow disables only the scheduler, not the local generator.
 
 ## Safety and release status
 

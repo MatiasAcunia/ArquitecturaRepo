@@ -20,7 +20,7 @@ El CLIENT define el producto y autoriza acciones sensibles; I2 decide estrategia
 
 Los proyectos nuevos generan un informe mínimo de metadatos una vez al mes en los artifacts de GitHub Actions del propio proyecto. Viene activado por defecto para mejorar la estructura y clasificar errores. No se envía automáticamente al mantenedor. No incluye código, conversaciones, nombres de proyectos, rutas, identificadores ni credenciales.
 
-Para desactivarlo, poné enabled=false en .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, borrá .github/workflows/agentic-sdlc-feedback.yml o instalá con --no-feedback-workflow.
+Para desactivar todos los reportes, poné enabled=false en .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Borrar .github/workflows/agentic-sdlc-feedback.yml o instalar con --no-feedback-workflow desactiva solo la programación, no el generador local.
 
 ## Seguridad y versión
 

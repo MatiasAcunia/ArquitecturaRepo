@@ -24,7 +24,7 @@ Der CLIENT behält Produktentscheidungen, subjektive Abnahme, Veröffentlichung,
 
 ### 6. Sind Goals und Codex Desktop schon integriert?
 
-Noch nicht. v1.2 enthält optionale Goal-/Plan-Prüfungen, doch die echte Host-Integration bei jeder Ausführung muss erst nachgewiesen werden.
+Nicht automatisch. v1.4 enthält portable Goal-/Plan- und Berechtigungsprüfungen; die native Codex-Desktop/Goals-Integration pro Ausführung erfordert weiterhin gesonderte physische Nachweise.
 
 ### 7. Ist Gemini erforderlich oder standardmäßig kostenpflichtig?
 
@@ -32,7 +32,7 @@ Nein. I4 ist deaktiviert, bis Einwilligung, Schlüssel, Kontingent und Datenschu
 
 ### 8. Kann das Starter Codex-Chats neu starten oder löschen?
 
-Nicht eigenständig. Codex Daily Control 2.0.2 ist eine separate Referenz; ein sicherer Host-Adapter ist in v1.2 noch nicht abgenommen.
+Nein. Der Starter startet, verwaltet oder löscht keine nativen Codex-Chats. Host-Adapter benötigen gesonderte Autorisierung und Nachweise; v1.4 zertifiziert keinen nativen Chat-Lebenszyklus.
 
 ### 9. Welches Feedback ist standardmäßig aktiv?
 
@@ -44,7 +44,7 @@ Code, Gespräche, Projekt-/Repositorynamen, Pfade, Zugangsdaten, Personenkennung
 
 ### 11. Wie ändere ich Sprache oder deaktiviere Feedback?
 
-Verwenden Sie --language auto|en|es|pt|fr|de|it|ja|zh. Zum Abschalten enabled=false oder --no-feedback-workflow. GitHubs README bleibt statisch.
+Verwenden Sie --language auto|en|es|pt|fr|de|it|ja|zh. Für die vollständige Abschaltung aller Berichte enabled=false setzen; --no-feedback-workflow deaktiviert nur die Zeitplanung. GitHubs README bleibt statisch.
 
 ### 12. Was ist getestet und wie melde ich Fehler?
 

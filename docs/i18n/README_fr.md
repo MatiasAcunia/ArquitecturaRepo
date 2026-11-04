@@ -20,7 +20,7 @@ Le CLIENT définit le produit et autorise les actions sensibles ; I2 gère la st
 
 Par défaut, un petit rapport mensuel de métadonnées est conservé dans les artifacts GitHub Actions du projet. Il aide à améliorer la structure du starter et à classer les problèmes. Il n'est pas envoyé automatiquement au mainteneur. Il ne contient ni code, ni conversations, ni noms de projets, ni chemins, ni identifiants, ni secrets.
 
-Pour désactiver : enabled=false dans .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, supprimer .github/workflows/agentic-sdlc-feedback.yml ou installer avec --no-feedback-workflow.
+Pour arrêter tous les rapports, utilisez enabled=false dans .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Supprimer .github/workflows/agentic-sdlc-feedback.yml ou installer avec --no-feedback-workflow désactive seulement la programmation, pas le générateur local.
 
 ## Sécurité et versions
 

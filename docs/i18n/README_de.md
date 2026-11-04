@@ -20,7 +20,7 @@ Der CLIENT entscheidet über Produkt und sensible Freigaben; I2 verantwortet Str
 
 Neue Installationen erzeugen standardmäßig einmal monatlich einen kleinen Metadatenbericht als GitHub-Actions-Artefakt im eigenen Projekt. Das hilft, die Starter-Struktur zu verbessern und Fehler zu ordnen. Der Bericht geht nicht automatisch an den Maintainer. Er enthält weder Code, Gespräche, Projektnamen, Pfade, Kennungen noch Zugangsdaten.
 
-Zum Deaktivieren enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json setzen, .github/workflows/agentic-sdlc-feedback.yml löschen oder mit --no-feedback-workflow installieren.
+Für die vollständige Deaktivierung aller Berichte enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json setzen. Das Entfernen von .github/workflows/agentic-sdlc-feedback.yml oder --no-feedback-workflow deaktiviert nur die Zeitplanung, nicht den lokalen Berichtsgenerator.
 
 ## Sicherheit und Versionen
 

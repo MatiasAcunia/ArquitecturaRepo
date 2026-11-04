@@ -20,7 +20,7 @@ Il CLIENT decide il prodotto e autorizza operazioni sensibili; I2 cura strategia
 
 Per impostazione predefinita, ogni nuovo scaffold genera un piccolo rapporto mensile di metadati come artifact GitHub Actions del progetto. Serve a migliorare la struttura e organizzare i problemi. Non viene inviato automaticamente al manutentore. Non contiene codice, conversazioni, nomi di progetti, percorsi, identificatori o credenziali.
 
-Per disabilitare: enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json, eliminare .github/workflows/agentic-sdlc-feedback.yml oppure installare con --no-feedback-workflow.
+Per fermare tutti i report, imposta enabled=false in .agentic-sdlc/feedback/ARCHITECTURE_FEEDBACK_CONFIG.json. Eliminare .github/workflows/agentic-sdlc-feedback.yml o usare --no-feedback-workflow disabilita solo la pianificazione, non il generatore locale.
 
 ## Sicurezza e versioni
 
