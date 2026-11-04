@@ -87,6 +87,26 @@ LOCALE_LABELS = {
         "contents": "Indice", "date": "4 novembre 2026", "version": "VERSIONE", "footer_date": "NOVEMBRE 2026",
         "fontsize": "12pt",
     },
+    "ja": {
+        "title": "完全ユーザーマニュアル", "code": "日本語", "lang": "ja-JP",
+        "chapter": "第", "header": "完全ユーザーマニュアル · v1.4",
+        "eyebrow": "ソフトウェア開発 / 利用者ガイド",
+        "summary1": "全8章：導入、インストール、導入設定、日常運用、",
+        "summary2": "変更依頼、復旧、受け入れ、実践的なクラブ管理の例。",
+        "byline": "ArquitecturaRepoの公開ソースに照合した利用者向け文書。",
+        "contents": "目次", "date": "2026年11月4日", "version": "バージョン", "footer_date": "2026年11月",
+        "fontsize": "16pt", "cjk": "ja",
+    },
+    "zh": {
+        "title": "完整用户手册", "code": "简体中文", "lang": "zh-CN",
+        "chapter": "第", "header": "完整用户手册 · v1.4",
+        "eyebrow": "软件工程 / 用户指南",
+        "summary1": "全八章：简介、安装、项目接入、日常运行、",
+        "summary2": "变更请求、故障恢复、能力验收以及俱乐部实例。",
+        "byline": "依据ArquitecturaRepo公开源代码核对的用户文档。",
+        "contents": "目录", "date": "2026年11月4日", "version": "版本", "footer_date": "2026年11月",
+        "fontsize": "16pt", "cjk": "zh",
+    },
 }
 LINK = re.compile(r"(?P<prefix>\]\()(?P<url>[^\s)]+)(?P<suffix>\))")
 
@@ -119,8 +139,10 @@ def collect(locale: str) -> str:
     for name in CHAPTERS:
         chapter = source / name
         content = chapter.read_text(encoding="utf-8")
-        if len(content.split()) < 1100:
-            raise ValueError(f"Not a full-length chapter: {chapter.relative_to(ROOT)}")
+        length = len(re.sub(r"\s+", "", content)) if locale in ("ja", "zh") else len(content.split())
+        minimum = 2900 if locale in ("ja", "zh") else 1100
+        if length < minimum:
+            raise ValueError(f"Not a full-length chapter: {chapter.relative_to(ROOT)} ({length} < {minimum})")
         # In the PDF, repository-local references must link to the repository,
         # not to nonexistent neighboring files at the PDF download location.
         def rewrite(match: re.Match[str]) -> str:
@@ -218,6 +240,12 @@ def main() -> int:
         }
         for old, new in replacements.items():
             latex = latex.replace(old, new)
+        if labels.get("cjk"):
+            locale = labels["cjk"]
+            latex += (
+                "\n\\XeTeXlinebreaklocale \"" + locale + "\"\n"
+                "\\XeTeXlinebreakskip = 0pt plus 1pt\n"
+            )
         preamble.write_text(latex, encoding="utf-8")
         command = [
             "pandoc", str(rendered), "--standalone", "--toc", "--toc-depth=2",
@@ -230,12 +258,30 @@ def main() -> int:
             "--metadata", f"toc-title:{labels['contents']}",
             "--variable", "documentclass=scrreprt", "--variable", "classoption=oneside",
             "--variable", "papersize=a4", "--variable", f"fontsize={labels.get('fontsize', '11pt')}",
-            "--variable", "mainfont=DejaVu Serif", "--variable", "sansfont=DejaVu Sans",
             "--variable", "monofont=DejaVu Sans Mono",
             "--variable", "geometry:margin=22mm",
             "--include-in-header", str(preamble),
             "--output", str(output),
         ]
+        if not labels.get("cjk"):
+            command.extend(["--variable", "mainfont=DejaVu Serif", "--variable", "sansfont=DejaVu Sans"])
+        if labels.get("cjk"):
+            try:
+                import fitz
+            except ImportError as exc:
+                parser.error(
+                    "CJK PDF generation needs PyMuPDF's bundled Droid Sans Fallback font; "
+                    "install PyMuPDF locally, without provider calls"
+                )
+            font_path = temp_dir / "ArquitecturaRepoCJK.ttf"
+            font_path.write_bytes(fitz.Font("cjk").buffer)
+            options = f"Path={temp_dir.as_posix()}/,Extension=.ttf"
+            command.extend([
+                "--variable", "mainfont=ArquitecturaRepoCJK",
+                "--variable", f"mainfontoptions={options}",
+                "--variable", "sansfont=ArquitecturaRepoCJK",
+                "--variable", f"sansfontoptions={options}",
+            ])
         subprocess.run(command, check=True)
     print(f"Built {output} ({output.stat().st_size:,} bytes) from eight complete source chapters")
     return 0

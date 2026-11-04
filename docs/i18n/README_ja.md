@@ -1,8 +1,8 @@
 # Agentic SDLC — はじめに
 
-[v1.4 ミニガイド](MINI_GUIDE_ja.md) · [FAQ](FAQ_ja.md)
+[v1.4 完全マニュアル（全8章）](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/ja/README.md) · [PDF全文](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/output/pdf/ArquitecturaRepo_Complete_Manual_v1.4_JA.pdf) · [v1.4 ミニガイド](MINI_GUIDE_ja.md) · [FAQ](FAQ_ja.md)
 
-[全8章の詳細マニュアル](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md)は**ソースリポジトリ内でスペイン語のみ**提供される**旧 v1.3 版**です。インストール先にはコピーされません。このページは v1.4 の短い入門であり、全文翻訳ではありません。最新の操作手順は[v1.4 インストールガイド](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)を参照してください。
+日本語の[全8章のv1.4詳細版](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/ja/README.md)とPDFを参照できます。[旧スペイン語v1.3マニュアル](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/ES/README.md)も歴史資料として保存されています。このページ自体は短い入門です。最新の操作手順は[v1.4 インストールガイド](../46_V1_4_PUBLIC_START_AND_SUPPORT.md)を優先してください。詳細版はv1.4.0タグ公開後にmainへ追加されたため、当時の配布用ZIPには収録されていません。
 
 エージェントを使ったソフトウェア開発向けの、リポジトリを中心とした再利用可能なアーキテクチャです。役割分担、永続的な状態、計画、復旧、検証を提供します。あらゆるアプリを自動で完成させるものではなく、製品責任者の判断も代行しません。
 
@@ -32,4 +32,4 @@ CLIENT は製品方針と機密操作の承認、I2 は戦略と受入れ、I3 �
 
 導入ツールは OS の言語を検出し、--language ja で明示指定もできます。資料はオフラインで読めます。GitHub の README は静的なので、言語リンクから選択してください。
 
-[v1.4 ミニガイド](MINI_GUIDE_ja.md) · [FAQ](FAQ_ja.md) · [GitHub README](../../README.md)
+[v1.4 完全マニュアル](https://github.com/MatiasAcunia/ArquitecturaRepo/blob/main/docs/manual/v1.4/ja/README.md) · [v1.4 ミニガイド](MINI_GUIDE_ja.md) · [FAQ](FAQ_ja.md) · [GitHub README](../../README.md)
