@@ -1,5 +1,9 @@
 # Agentic SDLC Starter — Root Agent Instructions
 
+## Execution autonomy and bounded storage (CLIENT adoption principle, 2026-11-06)
+
+I1 is optional and never a required synchronous gate, scheduled audit, ACK or permission service for I2/I3. The normal productive path is CLIENT -> local I2 -> authorized I3 -> I4. I3 handles all in-charter debugging, retries, hardening, integration, recovery and safe cleanup; no extra Planner PASS or new campaign for ordinary defects. PASS1/PASS2 apply to genuine new/material charters, PASS3 only exceptionally. Preserve one canonical checkout, reconcile dirty state rather than reset/reclone, apply CI at actual integration/release boundaries, and automatically clean only owned and safely reconstructible expired intermediates after verifying retention/evidence/lease safety. Protected or unique files are never automatically removed. A public starter does not mandate any external five-Task supervisory arrangement.
+
 Status: public starter root policy.
 
 This repository is an architecture template. Do not treat its example state as the truth of the target project.

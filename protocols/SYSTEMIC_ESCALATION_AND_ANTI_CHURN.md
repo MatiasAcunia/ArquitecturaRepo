@@ -40,7 +40,7 @@ Return to I2 only when evidence shows a strategic condition such as:
 
 ## Systemic escalation
 
-Escalate to I1 when the causal defect is shared across projects/workstreams or belongs to the development system itself, for example:
+If an I1 systemic maintainer exists, send a nonblocking source-bound finding when the causal defect is shared across projects/workstreams or belongs to the development system itself; if I1 is absent, route to the existing shared mechanism owner. Never wait for I1/Task approval to continue safe in-charter work. Examples:
 
 - Planner churn;
 - Campaign Leads repeatedly failing to absorb tactical work;
@@ -72,4 +72,4 @@ Otherwise absorb the correction into an existing owner.
 
 ## Zero-delivery override
 
-Repeated elapsed runtime with no user-visible physical deliverable is a systemic execution defect even if checkpoint/test activity increases. I1/I2 must reconcile the exact original acceptance scope, disallow unrequired evaluators, force a bounded deterministic batch method where possible and separate collection delivery from downstream publication/rights. Repeated invocation of the same failed method is not progress.
+Repeated elapsed runtime with no user-visible physical deliverable is a systemic execution defect even if checkpoint/test activity increases. the accountable local I2/I3 must reconcile the exact original acceptance scope, disallow unrequired evaluators, force a bounded deterministic batch method where possible and separate collection delivery from downstream publication/rights. Repeated invocation of the same failed method is not progress.

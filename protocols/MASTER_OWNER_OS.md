@@ -4,7 +4,7 @@
 
 I1 MASTER OWNER owns the development system above local project/workstream Planners.
 
-Use I1 only when the target has multiple independently planned boundaries or a shared agent/runtime/process layer that needs one canonical systemic owner.
+I1 is optional and never a prerequisite for productive I2/I3 engineering. If installed, use I1 only when the target has multiple independently planned boundaries or a shared agent/runtime/process layer that needs one canonical systemic owner.
 
 ## I1 owns
 
@@ -19,6 +19,9 @@ Use I1 only when the target has multiple independently planned boundaries or a s
 - causal correction when local roles repeatedly fail for the same systemic reason.
 
 ## I1 does not own
+
+An I1 report, scheduled Task, policy suggestion, ACK or pending CI is not an operational hold on an authorized I3 campaign; only a real local strategic/protected action boundary changes authority. Local I2/I3 do not request routine approval or permission from I1.
+
 
 - routine local campaign implementation;
 - product-local tactical DAGs;

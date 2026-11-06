@@ -8,7 +8,7 @@ The default operating posture is:
 
 `KNOWN_BASELINE -> NARROW_REMOTE_REFRESH -> DELTA_INSPECTION -> COHERENT_WORK -> ONE_MEANINGFUL_INTEGRATION_BOUNDARY -> LIFECYCLE_CLEANUP`
 
-Do not repeatedly clone, pull, reread or recommit the whole repository merely because one bounded change occurred.
+Do not repeatedly clone, pull, reread or recommit the whole repository merely because one bounded change occurred. A dirty checkout or unrelated pending CI is not a command to restart, re-clone, invent a worktree or escalate for permission. Recover and preserve uncommitted changes locally, and enforce CI only at the relevant canonical integration/release boundary. Automation should reclaim only verified owned and reconstructible expired intermediates while preserving current/unique/client evidence, with actual free-byte measurements during heavy batches.
 
 ## 1. Hard commit authority
 
