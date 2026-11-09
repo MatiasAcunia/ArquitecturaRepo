@@ -24,6 +24,10 @@ jobs:
         run: python tools/selftest_structure_policy.py
       - name: Validate repository structure
         run: python tools/validate_structure.py
+      - name: Verify complete engine navigation and adversarial registry fixtures
+        run: |
+          python tools/test_engine_registry.py
+          python tools/engine_registry.py validate-navigation --root .
       - name: Validate starter manifest contract
         run: python tools/validate_project.py --root state
       - name: Validate profile definitions

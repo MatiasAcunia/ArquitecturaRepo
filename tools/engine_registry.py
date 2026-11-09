@@ -64,8 +64,15 @@ def navigation_index(root: Path) -> list[dict[str, Any]]:
         raise EngineRegistryError("CATALOG_MANIFESTS_REQUIRED")
     if len(refs) != len(set(refs)):
         raise EngineRegistryError("DUPLICATE_ENGINE_MANIFEST")
+    directories = {p.relative_to(root).as_posix()
+                   for p in (root / "engines").iterdir() if p.is_dir()}
     actual = {p.relative_to(root).as_posix()
               for p in (root / "engines").glob("*/engine.json") if p.is_file()}
+    indexed_dirs = {Path(ref).parent.as_posix() for ref in refs}
+    if directories != indexed_dirs:
+        raise EngineRegistryError("ENGINE_DIRECTORY_UNREGISTERED:"
+                                  + json.dumps({"missing": sorted(directories - indexed_dirs),
+                                                "extra": sorted(indexed_dirs - directories)}))
     if set(refs) != actual:
         raise EngineRegistryError("CATALOG_DIRECTORY_DRIFT:"
                                   + json.dumps({"missing": sorted(actual - set(refs)),

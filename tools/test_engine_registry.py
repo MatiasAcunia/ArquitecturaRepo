@@ -63,7 +63,7 @@ class EngineRegistryTests(unittest.TestCase):
             new_folder = root / "engines" / "unindexed"
             new_folder.mkdir()
             (new_folder / "engine.json").write_text(json.dumps(dict(payload, engine_id="second")), encoding="utf-8")
-            with self.assertRaisesRegex(EngineRegistryError, "CATALOG_DIRECTORY_DRIFT"):
+            with self.assertRaisesRegex(EngineRegistryError, "ENGINE_DIRECTORY_UNREGISTERED"):
                 navigation_index(root)
             catalog["manifests"].append("engines/unindexed/engine.json")
             catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
