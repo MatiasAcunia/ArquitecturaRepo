@@ -153,6 +153,106 @@ def runtime_summary(runtime: dict[str, Any] | None) -> dict[str, Any] | None:
     }
 
 
+def canonical_handoff(
+    records: list[tuple[Path, dict[str, Any]]],
+    root: Path,
+    active: dict[str, Any] | None,
+    current_code_ref: str,
+    currentness_set: list[str],
+    snapshot: tuple[tuple[str, str], ...],
+) -> dict[str, Any]:
+    """Read the active checkpoint/terminal itself; never infer state from old chat.
+
+    This is a transient, source-bound view of the *existing* canonical record,
+    not a second mutable memory or a substitute for state transaction/recovery.
+    """
+    if active is None:
+        return {"status": "NO_ACTIVE_CAMPAIGN", "source_ref": None}
+
+    campaign_id = active["campaign_id"]
+    pointer = active.get("checkpoint_or_terminal_ref")
+    if not pointer:
+        return {
+            "status": "NO_CHECKPOINT_OR_TERMINAL",
+            "campaign_id": campaign_id,
+            "source_ref": None,
+        }
+
+    checkpoints = [
+        (path, data)
+        for path, data in records
+        if data.get("schema_version") == "campaign-checkpoint-0.1"
+        and data.get("checkpoint_id") == pointer
+    ]
+    if len(checkpoints) > 1:
+        raise ReconstructionError(f"duplicate active checkpoint {pointer!r}")
+
+    if checkpoints:
+        path, data = checkpoints[0]
+        if data["campaign_id"] != campaign_id or data["exact_integrated_ref"] != current_code_ref:
+            raise ReconstructionError("active checkpoint is not bound to current campaign and code")
+        status = "CHECKPOINT"
+    else:
+        terminals = [
+            (path, data)
+            for path, data in records
+            if data.get("schema_version") == "campaign-terminal-0.1"
+            and data.get("campaign_id") == campaign_id
+        ]
+        if len(terminals) != 1:
+            raise ReconstructionError("active terminal pointer has no unique canonical terminal")
+        path, data = terminals[0]
+        relative = path.relative_to(root).as_posix()
+        if pointer not in {path.stem, path.name, relative}:
+            raise ReconstructionError("active terminal pointer does not name the canonical terminal")
+        if data["exact_candidate_ref"] != current_code_ref:
+            raise ReconstructionError("active terminal is not bound to current code")
+        status = "TERMINAL"
+
+    relative = path.relative_to(root).as_posix()
+    refs = {ref.replace("\\", "/").removeprefix("./") for ref in currentness_set}
+    if not ({relative, path.name} & refs):
+        raise ReconstructionError(
+            f"active {status.lower()} {relative!r} is not in the canonical Currentness Set"
+        )
+    hashes = dict(snapshot)
+    if relative not in hashes:
+        raise ReconstructionError("active continuation source missing from control snapshot")
+
+    source = {
+        "status": status,
+        "campaign_id": campaign_id,
+        "source_ref": relative,
+        "source_sha256": hashes[relative],
+        "code_ref": current_code_ref,
+    }
+    if status == "CHECKPOINT":
+        source.update(
+            checkpoint_id=data["checkpoint_id"],
+            created_at=data["created_at"],
+            charter_status=data["charter_status"],
+            completed_capability_delta=data.get("completed_capability_delta"),
+            tactical_dag=data["tactical_dag"],
+            evidence_refs=data["evidence_refs"],
+            rejected_approaches=data.get("rejected_approaches"),
+            current_falsifiers=data.get("current_falsifiers"),
+            resource_locks=data.get("resource_locks"),
+            resume_procedure=data["resume_procedure"],
+            strategic_return_required=data.get("strategic_return_required"),
+        )
+    else:
+        source.update(
+            terminal_type=data["terminal_type"],
+            capability_claim=data["capability_claim"],
+            evidence=data["evidence"],
+            independent_review=data.get("independent_review"),
+            known_limitations=data["known_limitations"],
+            in_scope_rework_remaining=data.get("in_scope_rework_remaining"),
+            strategic_return_reason=data["strategic_return_reason"],
+        )
+    return source
+
+
 def posture(
     product_state: dict[str, Any],
     bootstrap: dict[str, Any],
@@ -253,6 +353,14 @@ def reconstruct(root: Path) -> dict[str, Any]:
         "TRACKING_REF_UNRESOLVED",
     }
     active = product_state.get("active_campaign")
+    handoff = canonical_handoff(
+        records,
+        root,
+        active,
+        product_state["current_code_ref"],
+        product_state.get("currentness_set", []),
+        before,
+    )
     forbidden = []
     for value in list(product_state.get("forbidden_actions", [])) + list(
         bootstrap.get("forbidden_actions", [])
@@ -266,6 +374,7 @@ def reconstruct(root: Path) -> dict[str, Any]:
         "posture": canonical_posture,
         "product_state": {
             "status": product_state.get("status"),
+            "state_version": product_state.get("state_version"),
             "current_code_ref": product_state.get("current_code_ref"),
             "current_gate": product_state.get("current_gate"),
             "active_campaign_id": active.get("campaign_id") if active else None,
@@ -286,6 +395,7 @@ def reconstruct(root: Path) -> dict[str, Any]:
             ),
             "next_legal_boundary": bootstrap.get("next_legal_boundary"),
         },
+        "canonical_handoff": handoff,
         "currentness": currentness,
         "git_currentness": git_currentness,
         "continuation_preflight": {

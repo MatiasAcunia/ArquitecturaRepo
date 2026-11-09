@@ -2,11 +2,15 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+from state_tx import state_lock, write_json_set
 
 ROOT = Path(__file__).resolve().parents[1]
 SCAFFOLD = ROOT / "tools" / "scaffold_project.py"
@@ -53,6 +57,31 @@ def load(path: Path) -> dict:
 
 def save(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def superseding_checkpoint(root: Path) -> list[tuple[Path, dict]]:
+    old = load(root / "CHECKPOINT_API_002.json")
+    old["checkpoint_id"] = "CHECKPOINT_API_003"
+    old["created_at"] = "2030-02-02T12:00:00Z"
+    old["completed_capability_delta"] = "Integration corrected; independent review is next."
+    old["rejected_approaches"] = ["Retrying the stale read identity without checking storage lineage"]
+    old["current_falsifiers"] = ["fresh process cannot read the accepted note identity"]
+    old["evidence_refs"].append("evidence/integration-corrected")
+    old["resume_procedure"] = "Validate the corrected integration and request independent review."
+    state = load(root / "PRODUCT_STATE_CURRENT.json")
+    state["state_version"] = "3"
+    state["active_campaign"]["checkpoint_or_terminal_ref"] = "CHECKPOINT_API_003"
+    state["currentness_set"] = [
+        "CHECKPOINT_API_003.json" if ref == "CHECKPOINT_API_002.json" else ref
+        for ref in state["currentness_set"]
+    ]
+    bootstrap = load(root / "CURRENT_BOOTSTRAP_STATE.json")
+    bootstrap["active_checkpoint_or_terminal_ref"] = "CHECKPOINT_API_003"
+    return [
+        (root / "CHECKPOINT_API_003.json", old),
+        (root / "PRODUCT_STATE_CURRENT.json", state),
+        (root / "CURRENT_BOOTSTRAP_STATE.json", bootstrap),
+    ]
 
 
 def main() -> int:
@@ -141,6 +170,22 @@ def main() -> int:
             raise AssertionError("legacy ACTIVE authority cannot certify live remote freshness")
         if active["continuation_preflight"]["effective_posture"] != "CURRENTNESS_RECONCILIATION_REQUIRED":
             raise AssertionError("symbolic legacy source must hold effective execution")
+        handoff = active["canonical_handoff"]
+        if handoff["status"] != "CHECKPOINT" or handoff["checkpoint_id"] != "CHECKPOINT_API_002":
+            raise AssertionError("fresh context did not consume active checkpoint identity")
+        if handoff["current_falsifiers"] != [
+            "created note cannot be read by returned identity",
+            "restart loses accepted note state",
+        ]:
+            raise AssertionError("fresh context lost active checkpoint falsifiers")
+        if handoff["resume_procedure"] != (
+            "Reconstruct campaign authority, verify candidate/ref-002 remains current, "
+            "then continue integration verification."
+        ):
+            raise AssertionError("fresh context lost canonical resume procedure")
+        checkpoint_path = ROOT / "examples" / "active_campaign" / handoff["source_ref"]
+        if handoff["source_sha256"] != hashlib.sha256(checkpoint_path.read_bytes()).hexdigest():
+            raise AssertionError("fresh context checkpoint source hash does not match readback")
 
         terminal = must_reconstruct(
             ROOT / "examples" / "terminal_candidate",
@@ -154,6 +199,86 @@ def main() -> int:
             raise AssertionError("terminal candidate gate not reconstructed")
         if terminal["execution_authority"]["status"] != "SUPERSEDED":
             raise AssertionError("terminal authority status not reconstructed")
+        if terminal["canonical_handoff"]["status"] != "TERMINAL":
+            raise AssertionError("fresh context did not consume the active terminal")
+        if terminal["canonical_handoff"]["known_limitations"] != [
+            "External deployment is outside this campaign."
+        ]:
+            raise AssertionError("fresh context lost terminal limitations")
+
+        superseded = base / "superseded"
+        shutil.copytree(ROOT / "examples" / "active_campaign", superseded)
+        with state_lock(superseded):
+            write_json_set(
+                superseded,
+                "REPLACE_ACTIVE_CHECKPOINT_E4",
+                superseding_checkpoint(superseded),
+            )
+        latest = must_reconstruct(superseded, "checkpoint supersession/new process")
+        latest_handoff = latest["canonical_handoff"]
+        if latest_handoff["checkpoint_id"] != "CHECKPOINT_API_003":
+            raise AssertionError("new context followed superseded checkpoint")
+        if latest_handoff["rejected_approaches"] != [
+            "Retrying the stale read identity without checking storage lineage"
+        ]:
+            raise AssertionError("rejected experiment not persisted through fresh context")
+        if latest_handoff["current_falsifiers"] != [
+            "fresh process cannot read the accepted note identity"
+        ]:
+            raise AssertionError("superseding falsifiers lost in readback")
+        if latest["product_state"]["state_version"] != "3":
+            raise AssertionError("Product State version not recovered")
+        if latest_handoff["source_sha256"] != hashlib.sha256(
+            (superseded / "CHECKPOINT_API_003.json").read_bytes()
+        ).hexdigest():
+            raise AssertionError("superseded source hash not bound to canonical file")
+
+        unbound = base / "unbound"
+        shutil.copytree(superseded, unbound)
+        bad_state = load(unbound / "PRODUCT_STATE_CURRENT.json")
+        bad_state["currentness_set"].remove("CHECKPOINT_API_003.json")
+        save(unbound / "PRODUCT_STATE_CURRENT.json", bad_state)
+        must_fail(unbound, "unbound checkpoint fail closed", "not in the canonical Currentness Set")
+
+        mismatched = base / "mismatched"
+        shutil.copytree(superseded, mismatched)
+        old_bootstrap = load(mismatched / "CURRENT_BOOTSTRAP_STATE.json")
+        old_bootstrap["active_checkpoint_or_terminal_ref"] = "CHECKPOINT_API_002"
+        save(mismatched / "CURRENT_BOOTSTRAP_STATE.json", old_bootstrap)
+        must_fail(mismatched, "mixed-version bootstrap fail closed", "checkpoint/terminal pointer")
+
+        crashed = base / "crashed"
+        shutil.copytree(ROOT / "examples" / "active_campaign", crashed)
+        py = (
+            "import sys; from pathlib import Path; "
+            f"sys.path.insert(0, {str(ROOT / 'tools')!r}); "
+            "from state_tx import state_lock, write_json_set; "
+            f"sys.path.insert(0, {str(ROOT / 'tools')!r}); "
+            "from selftest_reconstruction import superseding_checkpoint; "
+            f"root = Path({str(crashed)!r}); "
+            "write_json_set(root, 'CRASHED_E4', superseding_checkpoint(root))"
+        )
+        crashed_result = subprocess.run(
+            [sys.executable, "-c", py],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            env={**os.environ, "AGENTIC_SDLC_TX_CRASH_AFTER_APPLY": "1"},
+        )
+        if crashed_result.returncode != 92:
+            raise AssertionError(f"expected simulated crash exit 92: {crashed_result.stderr}")
+        must_fail(crashed, "pending supersession fail closed", "pending multi-file transition")
+        recovered = run(
+            str(ROOT / "tools" / "state_tx.py"),
+            "--control-root", str(crashed),
+            "recover",
+        )
+        if recovered.returncode != 0 or "RECOVERED" not in recovered.stdout:
+            raise AssertionError(f"durable state recovery failed: {recovered.stderr}")
+        resumed = must_reconstruct(crashed, "post-crash new context")
+        if resumed["canonical_handoff"] != latest_handoff:
+            raise AssertionError("crash recovery did not restore identical continuation state")
 
         duplicate = base / "duplicate_owner"
         shutil.copytree(fresh, duplicate)
@@ -218,6 +343,10 @@ def main() -> int:
     print("- duplicate owner fails before reconstruction")
     print("- pending transaction fails before reconstruction")
     print("- non-Git source remains explicitly unverified")
+    print("- canonical checkpoint/terminal facts consumed by a fresh process")
+    print("- atomic checkpoint supersession preserves decisions and falsifiers")
+    print("- source hashing, stale pointers and unbound currentness fail closed")
+    print("- crash during multi-file supersession recovers before re-entry")
     return 0
 
 
