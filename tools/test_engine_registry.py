@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from engine_registry import EngineRegistryError, index
+from engine_registry import EngineRegistryError, index, navigation_index
 from cognitive_i4 import CognitiveHold, consult_public_or_synthetic
 
 
@@ -28,6 +28,50 @@ class EngineRegistryTests(unittest.TestCase):
             }))
             with self.assertRaises(EngineRegistryError):
                 index(root)
+
+    def test_portable_navigation_resolves_registered_engine(self):
+        rows = navigation_index(Path(__file__).resolve().parents[1])
+        self.assertEqual([r["engine_id"] for r in rows],
+                         ["arquitectura.portable-goal-engineering"])
+        self.assertEqual(rows[0]["navigation_gaps"], [])
+        self.assertEqual(rows[0]["scope"],
+                         "READ_ONLY_PATH_NAVIGATION__NOT_LIVE_STATE_OR_RELEASE_VERIFICATION")
+
+    def test_navigation_handles_mixed_engine_schema_and_rejects_catalog_drift(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            folder = root / "engines" / "legacy"
+            folder.mkdir(parents=True)
+            (root / "src").mkdir()
+            (root / "src" / "engine.py").write_text("def run(): pass\n", encoding="utf-8")
+            (folder / "CONTRACT.md").write_text("bounded contract\n", encoding="utf-8")
+            (root / "state").mkdir()
+            (root / "state" / "CURRENT.json").write_text("{}\n", encoding="utf-8")
+            payload = {"schema": "tro-engine-manifest-v1", "engine_id": "CTR_AUTHORING",
+                       "status": "HISTORICAL_ONLY", "contract": "engines/legacy/CONTRACT.md",
+                       "implementation_paths": ["src/engine.py::run"]}
+            (folder / "engine.json").write_text(json.dumps(payload), encoding="utf-8")
+            catalog_path = root / "engines" / "catalog.json"
+            catalog = {"schema": "engine-catalog-v1",
+                       "manifests": ["engines/legacy/engine.json"],
+                       "navigation": {"entrypoints": ["state/CURRENT.json"]}}
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            rows = navigation_index(root)
+            self.assertEqual(rows[0]["engine_id"], "CTR_AUTHORING")
+            self.assertEqual(rows[0]["navigation_gaps"], ["TEST_OWNERSHIP_NOT_INDEXED"])
+            self.assertEqual(rows[0]["navigation_entrypoints"], ["state/CURRENT.json"])
+            new_folder = root / "engines" / "unindexed"
+            new_folder.mkdir()
+            (new_folder / "engine.json").write_text(json.dumps(dict(payload, engine_id="second")), encoding="utf-8")
+            with self.assertRaisesRegex(EngineRegistryError, "CATALOG_DIRECTORY_DRIFT"):
+                navigation_index(root)
+            catalog["manifests"].append("engines/unindexed/engine.json")
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            self.assertEqual(len(navigation_index(root)), 2)
+            catalog["navigation"]["entrypoints"] = ["../outside"]
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            with self.assertRaises(EngineRegistryError):
+                navigation_index(root)
 
     def test_provider_effect_fails_closed_without_cost_attestation(self):
         with self.assertRaises(CognitiveHold) as e:

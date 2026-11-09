@@ -48,6 +48,85 @@ def _load(root: Path, relative: str) -> dict:
     return value
 
 
+
+def navigation_index(root: Path) -> list[dict[str, Any]]:
+    """Validate a repository's COMPLETE engine navigation without promoting state.
+
+    Accept legacy TRO and released project manifests alongside portable v1.
+    Release/adoption proofs remain owned by their respective product validators.
+    """
+    root = Path(root).resolve(strict=True)
+    catalog = _load(root, "engines/catalog.json")
+    if catalog.get("schema") != "engine-catalog-v1":
+        raise EngineRegistryError("CATALOG_SCHEMA_UNSUPPORTED")
+    refs = catalog.get("manifests")
+    if not isinstance(refs, list) or not refs or any(not isinstance(r, str) for r in refs):
+        raise EngineRegistryError("CATALOG_MANIFESTS_REQUIRED")
+    if len(refs) != len(set(refs)):
+        raise EngineRegistryError("DUPLICATE_ENGINE_MANIFEST")
+    actual = {p.relative_to(root).as_posix()
+              for p in (root / "engines").glob("*/engine.json") if p.is_file()}
+    if set(refs) != actual:
+        raise EngineRegistryError("CATALOG_DIRECTORY_DRIFT:"
+                                  + json.dumps({"missing": sorted(actual - set(refs)),
+                                                "extra": sorted(set(refs) - actual)}))
+    nav = catalog.get("navigation", {})
+    if not isinstance(nav, dict):
+        raise EngineRegistryError("BAD_NAVIGATION_METADATA")
+    entrypoints = nav.get("entrypoints", [])
+    if not isinstance(entrypoints, list) or len(entrypoints) != len(set(entrypoints)):
+        raise EngineRegistryError("BAD_NAVIGATION_ENTRYPOINTS")
+    for ref in entrypoints:
+        _path(root, ref)
+    results: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for rel in refs:
+        manifest = _load(root, rel)
+        engine_id = manifest.get("engine_id")
+        if not isinstance(engine_id, str) or not engine_id.strip():
+            raise EngineRegistryError("ENGINE_ID_REQUIRED:" + rel)
+        if engine_id in seen:
+            raise EngineRegistryError("DUPLICATE_ENGINE_ID:" + engine_id)
+        seen.add(engine_id)
+        sources = manifest.get("source_paths", manifest.get("implementation_paths"))
+        if not isinstance(sources, list) or not sources:
+            raise EngineRegistryError("ENGINE_SOURCE_PATHS_REQUIRED:" + engine_id)
+        tests = manifest.get("test_refs", [])
+        if not isinstance(tests, list):
+            raise EngineRegistryError("ENGINE_TEST_REFS_MALFORMED:" + engine_id)
+        contract = manifest.get("contract_ref", manifest.get("contract"))
+        if not isinstance(contract, str) or not contract:
+            raise EngineRegistryError("ENGINE_CONTRACT_REQUIRED:" + engine_id)
+        documents = [contract] + [manifest[key] for key in ("design_ref", "changelog_ref")
+                                  if isinstance(manifest.get(key), str)]
+        evidence = manifest.get("evidence_refs", [])
+        if not isinstance(evidence, list):
+            raise EngineRegistryError("ENGINE_EVIDENCE_REFS_MALFORMED:" + engine_id)
+        for ref in sources:
+            if not isinstance(ref, str) or ref.endswith("::"):
+                raise EngineRegistryError("BAD_CODE_REF:" + engine_id)
+            # Historic Python symbol references are navigable through their real file.
+            _path(root, ref.split("::", 1)[0])
+        for ref in [*tests, *documents, *evidence]:
+            _path(root, ref)
+        for key in ("acceptance_receipt", "receipt"):
+            if isinstance(manifest.get(key), str):
+                _path(root, manifest[key])
+        results.append({
+            "engine_id": engine_id,
+            "manifest_ref": rel,
+            "manifest_schema": manifest.get("schema"),
+            "contract_ref": contract,
+            "design_ref": manifest.get("design_ref"),
+            "source_paths": sources,
+            "test_refs": tests,
+            "navigation_entrypoints": entrypoints,
+            "navigation_gaps": ["TEST_OWNERSHIP_NOT_INDEXED"] if not tests else [],
+            "scope": "READ_ONLY_PATH_NAVIGATION__NOT_LIVE_STATE_OR_RELEASE_VERIFICATION",
+        })
+    return sorted(results, key=lambda x: x["engine_id"])
+
+
 def verify_candidate(root: Path, value: dict, *, engine_id: str, source_paths: list[str]) -> dict:
     """Verify a source-pinned pre-release; never upgrade it to RELEASED."""
     root = Path(root).resolve(strict=True)
@@ -206,7 +285,7 @@ def verify_release(root: Path, receipt_ref: str, *, expected_id: str | None = No
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["list", "show", "validate", "verify-release", "history", "diff"])
+    parser.add_argument("command", choices=["list", "show", "validate", "verify-release", "history", "diff", "navigation", "validate-navigation"])
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--engine-id")
     parser.add_argument("--receipt")
@@ -214,7 +293,12 @@ def main() -> int:
     parser.add_argument("--to-receipt")
     args = parser.parse_args()
     try:
-        if args.command == "verify-release":
+        if args.command in {"navigation", "validate-navigation"}:
+            navigation = navigation_index(args.root)
+            result: Any = (navigation if args.command == "navigation"
+                           else {"valid": True, "engine_count": len(navigation),
+                                 "scope": "PATH_NAVIGATION_ONLY_NOT_PRODUCT_ACCEPTANCE"})
+        elif args.command == "verify-release":
             if not args.receipt:
                 parser.error("--receipt is required")
             result: Any = verify_release(args.root, args.receipt)

@@ -3,5 +3,12 @@
   "authority_class": "DISCOVERY_ONLY_NOT_PRODUCT_STATE",
   "manifests": [
     "engines/portable-goal/engine.json"
-  ]
+  ],
+  "navigation": {
+    "scope": "READ_ONLY_PATHS_NOT_PRODUCT_STATE",
+    "entrypoints": [
+      "AGENTS.md",
+      "docs/README.md"
+    ]
+  }
 }
